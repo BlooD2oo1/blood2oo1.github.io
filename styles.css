@@ -1,0 +1,51 @@
+body {
+    background-color: white;
+    font-family: Arial, sans-serif;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    margin: 0;
+}
+
+.menu-container {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 20px;
+    width: 80%;
+    max-width: 800px;
+}
+
+.menu-item {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    background-color: #777;
+    color: #ddd;
+    text-decoration: none;
+    padding: 20px;
+    border-radius: 10px;
+    transition: background 0.3s, transform 0.2s;
+}
+
+.menu-item:hover {
+    background-color: #666;
+    transform: scale(1.05);
+}
+
+.menu-item div {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.menu-item span {
+    font-size: 1.2em;
+    font-weight: bold;
+}
+
+.menu-item p {
+    margin: 5px 0 0;
+    font-size: 0.9em;
+}
