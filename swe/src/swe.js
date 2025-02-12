@@ -4,12 +4,10 @@ import { createShader } from './webglapp.js';
 export class SWE {
     constructor(gl) {
         this.gl = gl;
-        this.initShaders();
-        this.initBuffers();
         this.initRenderTarget();
     }
 
-    initShaders() {
+    loadResources() {
         this.screenVertexShader = createShader(this.gl, this.gl.VERTEX_SHADER, 'src/shaders/vsSWE.glsl');
         this.screenFragmentShader = createShader(this.gl, this.gl.FRAGMENT_SHADER, 'src/shaders/psSWE.glsl');
 
@@ -21,9 +19,7 @@ export class SWE {
         if (!this.gl.getProgramParameter(this.program, this.gl.LINK_STATUS)) {
             console.error(this.gl.getProgramInfoLog(this.program));
         }
-    }
 
-    initBuffers() {
         const quadVertices = new Float32Array([
             -1, -1,
             1, -1,

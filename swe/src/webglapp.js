@@ -1,16 +1,16 @@
-function loadFile(url) {
+
+export function createShader(gl, type, url) {
+
     const xhr = new XMLHttpRequest();
     xhr.open('GET', url, false); // Synchronous request
     xhr.send(null);
     if (xhr.status === 200) {
-        return xhr.responseText;
     } else {
         console.error(`Failed to load file from ${url}`);
         return null;
     }
-}
-export function createShader(gl, type, source) {
-    const shaderSource = loadFile(source);
+
+    const shaderSource = xhr.responseText;
     const shader = gl.createShader(type);
     gl.shaderSource(shader, shaderSource);
     gl.compileShader(shader);
@@ -45,7 +45,10 @@ class WebGLApp {
         }
 
         this.screenPresent = new SWE(this.gl);
-        this.init();
+
+        this.loadResources();
+        this.screenPresent.loadResources();
+        this.startRenderLoop();
     }
 
     updateMousePosition(event) {
@@ -67,7 +70,8 @@ class WebGLApp {
         this.gl.viewport(0, 0, this.canvas.width, this.canvas.height);
     }
 
-    init() {
+    loadResources() {
+
         this.screenVertexShader = createShader(this.gl, this.gl.VERTEX_SHADER, 'src/shaders/vsPresent.glsl');
         this.screenFragmentShader = createShader(this.gl, this.gl.FRAGMENT_SHADER, 'src/shaders/psPresent.glsl');
 
@@ -107,12 +111,14 @@ class WebGLApp {
         this.gl.vertexAttribPointer(texCoordLocation, 2, this.gl.FLOAT, false, 4 * Float32Array.BYTES_PER_ELEMENT, 2 * Float32Array.BYTES_PER_ELEMENT);
     }
 
-    initScreenBuffers() {
-
+    startRenderLoop() {
+        console.log("All resources loaded, starting render loop.");
+        requestAnimationFrame(this.loop.bind(this));
     }
 
-    update() {
-        // Future update logic goes here
+    loop() {
+        this.render();
+        requestAnimationFrame(this.loop.bind(this));
     }
 
     render() {
@@ -144,9 +150,3 @@ class WebGLApp {
 }
 
 const app = new WebGLApp();
-function loop() {
-    app.update();
-    app.render();
-    requestAnimationFrame(loop);
-}
-loop();
