@@ -1,5 +1,29 @@
+function loadFile(url) {
+    const xhr = new XMLHttpRequest();
+    xhr.open('GET', url, false); // Synchronous request
+    xhr.send(null);
+    if (xhr.status === 200) {
+        return xhr.responseText;
+    } else {
+        console.error(`Failed to load file from ${url}`);
+        return null;
+    }
+}
+export function createShader(gl, type, source) {
+    const shaderSource = loadFile(source);
+    const shader = gl.createShader(type);
+    gl.shaderSource(shader, shaderSource);
+    gl.compileShader(shader);
+    if (!gl.getShaderParameter(shader, gl.COMPILE_STATUS)) {
+        console.error(gl.getShaderInfoLog(shader));
+        gl.deleteShader(shader);
+        return null;
+    }
+    return shader;
+}
+
 import * as mat4 from './dependencies/gl-matrix/esm/mat4.js';
-import { ScreenPresent } from './screenpresent.js';
+import { SWE } from './swe.js';
 
 class WebGLApp {
     constructor() {
@@ -12,16 +36,24 @@ class WebGLApp {
         this.resize();
         window.addEventListener("resize", () => this.resize());
 
-        this.screenPresent = new ScreenPresent(this.gl);
-        this.initScreenShader();
-        this.initScreenBuffers();
+        this.mousePosition = { x: 0, y: 0 };
+        this.canvas.addEventListener("mousemove", (event) => this.updateMousePosition(event));
+
+        this.screenPresent = new SWE(this.gl);
+        this.init();
+    }
+
+    updateMousePosition(event) {
+        const rect = this.canvas.getBoundingClientRect();
+        this.mousePosition.x = (event.clientX - rect.left) / rect.width;
+        this.mousePosition.y = (event.clientY - rect.top) / rect.height;
     }
 
     resize() {
         //let iSize = Math.min(window.innerWidth, window.innerHeight);
         const contentRect = this.webapp.getBoundingClientRect();
         let iSize = Math.min(contentRect.width, contentRect.height);
-        
+
         iSize = Math.floor(iSize * 0.9);
         iSize = iSize - (iSize % 256);
         iSize = Math.max(256, iSize);
@@ -30,28 +62,9 @@ class WebGLApp {
         this.gl.viewport(0, 0, this.canvas.width, this.canvas.height);
     }
 
-    initScreenShader() {
-        const vertexShaderSource = `#version 300 es
-        precision highp float;
-        in vec2 position;
-        in vec2 texCoord;
-        out vec2 vTexCoord;
-        void main() {
-            gl_Position = vec4(position, 0.0, 1.0);
-            vTexCoord = texCoord;
-        }`;
-
-        const fragmentShaderSource = `#version 300 es
-        precision highp float;
-        in vec2 vTexCoord;
-        out vec4 outColor;
-        uniform sampler2D uTexture;
-        void main() {
-            outColor = texture(uTexture, vTexCoord);
-        }`;
-
-        this.screenVertexShader = this.createShader(this.gl.VERTEX_SHADER, vertexShaderSource);
-        this.screenFragmentShader = this.createShader(this.gl.FRAGMENT_SHADER, fragmentShaderSource);
+    init() {
+        this.screenVertexShader = createShader(this.gl, this.gl.VERTEX_SHADER, 'src/shaders/vsPresent.glsl');
+        this.screenFragmentShader = createShader(this.gl, this.gl.FRAGMENT_SHADER, 'src/shaders/psPresent.glsl');
 
         this.screenProgram = this.gl.createProgram();
         this.gl.attachShader(this.screenProgram, this.screenVertexShader);
@@ -61,21 +74,7 @@ class WebGLApp {
         if (!this.gl.getProgramParameter(this.screenProgram, this.gl.LINK_STATUS)) {
             console.error(this.gl.getProgramInfoLog(this.screenProgram));
         }
-    }
 
-    createShader(type, source) {
-        const shader = this.gl.createShader(type);
-        this.gl.shaderSource(shader, source);
-        this.gl.compileShader(shader);
-        if (!this.gl.getShaderParameter(shader, this.gl.COMPILE_STATUS)) {
-            console.error(this.gl.getShaderInfoLog(shader));
-            this.gl.deleteShader(shader);
-            return null;
-        }
-        return shader;
-    }
-
-    initScreenBuffers() {
         const quadVertices = new Float32Array([
             // Positions   // TexCoords
             -1, -1, 0, 0,
@@ -103,6 +102,10 @@ class WebGLApp {
         this.gl.vertexAttribPointer(texCoordLocation, 2, this.gl.FLOAT, false, 4 * Float32Array.BYTES_PER_ELEMENT, 2 * Float32Array.BYTES_PER_ELEMENT);
     }
 
+    initScreenBuffers() {
+
+    }
+
     update() {
         // Future update logic goes here
     }
@@ -111,8 +114,10 @@ class WebGLApp {
         // Render to the 512x512 framebuffer
         this.screenPresent.render();
 
+        //set the viewport to the size of the canvas
+        this.gl.viewport(0, 0, this.canvas.width, this.canvas.height);
         // Render the framebuffer texture to the screen
-        this.gl.clearColor(0.0, 0.0, 0.0, 1.0);
+        this.gl.clearColor(0.0, 0.1, 0.0, 1.0);
         this.gl.clear(this.gl.COLOR_BUFFER_BIT);
 
         this.gl.useProgram(this.screenProgram);
@@ -122,6 +127,12 @@ class WebGLApp {
         this.gl.activeTexture(this.gl.TEXTURE0);
         this.gl.bindTexture(this.gl.TEXTURE_2D, texture);
         this.gl.uniform1i(this.gl.getUniformLocation(this.screenProgram, "uTexture"), 0);
+        this.gl.texParameteri(this.gl.TEXTURE_2D, this.gl.TEXTURE_MIN_FILTER, this.gl.NEAREST);
+        this.gl.texParameteri(this.gl.TEXTURE_2D, this.gl.TEXTURE_MAG_FILTER, this.gl.NEAREST);
+
+        // Pass mouse position to the fragment shader
+        this.gl.uniform2f(this.gl.getUniformLocation(this.screenProgram, "uMousePosition"), this.mousePosition.x, 1.0-this.mousePosition.y);
+
 
         this.gl.drawArrays(this.gl.TRIANGLES, 0, 6);
     }

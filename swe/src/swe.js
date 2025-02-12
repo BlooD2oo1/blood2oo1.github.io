@@ -1,5 +1,7 @@
+import { createShader } from './webglapp.js';
+
 // screenpresent.js
-export class ScreenPresent {
+export class SWE {
     constructor(gl) {
         this.gl = gl;
         this.initShaders();
@@ -8,52 +10,17 @@ export class ScreenPresent {
     }
 
     initShaders() {
-        const vertexShaderSource =
-            `#version 300 es
-        precision highp float;
-        in vec2 position;
-        out vec2 vTexCoord;
-        void main()
-        {
-            gl_Position = vec4(position, 0.0, 1.0);
-            vTexCoord = position * 0.5 + 0.5; // Convert from [-1, 1] to [0, 1]
-        }
-        `;
-
-        const fragmentShaderSource =
-            `#version 300 es
-        precision highp float;
-        in vec2 vTexCoord;
-        out vec4 outColor;
-        void main()
-        {
-            outColor = vec4(vTexCoord, 0.0, 1.0);
-        }
-        `;
-
-        this.vertexShader = this.createShader(this.gl.VERTEX_SHADER, vertexShaderSource);
-        this.fragmentShader = this.createShader(this.gl.FRAGMENT_SHADER, fragmentShaderSource);
+        this.screenVertexShader = createShader(this.gl, this.gl.VERTEX_SHADER, 'src/shaders/vsSWE.glsl');
+        this.screenFragmentShader = createShader(this.gl, this.gl.FRAGMENT_SHADER, 'src/shaders/psSWE.glsl');
 
         this.program = this.gl.createProgram();
-        this.gl.attachShader(this.program, this.vertexShader);
-        this.gl.attachShader(this.program, this.fragmentShader);
+        this.gl.attachShader(this.program, this.screenVertexShader);
+        this.gl.attachShader(this.program, this.screenFragmentShader);
         this.gl.linkProgram(this.program);
 
         if (!this.gl.getProgramParameter(this.program, this.gl.LINK_STATUS)) {
             console.error(this.gl.getProgramInfoLog(this.program));
         }
-    }
-
-    createShader(type, source) {
-        const shader = this.gl.createShader(type);
-        this.gl.shaderSource(shader, source);
-        this.gl.compileShader(shader);
-        if (!this.gl.getShaderParameter(shader, this.gl.COMPILE_STATUS)) {
-            console.error(this.gl.getShaderInfoLog(shader));
-            this.gl.deleteShader(shader);
-            return null;
-        }
-        return shader;
     }
 
     initBuffers() {
@@ -84,7 +51,7 @@ export class ScreenPresent {
 
         this.renderTexture = this.gl.createTexture();
         this.gl.bindTexture(this.gl.TEXTURE_2D, this.renderTexture);
-        this.gl.texImage2D(this.gl.TEXTURE_2D, 0, this.gl.RGBA, 512, 512, 0, this.gl.RGBA, this.gl.UNSIGNED_BYTE, null);
+        this.gl.texImage2D(this.gl.TEXTURE_2D, 0, this.gl.RGBA, 256, 256, 0, this.gl.RGBA, this.gl.UNSIGNED_BYTE, null);
         this.gl.texParameteri(this.gl.TEXTURE_2D, this.gl.TEXTURE_MIN_FILTER, this.gl.LINEAR);
         this.gl.texParameteri(this.gl.TEXTURE_2D, this.gl.TEXTURE_MAG_FILTER, this.gl.LINEAR);
 
