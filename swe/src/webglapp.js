@@ -1,5 +1,4 @@
-
-export function createShader(gl, type, url) {
+export function createShaderAsync(gl, type, url) {
 
     const xhr = new XMLHttpRequest();
     xhr.open('GET', url, false); // Synchronous request
@@ -21,6 +20,7 @@ export function createShader(gl, type, url) {
     }
     return shader;
 }
+
 
 import * as mat4 from './dependencies/gl-matrix/esm/mat4.js';
 import { SWE } from './swe.js';
@@ -72,8 +72,8 @@ class WebGLApp {
 
     loadResources() {
 
-        this.screenVertexShader = createShader(this.gl, this.gl.VERTEX_SHADER, 'src/shaders/vsPresent.glsl');
-        this.screenFragmentShader = createShader(this.gl, this.gl.FRAGMENT_SHADER, 'src/shaders/psPresent.glsl');
+        this.screenVertexShader = createShaderAsync(this.gl, this.gl.VERTEX_SHADER, 'src/shaders/vsPresent.glsl');
+        this.screenFragmentShader = createShaderAsync(this.gl, this.gl.FRAGMENT_SHADER, 'src/shaders/psPresent.glsl');
 
         this.screenProgram = this.gl.createProgram();
         this.gl.attachShader(this.screenProgram, this.screenVertexShader);
