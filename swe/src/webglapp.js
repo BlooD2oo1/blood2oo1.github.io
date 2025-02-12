@@ -39,6 +39,11 @@ class WebGLApp {
         this.mousePosition = { x: 0, y: 0 };
         this.canvas.addEventListener("mousemove", (event) => this.updateMousePosition(event));
 
+        const ext = this.gl.getExtension("EXT_color_buffer_float");
+        if (!ext) {
+            console.error("EXT_color_buffer_float extension not supported!");
+        }
+
         this.screenPresent = new SWE(this.gl);
         this.init();
     }
