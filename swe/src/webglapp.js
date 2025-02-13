@@ -1,3 +1,5 @@
+import * as mat4 from './dependencies/gl-matrix/esm/mat4.js';
+
 import { Present } from './present.js';
 
 export async function loadShader(gl, type, url) {
@@ -26,9 +28,6 @@ export async function loadShader(gl, type, url) {
         return null;
     }
 }
-
-import * as mat4 from './dependencies/gl-matrix/esm/mat4.js';
-
 class WebGLApp {
     constructor() {
         this.canvas = document.createElement("canvas");
@@ -36,17 +35,20 @@ class WebGLApp {
         this.webapp = document.querySelector(".webapp");
         this.webapp.appendChild(this.canvas);
         //document.body.appendChild(this.canvas);
-        this.gl = this.canvas.getContext("webgl2");
-        this.resize();
-        window.addEventListener("resize", () => this.resize());
 
-        this.mousePosition = { x: 0, y: 0 };
-        this.canvas.addEventListener("mousemove", (event) => this.updateMousePosition(event));
+        this.gl = this.canvas.getContext("webgl2");
 
         const ext = this.gl.getExtension("EXT_color_buffer_float");
         if (!ext) {
             console.error("EXT_color_buffer_float extension not supported!");
         }
+
+        this.resize();
+
+        window.addEventListener("resize", () => this.resize());
+
+        this.mousePosition = { x: 0, y: 0 };
+        this.canvas.addEventListener("mousemove", (event) => this.updateMousePosition(event));
 
         this.showLoadingMessage();
 

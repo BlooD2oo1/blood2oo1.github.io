@@ -8,6 +8,10 @@ uniform vec2 uMousePosition;
 void main()
 {
     outColor = texture(uTexture, vTexCoord);
-    outColor.b += pow( 1.0 - length( vTexCoord - uMousePosition ), 4.0 );
+    outColor.rgb += pow( max( 0.0, ( 0.05 - length( vTexCoord - uMousePosition ) )/0.05 ), 5.0 );
     outColor.a = 1.0;
+
+    outColor.rgb = max(outColor.rgb, 0.0);
+    outColor.rgb = 1.0 - exp(-outColor.rgb);
+    outColor.rgb = pow(outColor.rgb, vec3( 0.454545 ) );
 }
