@@ -1,26 +1,30 @@
-export function createShaderAsync(gl, type, url) {
 
-    const xhr = new XMLHttpRequest();
-    xhr.open('GET', url, false); // Synchronous request
-    xhr.send(null);
-    if (xhr.status === 200) {
-    } else {
-        console.error(`Failed to load file from ${url}`);
+export async function loadShader(gl, type, url) {
+    console.log(url, "\nloading...\n");
+    try {
+        const response = await fetch(url);
+        if (!response.ok) {
+            throw new Error(`Failed to fetch shader: ${url}`);
+        }
+        const source = await response.text();
+
+        const shader = gl.createShader(type);
+        gl.shaderSource(shader, source);
+        gl.compileShader(shader);
+
+        if (!gl.getShaderParameter(shader, gl.COMPILE_STATUS)) {
+            console.error(`Error compiling shader ${url}:`, gl.getShaderInfoLog(shader));
+            gl.deleteShader(shader);
+            return null;
+        }
+
+        console.log(url, "\nloaded!\n");
+        return shader;
+    } catch (error) {
+        console.error(error);
         return null;
     }
-
-    const shaderSource = xhr.responseText;
-    const shader = gl.createShader(type);
-    gl.shaderSource(shader, shaderSource);
-    gl.compileShader(shader);
-    if (!gl.getShaderParameter(shader, gl.COMPILE_STATUS)) {
-        console.error(gl.getShaderInfoLog(shader));
-        gl.deleteShader(shader);
-        return null;
-    }
-    return shader;
 }
-
 
 import * as mat4 from './dependencies/gl-matrix/esm/mat4.js';
 import { SWE } from './swe.js';
@@ -46,34 +50,20 @@ class WebGLApp {
 
         this.screenPresent = new SWE(this.gl);
 
-        this.loadResources();
-        this.screenPresent.loadResources();
-        this.startRenderLoop();
+        this.showLoadingMessage();
+        this.init();
     }
 
-    updateMousePosition(event) {
-        const rect = this.canvas.getBoundingClientRect();
-        this.mousePosition.x = (event.clientX - rect.left) / rect.width;
-        this.mousePosition.y = (event.clientY - rect.top) / rect.height;
-    }
+    async init() {
 
-    resize() {
-        //let iSize = Math.min(window.innerWidth, window.innerHeight);
-        const contentRect = this.webapp.getBoundingClientRect();
-        let iSize = Math.min(contentRect.width, contentRect.height);
+        const [vs, ps] = await Promise.all([
+            loadShader(this.gl, this.gl.VERTEX_SHADER, 'src/shaders/vsPresent.glsl'),
+            loadShader(this.gl, this.gl.FRAGMENT_SHADER, 'src/shaders/psPresent.glsl'),
+            this.screenPresent.init()
+        ]);
 
-        iSize = Math.floor(iSize * 0.9);
-        iSize = iSize - (iSize % 256);
-        iSize = Math.max(256, iSize);
-        this.canvas.width = iSize;
-        this.canvas.height = iSize;
-        this.gl.viewport(0, 0, this.canvas.width, this.canvas.height);
-    }
-
-    loadResources() {
-
-        this.screenVertexShader = createShaderAsync(this.gl, this.gl.VERTEX_SHADER, 'src/shaders/vsPresent.glsl');
-        this.screenFragmentShader = createShaderAsync(this.gl, this.gl.FRAGMENT_SHADER, 'src/shaders/psPresent.glsl');
+        this.screenVertexShader = vs;
+        this.screenFragmentShader = ps;
 
         this.screenProgram = this.gl.createProgram();
         this.gl.attachShader(this.screenProgram, this.screenVertexShader);
@@ -109,16 +99,47 @@ class WebGLApp {
 
         this.gl.enableVertexAttribArray(texCoordLocation);
         this.gl.vertexAttribPointer(texCoordLocation, 2, this.gl.FLOAT, false, 4 * Float32Array.BYTES_PER_ELEMENT, 2 * Float32Array.BYTES_PER_ELEMENT);
-    }
 
-    startRenderLoop() {
         console.log("All resources loaded, starting render loop.");
-        requestAnimationFrame(this.loop.bind(this));
+        this.hideLoadingMessage();
+        requestAnimationFrame(this.render.bind(this));        
     }
 
-    loop() {
-        this.render();
-        requestAnimationFrame(this.loop.bind(this));
+    showLoadingMessage() {
+        this.loadingDiv = document.createElement("div");
+        this.loadingDiv.innerText = "Loading...";
+        this.loadingDiv.style.position = "absolute";
+        this.loadingDiv.style.top = "50%";
+        this.loadingDiv.style.left = "50%";
+        this.loadingDiv.style.transform = "translate(-50%, -50%)";
+        this.loadingDiv.style.fontSize = "24px";
+        this.loadingDiv.style.color = "white";
+        document.body.appendChild(this.loadingDiv);
+    }
+
+    hideLoadingMessage() {
+        if (this.loadingDiv) {
+            document.body.removeChild(this.loadingDiv);
+        }
+    }
+
+    updateMousePosition(event) {
+        const rect = this.canvas.getBoundingClientRect();
+        this.mousePosition.x = (event.clientX - rect.left) / rect.width;
+        this.mousePosition.y = (event.clientY - rect.top) / rect.height;
+    }
+
+    resize() {
+        //let iSize = Math.min(window.innerWidth, window.innerHeight);
+        const contentRect = this.webapp.getBoundingClientRect();
+        let iSize = Math.min(contentRect.width, contentRect.height);
+
+        iSize = Math.floor(iSize * 0.9);
+        iSize = iSize - (iSize % 256);
+        iSize = Math.max(256, iSize);
+        this.canvas.width = iSize;
+        this.canvas.height = iSize;
+        this.gl.viewport(0, 0, this.canvas.width, this.canvas.height);
     }
 
     render() {
@@ -146,6 +167,8 @@ class WebGLApp {
 
 
         this.gl.drawArrays(this.gl.TRIANGLES, 0, 6);
+
+        requestAnimationFrame(this.render.bind(this));
     }
 }
 
