@@ -1,28 +1,5 @@
 import { loadShader } from './webglapp.js';
 
-export function createShader(gl, type, url) {
-
-    const xhr = new XMLHttpRequest();
-    xhr.open('GET', url, false); // Synchronous request
-    xhr.send(null);
-    if (xhr.status === 200) {
-    } else {
-        console.error(`Failed to load file from ${url}`);
-        return null;
-    }
-
-    const shaderSource = xhr.responseText;
-    const shader = gl.createShader(type);
-    gl.shaderSource(shader, shaderSource);
-    gl.compileShader(shader);
-    if (!gl.getShaderParameter(shader, gl.COMPILE_STATUS)) {
-        console.error(gl.getShaderInfoLog(shader));
-        gl.deleteShader(shader);
-        return null;
-    }
-    return shader;
-}
-// screenpresent.js
 export class SWE {
     constructor(gl) {
         this.gl = gl;
