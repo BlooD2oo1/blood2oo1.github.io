@@ -68,6 +68,7 @@ class WebGLApp {
 
         this.mousePosition = { x: 0, y: 0 };
         this.canvas.addEventListener("mousemove", (event) => this.updateMousePosition(event));
+        this.canvas.addEventListener("click", (event) => this.handleMouseClick(event));
 
         this.createUIElements();
 
@@ -194,6 +195,15 @@ class WebGLApp {
         const rect = this.canvas.getBoundingClientRect();
         this.mousePosition.x = (event.clientX - rect.left);
         this.mousePosition.y = rect.height - (event.clientY - rect.top);
+    }
+
+    handleMouseClick(event) {
+        const rect = this.canvas.getBoundingClientRect();
+        const x = event.clientX - rect.left;
+        const y = rect.height - (event.clientY - rect.top);
+        //console.log(`Mouse clicked at: (${x}, ${y})`);
+        // Add your processing logic here
+        this.Present.SWE.renderInit();
     }
 
     resize() {
