@@ -122,68 +122,41 @@ export class SWE {
         
         this.gl.viewport(0, 0, this.width, this.height);
 
-        {
-            this.gl.bindFramebuffer(this.gl.FRAMEBUFFER, this.currentFramebuffer);
+        // Pass 01
+        this.gl.bindFramebuffer(this.gl.FRAMEBUFFER, this.currentFramebuffer);
+        this.gl.useProgram(this.program_SWEPass01);
+        this.gl.bindVertexArray(this.vao);
+        this.gl.activeTexture(this.gl.TEXTURE0);
+        this.gl.bindTexture(this.gl.TEXTURE_2D, this.otherTexture);
+        this.gl.uniform1i(this.gl.getUniformLocation(this.program_SWEPass01, "uTexture"), 0);
+        this.gl.uniform2f(this.gl.getUniformLocation(this.program_SWEPass01, "uRTRes"), this.getWidth(), this.getHeight());
+        this.gl.drawArrays(this.gl.TRIANGLES, 0, 6);
+        [this.currentFramebuffer, this.otherFramebuffer] = [this.otherFramebuffer, this.currentFramebuffer];
+        [this.currentTexture, this.otherTexture] = [this.otherTexture, this.currentTexture];
 
-            // Render to the framebuffer
-            this.gl.useProgram(this.program_SWEPass01);
-            this.gl.bindVertexArray(this.vao);
+        // Pass 02
+        this.gl.bindFramebuffer(this.gl.FRAMEBUFFER, this.currentFramebuffer);
+        this.gl.useProgram(this.program_SWEPass02);
+        this.gl.bindVertexArray(this.vao);
+        this.gl.activeTexture(this.gl.TEXTURE0);
+        this.gl.bindTexture(this.gl.TEXTURE_2D, this.otherTexture);
+        this.gl.uniform1i(this.gl.getUniformLocation(this.program_SWEPass02, "uTexture"), 0);
+        this.gl.uniform2f(this.gl.getUniformLocation(this.program_SWEPass02, "uRTRes"), this.getWidth(), this.getHeight());
+        this.gl.drawArrays(this.gl.TRIANGLES, 0, 6);
+        [this.currentFramebuffer, this.otherFramebuffer] = [this.otherFramebuffer, this.currentFramebuffer];
+        [this.currentTexture, this.otherTexture] = [this.otherTexture, this.currentTexture];
 
-            const texture = this.otherTexture;
-            this.gl.activeTexture(this.gl.TEXTURE0);
-            this.gl.bindTexture(this.gl.TEXTURE_2D, texture);
-            this.gl.uniform1i(this.gl.getUniformLocation(this.program_SWEPass01, "uTexture"), 0);
-            this.gl.texParameteri(this.gl.TEXTURE_2D, this.gl.TEXTURE_MIN_FILTER, this.gl.NEAREST);
-            this.gl.texParameteri(this.gl.TEXTURE_2D, this.gl.TEXTURE_MAG_FILTER, this.gl.NEAREST);
-
-            this.gl.drawArrays(this.gl.TRIANGLES, 0, 6);
-
-            // Swap the framebuffers and textures
-            [this.currentFramebuffer, this.otherFramebuffer] = [this.otherFramebuffer, this.currentFramebuffer];
-            [this.currentTexture, this.otherTexture] = [this.otherTexture, this.currentTexture];
-        }
-
-        {
-            this.gl.bindFramebuffer(this.gl.FRAMEBUFFER, this.currentFramebuffer);
-
-            // Render to the framebuffer
-            this.gl.useProgram(this.program_SWEPass02);
-            this.gl.bindVertexArray(this.vao);
-
-            const texture = this.otherTexture;
-            this.gl.activeTexture(this.gl.TEXTURE0);
-            this.gl.bindTexture(this.gl.TEXTURE_2D, texture);
-            this.gl.uniform1i(this.gl.getUniformLocation(this.program_SWEPass02, "uTexture"), 0);
-            this.gl.texParameteri(this.gl.TEXTURE_2D, this.gl.TEXTURE_MIN_FILTER, this.gl.NEAREST);
-            this.gl.texParameteri(this.gl.TEXTURE_2D, this.gl.TEXTURE_MAG_FILTER, this.gl.NEAREST);
-
-            this.gl.drawArrays(this.gl.TRIANGLES, 0, 6);
-
-            // Swap the framebuffers and textures
-            [this.currentFramebuffer, this.otherFramebuffer] = [this.otherFramebuffer, this.currentFramebuffer];
-            [this.currentTexture, this.otherTexture] = [this.otherTexture, this.currentTexture];
-        }
-
-        {
-            this.gl.bindFramebuffer(this.gl.FRAMEBUFFER, this.currentFramebuffer);
-
-            // Render to the framebuffer
-            this.gl.useProgram(this.program_SWEPass03);
-            this.gl.bindVertexArray(this.vao);
-
-            const texture = this.otherTexture;
-            this.gl.activeTexture(this.gl.TEXTURE0);
-            this.gl.bindTexture(this.gl.TEXTURE_2D, texture);
-            this.gl.uniform1i(this.gl.getUniformLocation(this.program_SWEPass03, "uTexture"), 0);
-            this.gl.texParameteri(this.gl.TEXTURE_2D, this.gl.TEXTURE_MIN_FILTER, this.gl.NEAREST);
-            this.gl.texParameteri(this.gl.TEXTURE_2D, this.gl.TEXTURE_MAG_FILTER, this.gl.NEAREST);
-
-            this.gl.drawArrays(this.gl.TRIANGLES, 0, 6);
-
-            // Swap the framebuffers and textures
-            [this.currentFramebuffer, this.otherFramebuffer] = [this.otherFramebuffer, this.currentFramebuffer];
-            [this.currentTexture, this.otherTexture] = [this.otherTexture, this.currentTexture];
-        }
+        // Pass 03
+        this.gl.bindFramebuffer(this.gl.FRAMEBUFFER, this.currentFramebuffer);
+        this.gl.useProgram(this.program_SWEPass03);
+        this.gl.bindVertexArray(this.vao);
+        this.gl.activeTexture(this.gl.TEXTURE0);
+        this.gl.bindTexture(this.gl.TEXTURE_2D, this.otherTexture);
+        this.gl.uniform1i(this.gl.getUniformLocation(this.program_SWEPass03, "uTexture"), 0);
+        this.gl.uniform2f(this.gl.getUniformLocation(this.program_SWEPass03, "uRTRes"), this.getWidth(), this.getHeight());
+        this.gl.drawArrays(this.gl.TRIANGLES, 0, 6);
+        [this.currentFramebuffer, this.otherFramebuffer] = [this.otherFramebuffer, this.currentFramebuffer];
+        [this.currentTexture, this.otherTexture] = [this.otherTexture, this.currentTexture];
 
         // Unbind the framebuffer
         this.gl.bindFramebuffer(this.gl.FRAMEBUFFER, null);

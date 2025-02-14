@@ -3,8 +3,11 @@ precision highp float;
 in vec2 vTexCoord;
 out vec4 outColor;
 uniform sampler2D uTexture;
+uniform vec2 uRTRes;
 
 void main()
 {
-    outColor = texture(uTexture, vTexCoord*vec2(0.98));
+    ivec2 tc = ivec2(vTexCoord*uRTRes);
+    vec4 vTex = texelFetch(uTexture, tc, 0);
+    outColor = vTex;
 }

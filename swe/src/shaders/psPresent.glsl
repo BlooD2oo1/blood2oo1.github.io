@@ -3,10 +3,11 @@ precision highp float;
 in vec2 vTexCoord;
 out vec4 outColor;
 uniform sampler2D uTexture;
+uniform vec2 uRTRes;
 uniform vec2 uMousePosition;
 uniform float fSlider1;
 uniform float fSlider2;
-uniform vec2 uRTRes;
+
 
 void main()
 {
