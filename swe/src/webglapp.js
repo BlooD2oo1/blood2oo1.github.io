@@ -2,7 +2,7 @@ import * as mat4 from './dependencies/gl-matrix/esm/mat4.js';
 
 import { Present } from './present.js';
 
-export async function loadShader(gl, type, url) {
+async function loadShader(gl, type, url) {
     console.log(url, "\nloading...\n");
     try {
         const response = await fetch(url);
@@ -28,6 +28,25 @@ export async function loadShader(gl, type, url) {
         return null;
     }
 }
+
+export async function createShaderProgram(gl, vsPath, fsPath) {
+    const [vs, ps] = await Promise.all([
+        loadShader(gl, gl.VERTEX_SHADER, vsPath),
+        loadShader(gl, gl.FRAGMENT_SHADER, fsPath)
+    ]);
+
+    const program = gl.createProgram();
+    gl.attachShader(program, vs);
+    gl.attachShader(program, ps);
+    gl.linkProgram(program);
+
+    if (!gl.getProgramParameter(program, gl.LINK_STATUS)) {
+        console.error(gl.getProgramInfoLog(program));
+    }
+
+    return [vs, ps, program];
+}
+
 class WebGLApp {
     constructor() {
         this.canvas = document.createElement("canvas");
@@ -173,8 +192,8 @@ class WebGLApp {
 
     updateMousePosition(event) {
         const rect = this.canvas.getBoundingClientRect();
-        this.mousePosition.x = (event.clientX - rect.left) / rect.width;
-        this.mousePosition.y = (event.clientY - rect.top) / rect.height;
+        this.mousePosition.x = (event.clientX - rect.left);
+        this.mousePosition.y = rect.height - (event.clientY - rect.top);
     }
 
     resize() {

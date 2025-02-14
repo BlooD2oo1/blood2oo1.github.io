@@ -11,22 +11,21 @@ uniform vec2 uRTRes;
 void main()
 {
     // Get the texture resolution
-    vec2 textureResolution = vec2(textureSize(uTexture, 0));
+    vec2 vTexRes = vec2(textureSize(uTexture, 0));
 
     // Calculate the pixel coordinates
-    vec2 pixelCoord = vTexCoord / textureResolution;
+    vec2 pixelCoord = vTexCoord * uRTRes;
 
     // Convert pixel coordinates back to texture coordinates
-    vec2 texCoord = pixelCoord * uRTRes;
+    vec2 texCoord = pixelCoord / vTexRes;
 
     outColor = vec4(0.1, 0.1, 0.1, 1.0);
     if ( texCoord.x >= 0.0 && texCoord.x < 1.0 && texCoord.y >= 0.0 && texCoord.y < 1.0 )
     {
         outColor = texture(uTexture, texCoord);
-    };
-    
+    };    
 
-    outColor.rgb += pow( max( 0.0, ( 0.05 - length( vTexCoord - uMousePosition ) )/0.05 ), 5.0 );
+    outColor.rgb += pow( max( 0.0, ( 20.0 - length( (pixelCoord - uMousePosition) ) )/20.0 ), 5.0 );
     outColor.a = 1.0;
 
     outColor.r *= fSlider1;
