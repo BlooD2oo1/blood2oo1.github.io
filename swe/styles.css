@@ -16,7 +16,7 @@ header {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    width: 100%;
+    width: calc(100% - 4rem); /* Adjust the width to fit within the viewport */
     max-width: 1200px;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
     border-radius: 10px;
@@ -35,6 +35,16 @@ nav a {
 
 nav a:hover {
     text-decoration: underline;
+}
+
+.content {
+    padding: 20px;
+    width: calc(100% - 4rem); /* Adjust the width to fit within the viewport */
+    max-width: 800px;
+    text-align: center;
+    background: white;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    border-radius: 5px;
 }
 
 canvas {
@@ -79,16 +89,6 @@ input[type="range"]::-moz-range-thumb {
 .slider-container label,
 .slider-container span {
     font-size: 0.6rem; /* Smaller font size for labels and values */
-}
-
-.content {
-    padding: 20px;
-    width: 100%;
-    max-width: 800px;
-    text-align: center;
-    background: white;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-    border-radius: 10px;
 }
 
 .webapp {

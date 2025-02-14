@@ -16,7 +16,7 @@ header {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    width: 100%;
+    width: calc(100% - 4rem);
     max-width: 1200px;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
     border-radius: 10px;
@@ -39,10 +39,10 @@ nav a:hover {
 
 .content {
     padding: 20px;
-    width: 100%;
+    width: calc(100% - 4rem);
     max-width: 800px;
     text-align: center;
     background: white;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-    border-radius: 10px;
+    border-radius: 5px;
 }
