@@ -15,18 +15,19 @@ void main()
     vec2 vTexRes = vec2(textureSize(uTexture, 0));
 
     // Calculate the pixel coordinates
-    vec2 pixelCoord = vTexCoord * uRTRes;
+    vec2 vPixelCoord = vTexCoord * uRTRes;
+    ivec2 viPixelCoord = ivec2(vPixelCoord);
 
     // Convert pixel coordinates back to texture coordinates
-    vec2 texCoord = pixelCoord / vTexRes;
+    vec2 texCoord = vPixelCoord / vTexRes;
 
     outColor = vec4(0.1, 0.1, 0.1, 1.0);
     if ( texCoord.x >= 0.0 && texCoord.x < 1.0 && texCoord.y >= 0.0 && texCoord.y < 1.0 )
     {
-        outColor = texture(uTexture, texCoord);
+        outColor = texelFetch(uTexture, viPixelCoord, 0);
     };    
 
-    outColor.rgb += pow( max( 0.0, ( 20.0 - length( (pixelCoord - uMousePosition) ) )/20.0 ), 5.0 );
+    outColor.rgb += pow( max( 0.0, ( 20.0 - length( (vPixelCoord - uMousePosition) ) )/20.0 ), 5.0 );
     outColor.a = 1.0;
 
     outColor.r *= fSlider1;

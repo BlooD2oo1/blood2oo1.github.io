@@ -62,6 +62,11 @@ class WebGLApp {
             console.error("EXT_color_buffer_float extension not supported!");
         }
 
+        const floatLinearExt = this.gl.getExtension("OES_texture_float_linear");
+        if (!floatLinearExt) {
+            console.error("OES_texture_float_linear extension not supported!");
+        }
+
         this.resize();
 
         window.addEventListener("resize", () => this.resize());

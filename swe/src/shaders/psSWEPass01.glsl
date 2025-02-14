@@ -9,7 +9,7 @@ uniform vec2 uRTRes;
 
 void main()
 {
-    const float g_fGridSizeInMeter = 1.5;
+    const float g_fGridSizeInMeter = 5.0;
     const float g_fElapsedTimeInSec = 1.0;
     const float g_fAdvectSpeed = -1.0;
     const float g_fG = 10.0;
@@ -25,6 +25,5 @@ void main()
     vec2 v4 = textureLod(uTexture, vTexCoord - ( v3 * dt ) / uRTRes, 0.0 ).xy;
     vec2 v = (1.0 * v1 + 2.0 * v2 + 2.0 * v3 + 1.0 * v4) / 6.0;
     
-    v = vec2( 0.8, 0.7 );
     outColor = textureLod(uTexture, vTexCoord + ( v * dt ) / uRTRes, 0.0);
 }

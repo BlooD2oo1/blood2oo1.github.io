@@ -129,6 +129,8 @@ export class SWE {
         this.gl.activeTexture(this.gl.TEXTURE0);
         this.gl.bindTexture(this.gl.TEXTURE_2D, this.otherTexture);
         this.gl.uniform1i(this.gl.getUniformLocation(this.program_SWEPass01, "uTexture"), 0);
+        this.gl.texParameteri(this.gl.TEXTURE_2D, this.gl.TEXTURE_MIN_FILTER, this.gl.LINEAR);
+        this.gl.texParameteri(this.gl.TEXTURE_2D, this.gl.TEXTURE_MAG_FILTER, this.gl.LINEAR);
         this.gl.uniform2f(this.gl.getUniformLocation(this.program_SWEPass01, "uRTRes"), this.getWidth(), this.getHeight());
         this.gl.drawArrays(this.gl.TRIANGLES, 0, 6);
         [this.currentFramebuffer, this.otherFramebuffer] = [this.otherFramebuffer, this.currentFramebuffer];
@@ -141,6 +143,8 @@ export class SWE {
         this.gl.activeTexture(this.gl.TEXTURE0);
         this.gl.bindTexture(this.gl.TEXTURE_2D, this.otherTexture);
         this.gl.uniform1i(this.gl.getUniformLocation(this.program_SWEPass02, "uTexture"), 0);
+        this.gl.texParameteri(this.gl.TEXTURE_2D, this.gl.TEXTURE_MIN_FILTER, this.gl.LINEAR);
+        this.gl.texParameteri(this.gl.TEXTURE_2D, this.gl.TEXTURE_MAG_FILTER, this.gl.LINEAR);
         this.gl.uniform2f(this.gl.getUniformLocation(this.program_SWEPass02, "uRTRes"), this.getWidth(), this.getHeight());
         this.gl.drawArrays(this.gl.TRIANGLES, 0, 6);
         [this.currentFramebuffer, this.otherFramebuffer] = [this.otherFramebuffer, this.currentFramebuffer];
@@ -153,6 +157,8 @@ export class SWE {
         this.gl.activeTexture(this.gl.TEXTURE0);
         this.gl.bindTexture(this.gl.TEXTURE_2D, this.otherTexture);
         this.gl.uniform1i(this.gl.getUniformLocation(this.program_SWEPass03, "uTexture"), 0);
+        this.gl.texParameteri(this.gl.TEXTURE_2D, this.gl.TEXTURE_MIN_FILTER, this.gl.LINEAR);
+        this.gl.texParameteri(this.gl.TEXTURE_2D, this.gl.TEXTURE_MAG_FILTER, this.gl.LINEAR);
         this.gl.uniform2f(this.gl.getUniformLocation(this.program_SWEPass03, "uRTRes"), this.getWidth(), this.getHeight());
         this.gl.drawArrays(this.gl.TRIANGLES, 0, 6);
         [this.currentFramebuffer, this.otherFramebuffer] = [this.otherFramebuffer, this.currentFramebuffer];
