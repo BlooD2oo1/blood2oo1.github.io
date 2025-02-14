@@ -50,6 +50,8 @@ class WebGLApp {
         this.mousePosition = { x: 0, y: 0 };
         this.canvas.addEventListener("mousemove", (event) => this.updateMousePosition(event));
 
+        this.createUIElements();
+
         this.showLoadingMessage();
 
         this.Present = new Present(this.gl);
@@ -57,13 +59,98 @@ class WebGLApp {
         this.init();
     }
 
-    async init() {
+    createUIElements() {
+        // Create a container for the UI elements
+        this.uiContainer = document.createElement('div');
+        this.uiContainer.className = 'gui-container';
+        this.webapp.appendChild(this.uiContainer); // Append to webapp, not canvas
 
+        // Create buttons
+        this.button1 = document.createElement('button');
+        this.button1.id = 'button1';
+        this.button1.innerText = 'Button 1';
+        this.uiContainer.appendChild(this.button1);
+
+        this.button2 = document.createElement('button');
+        this.button2.id = 'button2';
+        this.button2.innerText = 'Button 2';
+        this.uiContainer.appendChild(this.button2);
+
+        // Create sliders with labels
+        this.createSlider('slider1', 'Slider 1', 0.0, 1.0, 1.0);
+        this.createSlider('slider2', 'Slider 2', 0.0, 1.0, 1.0);
+
+        // Add event listeners to the buttons
+        this.button1.addEventListener('click', () => {
+            //console.log('Button 1 clicked');
+            // Add your processing logic here
+        });
+
+        this.button2.addEventListener('click', () => {
+            //console.log('Button 2 clicked');
+            // Add your processing logic here
+        });
+    }
+
+    createSlider(id, label, min, max, value) {
+        const container = document.createElement('div');
+        container.className = 'slider-container';
+
+        const labelElement = document.createElement('label');
+        labelElement.innerText = `${label}: `;
+        container.appendChild(labelElement);
+
+        const valueElement = document.createElement('span');
+        valueElement.id = `${id}-value`;
+        valueElement.innerText = value;
+        container.appendChild(valueElement);
+
+        const slider = document.createElement('input');
+        slider.id = id;
+        slider.type = 'range';
+        slider.min = min;
+        slider.max = max;
+        slider.step = '0.01'; // Set step to 0.01 for finer control
+        slider.value = value;
+        container.appendChild(slider);
+
+        this.uiContainer.appendChild(container);
+
+        slider.addEventListener('input', (event) => {
+            valueElement.innerText = event.target.value;
+            //console.log(`${label} value:`, event.target.value);
+            // Add your processing logic here
+        });
+
+        // Store the slider reference for later use
+        this[id] = slider;
+    }
+
+    getSlider1() {
+        return this.slider1.value;
+    }
+
+    getSlider2() {
+        return this.slider2.value;
+    }
+    getWidth() {
+        return this.canvas.width;
+    }
+
+    getHeight() {
+        return this.canvas.height;
+    }
+
+    getMousePosition() {
+        return this.mousePosition;
+    }
+
+    async init() {
         await this.Present.init();
 
         console.log("All resources loaded, starting render loop.");
         this.hideLoadingMessage();
-        requestAnimationFrame(this.render.bind(this));        
+        requestAnimationFrame(this.render.bind(this));
     }
 
     showLoadingMessage() {
@@ -93,31 +180,22 @@ class WebGLApp {
     resize() {
         //let iSize = Math.min(window.innerWidth, window.innerHeight);
         const contentRect = this.webapp.getBoundingClientRect();
-        let iSize = Math.min(contentRect.width, contentRect.height);
+        //let iSize = Math.min(contentRect.width, contentRect.height);
 
-        iSize = Math.floor(iSize * 0.9);
-        iSize = iSize - (iSize % 256);
-        iSize = Math.max(256, iSize);
-        this.canvas.width = iSize;
-        this.canvas.height = iSize;
+        //iSize = Math.floor(iSize * 0.9);
+        //iSize = iSize - (iSize % 256);
+        //iSize = Math.max(256, iSize);
+        this.canvas.width = contentRect.width - 10;
+        this.canvas.height = contentRect.height - 10;
         this.gl.viewport(0, 0, this.canvas.width, this.canvas.height);
     }
 
-    getResolution() {
-        return { width: this.canvas.width, height: this.canvas.height };
-    }
-
-    getMousePosition() {
-        return this.mousePosition;
-    }
-
     render() {
-
         this.Present.render();
-
         requestAnimationFrame(this.render.bind(this));
     }
 }
 
 const app = new WebGLApp();
 export { app };
+

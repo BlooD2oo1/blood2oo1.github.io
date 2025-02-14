@@ -37,6 +37,50 @@ nav a:hover {
     text-decoration: underline;
 }
 
+canvas {
+    display: block;
+}
+
+button, input {
+    display: block;
+    margin-top: 2px;
+    padding: 2px 2px; /* Smaller padding for more compact buttons */
+    font-size: 0.6rem; /* Smaller font size */
+}
+
+input[type="range"] {
+    width: 100px; /* Set a fixed width for sliders */
+    margin-top: 4px;
+    -webkit-appearance: none; /* Remove default styling */
+    height: 4px; /* Set the height of the slider */
+    background: #ddd; /* Background color of the slider */
+    border-radius: 1px; /* Rounded corners */
+    outline: none; /* Remove outline */
+}
+
+input[type="range"]::-webkit-slider-thumb {
+    -webkit-appearance: none; /* Remove default styling */
+    appearance: none;
+    width: 10px; /* Width of the thumb */
+    height: 10px; /* Height of the thumb */
+    background: #333; /* Color of the thumb */
+    border-radius: 50%; /* Rounded thumb */
+    cursor: pointer; /* Cursor style */
+}
+
+input[type="range"]::-moz-range-thumb {
+    width: 10px; /* Width of the thumb */
+    height: 10px; /* Height of the thumb */
+    background: #333; /* Color of the thumb */
+    border-radius: 50%; /* Rounded thumb */
+    cursor: pointer; /* Cursor style */
+}
+
+.slider-container label,
+.slider-container span {
+    font-size: 0.6rem; /* Smaller font size for labels and values */
+}
+
 .content {
     padding: 20px;
     width: 100%;
@@ -54,13 +98,22 @@ nav a:hover {
     justify-content: center;
     align-items: center;
     margin-top: 1rem;
+    margin-bottom: 2rem; /* Add this line to create space at the bottom */
     background: #303030;
     border-radius: 2px;
     flex-grow: 1;
-    height: calc(100% - 8rem); /* Adjust the height to fit within the viewport */
+    height: calc(100% - 10rem); /* Adjust the height to fit within the viewport */
     width: calc(100% - 4rem); /* Adjust the width to fit within the viewport */
+    position: relative; /* Add this line */
 }
 
-canvas {
-	display: block;
+.gui-container {
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    background: rgba(0, 0, 0, 0.3);
+    padding: 10px;
+    border-radius: 5px;
+    color: white;
+    z-index: 10; /* Ensure the GUI is above the canvas */
 }

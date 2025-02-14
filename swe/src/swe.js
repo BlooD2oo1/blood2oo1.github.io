@@ -3,6 +3,8 @@ import { loadShader } from './webglapp.js';
 export class SWE {
     constructor(gl) {
         this.gl = gl;
+        this.width = 256;
+        this.height = 256;
     }
 
     async init() {
@@ -49,7 +51,7 @@ export class SWE {
 
             this.renderTexture = this.gl.createTexture();
             this.gl.bindTexture(this.gl.TEXTURE_2D, this.renderTexture);
-            this.gl.texImage2D(this.gl.TEXTURE_2D, 0, this.gl.RGBA32F, 256, 256, 0, this.gl.RGBA, this.gl.FLOAT, null);
+            this.gl.texImage2D(this.gl.TEXTURE_2D, 0, this.gl.RGBA32F, this.width, this.height, 0, this.gl.RGBA, this.gl.FLOAT, null);
             this.gl.texParameteri(this.gl.TEXTURE_2D, this.gl.TEXTURE_MIN_FILTER, this.gl.LINEAR);
             this.gl.texParameteri(this.gl.TEXTURE_2D, this.gl.TEXTURE_MAG_FILTER, this.gl.LINEAR);
 
@@ -64,6 +66,14 @@ export class SWE {
         }
     }
 
+    getWidth() {
+        return this.width;
+    }
+
+    getHeight() {
+        return this.height;
+    }
+
     getRenderTexture() {
         return this.renderTexture;
     }
@@ -71,7 +81,7 @@ export class SWE {
     render() {
         // Bind the framebuffer and set the viewport to 512x512
         this.gl.bindFramebuffer(this.gl.FRAMEBUFFER, this.framebuffer);
-        this.gl.viewport(0, 0, 512, 512);
+        this.gl.viewport(0, 0, this.width, this.height);
 
         // Clear the framebuffer
         this.gl.clearColor(0.0, 0.0, 0.0, 1.0);

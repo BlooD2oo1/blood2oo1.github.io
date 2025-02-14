@@ -59,8 +59,7 @@ export class Present {
         this.SWE.render();
 
         //set the viewport to the size of the canvas
-        const resolution = app.getResolution();
-        this.gl.viewport(0, 0, resolution.width, resolution.height);
+        this.gl.viewport(0, 0, app.getWidth(), app.getHeight());
         // Render the framebuffer texture to the screen
         this.gl.clearColor(0.0, 0.1, 0.0, 1.0);
         this.gl.clear(this.gl.COLOR_BUFFER_BIT);
@@ -78,6 +77,13 @@ export class Present {
         // Pass mouse position to the fragment shader
         const mousePosition = app.getMousePosition();
         this.gl.uniform2f(this.gl.getUniformLocation(this.screenProgram, "uMousePosition"), mousePosition.x, 1.0 - mousePosition.y);
+
+        //fSlider1, fSlider1:
+        this.gl.uniform1f(this.gl.getUniformLocation(this.screenProgram, "fSlider1"), app.getSlider1());
+        this.gl.uniform1f(this.gl.getUniformLocation(this.screenProgram, "fSlider2"), app.getSlider2());
+
+        // create vec2 shader input for SWE width height:
+        this.gl.uniform2f(this.gl.getUniformLocation(this.screenProgram, "uRTRes"), app.getWidth(), app.getHeight());
 
         this.gl.drawArrays(this.gl.TRIANGLES, 0, 6);
     }
