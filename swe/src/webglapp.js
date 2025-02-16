@@ -1,5 +1,3 @@
-import * as mat4 from './dependencies/gl-matrix/esm/mat4.js';
-
 import { Present } from './present.js';
 
 async function loadShader(gl, type, url) {
@@ -175,6 +173,9 @@ class WebGLApp {
     getMouseButtonLeft() {
         return this.mouseButtonLeft;        
     }
+    getMouseButtonMiddle() {
+        return this.mouseButtonMiddle;
+    }
     getMouseButtonRight() {
         return this.mouseButtonRight;
     }
@@ -214,6 +215,9 @@ class WebGLApp {
         if (event.button === 0) {
             console.log('Left mouse button down');
             this.mouseButtonLeft = 1;
+        } else if (event.button === 1) {
+            console.log('Middle mouse button down');
+            this.mouseButtonMiddle = 1;
         } else if (event.button === 2) {
             console.log('Right mouse button down');
             this.mouseButtonRight = 1;
@@ -224,6 +228,9 @@ class WebGLApp {
         if (event.button === 0) {
             console.log('Left mouse button up');
             this.mouseButtonLeft = 0;
+        } else if (event.button === 1) {
+            console.log('Middle mouse button up');
+            this.mouseButtonMiddle = 0;
         } else if (event.button === 2) {
             console.log('Right mouse button up');
             this.mouseButtonRight = 0;

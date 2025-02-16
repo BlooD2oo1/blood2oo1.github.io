@@ -1,19 +1,22 @@
 import { app } from './webglapp.js';
 import { createShaderProgram } from './webglapp.js';
 import { SWE } from './swe.js';
-
+import { Terrain } from './terrain.js';
 
 export class Present {
     constructor(gl) {
         this.gl = gl;
         this.SWE = new SWE(this.gl);
+        this.Terrain = new Terrain(this.gl);
+        this.counter = 0;
     }
 
     async init() {
 
-        const [[vs, ps, program], _] = await Promise.all([
+        const [[vs, ps, program] ] = await Promise.all([
             createShaderProgram(this.gl, 'src/shaders/vsPresent.glsl', 'src/shaders/psPresent.glsl'),
-            this.SWE.init()
+            this.SWE.init(),
+            this.Terrain.init()
         ]);
 
         this.program_Present = program;
@@ -48,13 +51,15 @@ export class Present {
     }
 
     render() {
-        // Render to the 512x512 framebuffer
-        this.SWE.render();
+
+        this.SWE.render(); for (let i = 0; i < 10; i++) {
+            this.SWE.render();
+        }
 
         //set the viewport to the size of the canvas
         this.gl.viewport(0, 0, app.getWidth(), app.getHeight());
         // Render the framebuffer texture to the screen
-        this.gl.clearColor(0.0, 0.1, 0.0, 1.0);
+        this.gl.clearColor(0.0, 0.5, 0.0, 1.0);
         this.gl.clear(this.gl.COLOR_BUFFER_BIT);
 
         this.gl.useProgram(this.program_Present);
@@ -79,6 +84,27 @@ export class Present {
         this.gl.uniform2f(this.gl.getUniformLocation(this.program_Present, "uRTRes"), app.getWidth(), app.getHeight());
 
         this.gl.drawArrays(this.gl.TRIANGLES, 0, 6);
+
+        // Render the terrain every 100 frames
+        this.counter++;
+        if (this.counter > 20) {
+            const currentProgram = this.gl.getParameter(this.gl.CURRENT_PROGRAM);
+            const currentVAO = this.gl.getParameter(this.gl.VERTEX_ARRAY_BINDING);
+            const currentFramebuffer = this.gl.getParameter(this.gl.FRAMEBUFFER_BINDING);
+            const currentViewport = this.gl.getParameter(this.gl.VIEWPORT);
+
+            // Render the terrain
+            this.gl.enable(this.gl.DEPTH_TEST);
+            this.gl.depthFunc(this.gl.LEQUAL);
+            this.Terrain.render();
+            this.gl.disable(this.gl.DEPTH_TEST);
+
+            // Restore previous WebGL state
+            this.gl.useProgram(currentProgram);
+            this.gl.bindVertexArray(currentVAO);
+            this.gl.bindFramebuffer(this.gl.FRAMEBUFFER, currentFramebuffer);
+            this.gl.viewport(currentViewport[0], currentViewport[1], currentViewport[2], currentViewport[3]);
+        }
     }
 }
 
