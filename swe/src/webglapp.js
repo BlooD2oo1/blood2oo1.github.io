@@ -73,7 +73,9 @@ class WebGLApp {
 
         this.mousePosition = { x: 0, y: 0 };
         this.canvas.addEventListener("mousemove", (event) => this.updateMousePosition(event));
-        this.canvas.addEventListener("click", (event) => this.handleMouseClick(event));
+        this.canvas.addEventListener("mousedown", (event) => this.handleMouseDown(event));
+        this.canvas.addEventListener("mouseup", (event) => this.handleMouseUp(event));
+        this.canvas.addEventListener("contextmenu", (event) => event.preventDefault());
 
         this.createUIElements();
 
@@ -170,6 +172,13 @@ class WebGLApp {
         return this.mousePosition;
     }
 
+    getMouseButtonLeft() {
+        return this.mouseButtonLeft;        
+    }
+    getMouseButtonRight() {
+        return this.mouseButtonRight;
+    }
+
     async init() {
         await this.Present.init();
 
@@ -201,14 +210,24 @@ class WebGLApp {
         this.mousePosition.x = (event.clientX - rect.left);
         this.mousePosition.y = rect.height - (event.clientY - rect.top);
     }
+    handleMouseDown(event) {
+        if (event.button === 0) {
+            console.log('Left mouse button down');
+            this.mouseButtonLeft = 1;
+        } else if (event.button === 2) {
+            console.log('Right mouse button down');
+            this.mouseButtonRight = 1;
+        }
+    }
 
-    handleMouseClick(event) {
-        const rect = this.canvas.getBoundingClientRect();
-        const x = event.clientX - rect.left;
-        const y = rect.height - (event.clientY - rect.top);
-        //console.log(`Mouse clicked at: (${x}, ${y})`);
-        // Add your processing logic here
-        this.Present.SWE.renderInit();
+    handleMouseUp(event) {
+        if (event.button === 0) {
+            console.log('Left mouse button up');
+            this.mouseButtonLeft = 0;
+        } else if (event.button === 2) {
+            console.log('Right mouse button up');
+            this.mouseButtonRight = 0;
+        }
     }
 
     resize() {

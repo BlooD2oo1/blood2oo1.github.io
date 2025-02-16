@@ -1,10 +1,20 @@
+import { app } from './webglapp.js';
 import { createShaderProgram } from './webglapp.js';
+
 
 export class SWE {
     constructor(gl) {
         this.gl = gl;
         this.width = 512;
         this.height = 512;
+
+        this.params = {
+            fGridSizeInMeter: 5.0,
+            fElapsedTimeInSec: 1.0,
+            fAdvectSpeed: -1.0,
+            fG: 10.0,
+            fHackBlurDepth: 1.0
+        };
     }
 
     async init() {
@@ -111,6 +121,14 @@ export class SWE {
         // Render to the framebuffer
         this.gl.useProgram(this.program_SWEPassInit);
         this.gl.bindVertexArray(this.vao);
+        this.gl.uniform2f(this.gl.getUniformLocation(this.program_SWEPassInit, "uRTRes"), this.getWidth(), this.getHeight());
+
+        // Pass parameters to the fragment shader
+        this.gl.uniform1f(this.gl.getUniformLocation(this.program_SWEPassInit, "g_fGridSizeInMeter"), this.params.fGridSizeInMeter);
+        this.gl.uniform1f(this.gl.getUniformLocation(this.program_SWEPassInit, "g_fElapsedTimeInSec"), this.params.fElapsedTimeInSec);
+        this.gl.uniform1f(this.gl.getUniformLocation(this.program_SWEPassInit, "g_fAdvectSpeed"), this.params.fAdvectSpeed);
+        this.gl.uniform1f(this.gl.getUniformLocation(this.program_SWEPassInit, "g_fG"), this.params.fG);
+        this.gl.uniform1f(this.gl.getUniformLocation(this.program_SWEPassInit, "g_fHackBlurDepth"), this.params.fHackBlurDepth);
         this.gl.drawArrays(this.gl.TRIANGLES, 0, 6);
         // Unbind the framebuffer
         this.gl.bindFramebuffer(this.gl.FRAMEBUFFER, null);
@@ -132,6 +150,19 @@ export class SWE {
         this.gl.texParameteri(this.gl.TEXTURE_2D, this.gl.TEXTURE_MIN_FILTER, this.gl.LINEAR);
         this.gl.texParameteri(this.gl.TEXTURE_2D, this.gl.TEXTURE_MAG_FILTER, this.gl.LINEAR);
         this.gl.uniform2f(this.gl.getUniformLocation(this.program_SWEPass01, "uRTRes"), this.getWidth(), this.getHeight());
+
+        // Pass parameters to the fragment shader
+        this.gl.uniform1f(this.gl.getUniformLocation(this.program_SWEPass01, "g_fGridSizeInMeter"), this.params.fGridSizeInMeter);
+        this.gl.uniform1f(this.gl.getUniformLocation(this.program_SWEPass01, "g_fElapsedTimeInSec"), this.params.fElapsedTimeInSec);
+        this.gl.uniform1f(this.gl.getUniformLocation(this.program_SWEPass01, "g_fAdvectSpeed"), this.params.fAdvectSpeed);
+        this.gl.uniform1f(this.gl.getUniformLocation(this.program_SWEPass01, "g_fG"), this.params.fG);
+        this.gl.uniform1f(this.gl.getUniformLocation(this.program_SWEPass01, "g_fHackBlurDepth"), this.params.fHackBlurDepth);
+
+        // Pass mouse position to the fragment shader
+        const mousePosition = app.getMousePosition();
+        this.gl.uniform2f(this.gl.getUniformLocation(this.program_SWEPass01, "uMousePosition"), mousePosition.x, mousePosition.y);
+        this.gl.uniform2i(this.gl.getUniformLocation(this.program_SWEPass01, "uMouseButtons"), app.getMouseButtonLeft(), app.getMouseButtonRight());
+
         this.gl.drawArrays(this.gl.TRIANGLES, 0, 6);
         [this.currentFramebuffer, this.otherFramebuffer] = [this.otherFramebuffer, this.currentFramebuffer];
         [this.currentTexture, this.otherTexture] = [this.otherTexture, this.currentTexture];
@@ -146,6 +177,14 @@ export class SWE {
         this.gl.texParameteri(this.gl.TEXTURE_2D, this.gl.TEXTURE_MIN_FILTER, this.gl.LINEAR);
         this.gl.texParameteri(this.gl.TEXTURE_2D, this.gl.TEXTURE_MAG_FILTER, this.gl.LINEAR);
         this.gl.uniform2f(this.gl.getUniformLocation(this.program_SWEPass02, "uRTRes"), this.getWidth(), this.getHeight());
+
+        // Pass parameters to the fragment shader
+        this.gl.uniform1f(this.gl.getUniformLocation(this.program_SWEPass02, "g_fGridSizeInMeter"), this.params.fGridSizeInMeter);
+        this.gl.uniform1f(this.gl.getUniformLocation(this.program_SWEPass02, "g_fElapsedTimeInSec"), this.params.fElapsedTimeInSec);
+        this.gl.uniform1f(this.gl.getUniformLocation(this.program_SWEPass02, "g_fAdvectSpeed"), this.params.fAdvectSpeed);
+        this.gl.uniform1f(this.gl.getUniformLocation(this.program_SWEPass02, "g_fG"), this.params.fG);
+        this.gl.uniform1f(this.gl.getUniformLocation(this.program_SWEPass02, "g_fHackBlurDepth"), this.params.fHackBlurDepth);
+
         this.gl.drawArrays(this.gl.TRIANGLES, 0, 6);
         [this.currentFramebuffer, this.otherFramebuffer] = [this.otherFramebuffer, this.currentFramebuffer];
         [this.currentTexture, this.otherTexture] = [this.otherTexture, this.currentTexture];
@@ -160,6 +199,14 @@ export class SWE {
         this.gl.texParameteri(this.gl.TEXTURE_2D, this.gl.TEXTURE_MIN_FILTER, this.gl.LINEAR);
         this.gl.texParameteri(this.gl.TEXTURE_2D, this.gl.TEXTURE_MAG_FILTER, this.gl.LINEAR);
         this.gl.uniform2f(this.gl.getUniformLocation(this.program_SWEPass03, "uRTRes"), this.getWidth(), this.getHeight());
+
+        // Pass parameters to the fragment shader
+        this.gl.uniform1f(this.gl.getUniformLocation(this.program_SWEPass03, "g_fGridSizeInMeter"), this.params.fGridSizeInMeter);
+        this.gl.uniform1f(this.gl.getUniformLocation(this.program_SWEPass03, "g_fElapsedTimeInSec"), this.params.fElapsedTimeInSec);
+        this.gl.uniform1f(this.gl.getUniformLocation(this.program_SWEPass03, "g_fAdvectSpeed"), this.params.fAdvectSpeed);
+        this.gl.uniform1f(this.gl.getUniformLocation(this.program_SWEPass03, "g_fG"), this.params.fG);
+        this.gl.uniform1f(this.gl.getUniformLocation(this.program_SWEPass03, "g_fHackBlurDepth"), this.params.fHackBlurDepth);
+
         this.gl.drawArrays(this.gl.TRIANGLES, 0, 6);
         [this.currentFramebuffer, this.otherFramebuffer] = [this.otherFramebuffer, this.currentFramebuffer];
         [this.currentTexture, this.otherTexture] = [this.otherTexture, this.currentTexture];

@@ -1,6 +1,7 @@
-import { SWE } from './swe.js';
 import { app } from './webglapp.js';
 import { createShaderProgram } from './webglapp.js';
+import { SWE } from './swe.js';
+
 
 export class Present {
     constructor(gl) {
