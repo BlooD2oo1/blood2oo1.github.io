@@ -127,7 +127,7 @@ export class Terrain {
 
         //g_vLightDir:
         // Extract the left vector from the view matrix and normalize it
-        const vLightDir = vec3.fromValues(this.viewMatrix[0], this.viewMatrix[4], 0.1);
+        const vLightDir = vec3.fromValues(this.viewMatrix[0], this.viewMatrix[4], 0.3);
         //rotate around z axis:
         vec3.rotateZ(vLightDir, vLightDir, [0, 0, 0], Math.PI / 3);
         vec3.normalize(vLightDir, vLightDir);

@@ -84,7 +84,7 @@ export class Present {
         //set the viewport to the size of the canvas
         this.gl.viewport(0, 0, app.getWidth(), app.getHeight());
         // Render the framebuffer texture to the screen
-        this.gl.clearColor(0.0, 0.2, 0.3, 1.0);
+        this.gl.clearColor(0.02, 0.02, 0.02, 1.0);
         this.gl.clear(this.gl.COLOR_BUFFER_BIT);
 
         this.gl.useProgram(this.program_Present);

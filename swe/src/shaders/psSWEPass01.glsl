@@ -32,6 +32,6 @@ void main()
 
     if ( uMouseButtons.x!=0)
     {
-        outColor.z += max(0.0, 0.04 - length(vTexCoord - uClickPosition)) * 0.0004;
+        outColor.z += max(0.0, 0.015 - length(vTexCoord - uClickPosition)) * 0.04;
     }
 }

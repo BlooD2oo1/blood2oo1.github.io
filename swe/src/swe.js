@@ -154,7 +154,7 @@ export class SWE {
         
         this.gl.viewport(0, 0, this.width, this.height);
 
-        for (let i = 0; i < 20; i++) {
+        for (let i = 0; i < 10; i++) {
             // Pass 01
             this.gl.bindFramebuffer(this.gl.FRAMEBUFFER, this.currentFramebuffer);
             this.gl.useProgram(this.program_SWEPass01);
