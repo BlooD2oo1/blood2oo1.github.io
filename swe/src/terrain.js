@@ -1,10 +1,12 @@
 import { app } from './webglapp.js';
 import { createShaderProgram } from './webglapp.js';
 import * as mat4 from './dependencies/gl-matrix/esm/mat4.js';
+import * as vec3 from './dependencies/gl-matrix/esm/vec3.js';
 
 export class Terrain {
     constructor(gl) {
         this.gl = gl;
+        this.mousePosition = { x: 0, y: 0 };
     }
 
     async init() {
@@ -19,6 +21,8 @@ export class Terrain {
         this.orthoMatrix = mat4.create();
         this.viewMatrix = mat4.create();
         this.mvpMatrix = mat4.create();
+        this.fCamRotX = Math.PI / 4;
+        this.fCamRotZ = Math.PI / 6;
     }
 
     createBuffers() {
@@ -26,12 +30,12 @@ export class Terrain {
         const height = app.Present.SWE.getHeight();
         const vertices = [];
         const indices = [];
-        const stepX = 1.0 / (width - 1);
-        const stepY = 1.0 / (height - 1);
+        const stepX = 1.0 / width;
+        const stepY = 1.0 / height;
 
         for (let y = 0; y < height; y++) {
             for (let x = 0; x < width; x++) {
-                vertices.push(x * stepX, y * stepY, 0.0);
+                vertices.push((x + 0.5) * stepX, (y + 0.5) * stepY, 0.0);
             }
         }
 
@@ -54,7 +58,58 @@ export class Terrain {
         this.indexCount = indices.length;
     }
 
+    handleMouseMove(mousePosition) {
+        if (this.mouseButtonMiddle === 1) {
+            this.fCamRotX += (mousePosition.y - this.mousePosition.y) * 0.002;
+            this.fCamRotZ -= (mousePosition.x - this.mousePosition.x) * 0.002;
+
+            //limit the rotation:
+            if (this.fCamRotX < 0) this.fCamRotX = 0;
+            if (this.fCamRotX > Math.PI / 3) this.fCamRotX = Math.PI / 3;
+            if (this.fCamRotZ > 2 * Math.PI) this.fCamRotZ -= 2 * Math.PI;
+            if (this.fCamRotZ < 0) this.fCamRotZ += 2 * Math.PI;
+        }
+        this.mousePosition = { ...mousePosition };
+    }
+    handleMouseDown(event) {
+        if (event.button === 0) {
+            this.mouseButtonLeft = 1;
+        } else if (event.button === 1) {
+            this.mouseButtonMiddle = 1;
+        } else if (event.button === 2) {
+            this.mouseButtonRight = 1;
+        }
+    }
+    handleMouseUp(event) {
+        if (event.button === 0) {
+            this.mouseButtonLeft = 0;
+        } else if (event.button === 1) {
+            this.mouseButtonMiddle = 0;
+        } else if (event.button === 2) {
+            this.mouseButtonRight = 0;
+        }
+    }
+
+    getMWPMatrix() {
+        return this.mvpMatrix;
+    }
+
     render() {
+        const width = app.getWidth();
+        const height = app.getHeight();
+        const aspect = width / height;
+        // Set up the ortho matrix to cover the entire plane
+        //mat4.ortho(this.orthoMatrix, -width / 2, width / 2, -height / 2, height / 2, -1, 1);
+        const zoom = 0.5;
+        mat4.ortho(this.orthoMatrix, -aspect * zoom, aspect * zoom, zoom, -zoom, -2, 2);
+        // Set up the view matrix for an isometric view
+        mat4.identity(this.viewMatrix);
+        mat4.rotateX(this.viewMatrix, this.viewMatrix, this.fCamRotX);//45
+        mat4.rotateZ(this.viewMatrix, this.viewMatrix, this.fCamRotZ);//30
+        // Combine the ortho and view matrices into the MVP matrix
+        mat4.multiply(this.mvpMatrix, this.orthoMatrix, this.viewMatrix);
+
+
         this.gl.useProgram(this.program);
 
         // Bind the vertex buffer
@@ -66,28 +121,38 @@ export class Terrain {
         // Bind the index buffer
         this.gl.bindBuffer(this.gl.ELEMENT_ARRAY_BUFFER, this.indexBuffer);
 
-        const width = app.getWidth();
-        const height = app.getHeight();
-        const aspect = width / height;
-        // Set up the ortho matrix to cover the entire plane
-        //mat4.ortho(this.orthoMatrix, -width / 2, width / 2, -height / 2, height / 2, -1, 1);
-        mat4.ortho(this.orthoMatrix, -aspect, aspect, 1, -1, -2, 2);
-        // Set up the view matrix for an isometric view
-        mat4.identity(this.viewMatrix);
-        mat4.rotateX(this.viewMatrix, this.viewMatrix, Math.PI / 4); // Rotate 45 degrees around the X axis
-        mat4.rotateZ(this.viewMatrix, this.viewMatrix, Math.PI / 6); // Rotate 45 degrees around the Y axis
-        // Combine the ortho and view matrices into the MVP matrix
-        mat4.multiply(this.mvpMatrix, this.orthoMatrix, this.viewMatrix);
-
         // Set the MVP matrix uniform
         const mvpMatrixLocation = this.gl.getUniformLocation(this.program, 'uMVPMatrix');
         this.gl.uniformMatrix4fv(mvpMatrixLocation, false, this.mvpMatrix);
 
+        //g_vLightDir:
+        // Extract the left vector from the view matrix and normalize it
+        const vLightDir = vec3.fromValues(this.viewMatrix[0], this.viewMatrix[4], 0.1);
+        //rotate around z axis:
+        vec3.rotateZ(vLightDir, vLightDir, [0, 0, 0], Math.PI / 3);
+        vec3.normalize(vLightDir, vLightDir);
+        this.gl.uniform3f(this.gl.getUniformLocation(this.program, "g_vLightDir"), vLightDir[0], vLightDir[1], vLightDir[2]);
+
         // Bind the SWE texture
-        const texture = app.Present.SWE.getRenderTexture();
+        const texture = app.Present.SWE.getSWETex();
         this.gl.activeTexture(this.gl.TEXTURE0);
         this.gl.bindTexture(this.gl.TEXTURE_2D, texture);
         this.gl.uniform1i(this.gl.getUniformLocation(this.program, 'uTexture'), 0);
+
+        // Bind the SWETex texture
+        const texture2 = app.Present.SWE.getNormalTex();
+        this.gl.activeTexture(this.gl.TEXTURE1);
+        this.gl.bindTexture(this.gl.TEXTURE_2D, texture2);
+        this.gl.uniform1i(this.gl.getUniformLocation(this.program, 'uTexNorm'), 1);
+
+        this.gl.uniform2f(this.gl.getUniformLocation(this.program, "uRTRes"), app.Present.SWE.getWidth(), app.Present.SWE.getHeight());
+
+        // Pass parameters to the fragment shader
+        this.gl.uniform1f(this.gl.getUniformLocation(this.program, "g_fGridSizeInMeter"), app.Present.SWE.params.fGridSizeInMeter);
+        this.gl.uniform1f(this.gl.getUniformLocation(this.program, "g_fElapsedTimeInSec"), app.Present.SWE.params.fElapsedTimeInSec);
+        this.gl.uniform1f(this.gl.getUniformLocation(this.program, "g_fAdvectSpeed"), app.Present.SWE.params.fAdvectSpeed);
+        this.gl.uniform1f(this.gl.getUniformLocation(this.program, "g_fG"), app.Present.SWE.params.fG);
+        this.gl.uniform1f(this.gl.getUniformLocation(this.program, "g_fHackBlurDepth"), app.Present.SWE.params.fHackBlurDepth);
 
         // Draw the grid
         this.gl.drawElements(this.gl.TRIANGLES, this.indexCount, this.gl.UNSIGNED_INT, 0);

@@ -50,22 +50,47 @@ export class Present {
         this.gl.vertexAttribPointer(texCoordLocation, 2, this.gl.FLOAT, false, 4 * Float32Array.BYTES_PER_ELEMENT, 2 * Float32Array.BYTES_PER_ELEMENT);
     }
 
+    handleMouseMove(mousePosition) {
+        this.SWE.handleMouseMove(mousePosition);
+        this.Terrain.handleMouseMove(mousePosition);
+    }
+    handleMouseDown(event) {
+        this.SWE.handleMouseDown(event);
+        this.Terrain.handleMouseDown(event);
+        if (event.button === 0) {
+            this.mouseButtonLeft = 1;
+        } else if (event.button === 1) {
+            this.mouseButtonMiddle = 1;
+        } else if (event.button === 2) {
+            this.mouseButtonRight = 1;
+        }
+    }
+    handleMouseUp(event) {
+        this.SWE.handleMouseUp(event);
+        this.Terrain.handleMouseUp(event);
+        if (event.button === 0) {
+            this.mouseButtonLeft = 0;
+        } else if (event.button === 1) {
+            this.mouseButtonMiddle = 0;
+        } else if (event.button === 2) {
+            this.mouseButtonRight = 0;
+        }
+    }
+
     render() {
 
-        this.SWE.render(); for (let i = 0; i < 10; i++) {
-            this.SWE.render();
-        }
+        this.SWE.render();
 
         //set the viewport to the size of the canvas
         this.gl.viewport(0, 0, app.getWidth(), app.getHeight());
         // Render the framebuffer texture to the screen
-        this.gl.clearColor(0.0, 0.5, 0.0, 1.0);
+        this.gl.clearColor(0.0, 0.2, 0.3, 1.0);
         this.gl.clear(this.gl.COLOR_BUFFER_BIT);
 
         this.gl.useProgram(this.program_Present);
         this.gl.bindVertexArray(this.screenVao);
 
-        const texture = this.SWE.getRenderTexture();
+        const texture = this.SWE.getSWETex();
         this.gl.activeTexture(this.gl.TEXTURE0);
         this.gl.bindTexture(this.gl.TEXTURE_2D, texture);
         this.gl.uniform1i(this.gl.getUniformLocation(this.program_Present, "uTexture"), 0);

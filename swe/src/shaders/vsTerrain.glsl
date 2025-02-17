@@ -10,6 +10,6 @@ uniform sampler2D uTexture;
 void main() {
     vTexCoord = position.xy;
 	vec4 vTexC = texture(uTexture, vTexCoord);
-    vec3 modifiedPosition = vec3(position.xy, vTexC.w+ vTexC.z); // Modify the z value with the texture sample
+    vec3 modifiedPosition = vec3(position.xy-vec2(0.5), vTexC.w + vTexC.z); // Modify the z value with the texture sample
     gl_Position = uMVPMatrix * vec4(modifiedPosition, 1.0);
 }

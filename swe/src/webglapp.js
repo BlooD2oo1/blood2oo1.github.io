@@ -44,6 +44,29 @@ export async function createShaderProgram(gl, vsPath, fsPath) {
 
     return [vs, ps, program];
 }
+export function createTextureAndFramebuffer(gl, framebuffer, width, height) {
+    gl.bindFramebuffer(gl.FRAMEBUFFER, framebuffer);
+
+    const texture = gl.createTexture();
+    gl.bindTexture(gl.TEXTURE_2D, texture);
+    gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA32F, width, height, 0, gl.RGBA, gl.FLOAT, null);
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
+
+    gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_2D, texture, 0);
+
+    const status = gl.checkFramebufferStatus(gl.FRAMEBUFFER);
+    if (status !== gl.FRAMEBUFFER_COMPLETE) {
+        console.error('Framebuffer is not complete:', status.toString(16));
+    }
+
+    gl.clearColor(0.0, 0.0, 0.0, 0.0);
+    gl.clear(gl.COLOR_BUFFER_BIT);
+
+    gl.bindFramebuffer(gl.FRAMEBUFFER, null);
+
+    return texture;
+}
 
 class WebGLApp {
     constructor() {
@@ -70,7 +93,7 @@ class WebGLApp {
         window.addEventListener("resize", () => this.resize());
 
         this.mousePosition = { x: 0, y: 0 };
-        this.canvas.addEventListener("mousemove", (event) => this.updateMousePosition(event));
+        this.canvas.addEventListener("mousemove", (event) => this.handleMouseMove(event));
         this.canvas.addEventListener("mousedown", (event) => this.handleMouseDown(event));
         this.canvas.addEventListener("mouseup", (event) => this.handleMouseUp(event));
         this.canvas.addEventListener("contextmenu", (event) => event.preventDefault());
@@ -206,12 +229,14 @@ class WebGLApp {
         }
     }
 
-    updateMousePosition(event) {
+    handleMouseMove(event) {
         const rect = this.canvas.getBoundingClientRect();
         this.mousePosition.x = (event.clientX - rect.left);
         this.mousePosition.y = rect.height - (event.clientY - rect.top);
+        this.Present.handleMouseMove(this.mousePosition);
     }
     handleMouseDown(event) {
+        this.Present.handleMouseDown(event);
         if (event.button === 0) {
             console.log('Left mouse button down');
             this.mouseButtonLeft = 1;
@@ -221,10 +246,12 @@ class WebGLApp {
         } else if (event.button === 2) {
             console.log('Right mouse button down');
             this.mouseButtonRight = 1;
+            this.Present.SWE.renderInit();
         }
     }
 
     handleMouseUp(event) {
+        this.Present.handleMouseUp(event);
         if (event.button === 0) {
             console.log('Left mouse button up');
             this.mouseButtonLeft = 0;

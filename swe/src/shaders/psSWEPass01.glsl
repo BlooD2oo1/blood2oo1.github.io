@@ -10,7 +10,7 @@ uniform float g_fAdvectSpeed;
 uniform float g_fG;
 uniform float g_fHackBlurDepth;
 
-uniform vec2 uMousePosition;
+uniform vec2 uClickPosition;
 uniform ivec2 uMouseButtons;
 
 // Velocity Advection
@@ -32,6 +32,6 @@ void main()
 
     if ( uMouseButtons.x!=0)
     {
-        outColor.z += max(0.0, 0.1 - length(vTexCoord - vec2(0.3))) * 0.05;
+        outColor.z += max(0.0, 0.04 - length(vTexCoord - uClickPosition)) * 0.0004;
     }
 }

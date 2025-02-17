@@ -48,7 +48,7 @@ float SampleDepth(vec2 xy)
     fRet += noise(vUV) / 256.0; vUV = (m * vUV);
     float fNoise = fRet;
 
-    fRet = fNoise * 0.1;
+    fRet = fNoise * 0.02;
     //fRet = textureLod(m_tDepthMap, vec4( uv, 0, 0 )).r*0.04 * _MainTex_TexelSize.w-130.0;
     //fRet += pow(-cos(uv.x*PI2)*0.5+0.5, 0.5)*100.0-110.0;
     //fRet += ( 1.0-exp( -pow( abs(uv.y*2.0-1.0)*1.0, 4.0 )*5.0 ) ) * 35.0;
