@@ -70,6 +70,12 @@ export function createTextureAndFramebuffer(gl, framebuffer, width, height) {
 
 class WebGLApp {
     constructor() {
+
+        if (this.isMobileDevice()) {
+            this.showMobileWarning();
+            return;
+        }
+
         this.canvas = document.createElement("canvas");
 
         this.webapp = document.querySelector(".webapp");
@@ -105,6 +111,25 @@ class WebGLApp {
         this.Present = new Present(this.gl);
 
         this.init();
+    }
+
+    isMobileDevice() {
+        return /Mobi|Android/i.test(navigator.userAgent);
+    }
+
+    showMobileWarning() {
+        const warningDiv = document.createElement("div");
+        warningDiv.innerText = "This application only works on desktop browsers.";
+        warningDiv.style.position = "absolute";
+        warningDiv.style.top = "50%";
+        warningDiv.style.left = "50%";
+        warningDiv.style.transform = "translate(-50%, -50%)";
+        warningDiv.style.fontSize = "24px";
+        warningDiv.style.color = "white";
+        warningDiv.style.backgroundColor = "black";
+        warningDiv.style.padding = "20px";
+        warningDiv.style.borderRadius = "10px";
+        document.body.appendChild(warningDiv);
     }
 
     createUIElements() {

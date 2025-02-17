@@ -1,6 +1,6 @@
 #version 300 es
 precision highp float;
-
+layout(std140, column_major) uniform;
 layout(location = 0) in vec3 position;
 out vec2 vTexCoord;
 

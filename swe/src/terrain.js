@@ -71,6 +71,7 @@ export class Terrain {
         }
         this.mousePosition = { ...mousePosition };
     }
+
     handleMouseDown(event) {
         if (event.button === 0) {
             this.mouseButtonLeft = 1;
@@ -80,6 +81,7 @@ export class Terrain {
             this.mouseButtonRight = 1;
         }
     }
+
     handleMouseUp(event) {
         if (event.button === 0) {
             this.mouseButtonLeft = 0;
@@ -99,16 +101,14 @@ export class Terrain {
         const height = app.getHeight();
         const aspect = width / height;
         // Set up the ortho matrix to cover the entire plane
-        //mat4.ortho(this.orthoMatrix, -width / 2, width / 2, -height / 2, height / 2, -1, 1);
         const zoom = 0.5;
         mat4.ortho(this.orthoMatrix, -aspect * zoom, aspect * zoom, zoom, -zoom, -2, 2);
         // Set up the view matrix for an isometric view
         mat4.identity(this.viewMatrix);
-        mat4.rotateX(this.viewMatrix, this.viewMatrix, this.fCamRotX);//45
-        mat4.rotateZ(this.viewMatrix, this.viewMatrix, this.fCamRotZ);//30
+        mat4.rotateX(this.viewMatrix, this.viewMatrix, this.fCamRotX); // 45 degrees
+        mat4.rotateZ(this.viewMatrix, this.viewMatrix, this.fCamRotZ); // 30 degrees
         // Combine the ortho and view matrices into the MVP matrix
         mat4.multiply(this.mvpMatrix, this.orthoMatrix, this.viewMatrix);
-
 
         this.gl.useProgram(this.program);
 
@@ -126,17 +126,18 @@ export class Terrain {
         this.gl.uniformMatrix4fv(mvpMatrixLocation, false, this.mvpMatrix);
 
         // Extract the view direction from the view matrix and normalize it
-        const viewDir = vec3.fromValues(this.viewMatrix[8], -this.viewMatrix[9], this.viewMatrix[10]);
+        const viewDir = vec3.fromValues(-this.viewMatrix[2], -this.viewMatrix[6], this.viewMatrix[10]);
         vec3.normalize(viewDir, viewDir);
         this.gl.uniform3f(this.gl.getUniformLocation(this.program, "g_vViewDir"), viewDir[0], viewDir[1], viewDir[2]);
 
-        //g_vLightDir:
+        // g_vLightDir:
         // Extract the left vector from the view matrix and normalize it
-        const vLightDir = vec3.fromValues(1.0, 0.0, app.getSlider2());
-        //rotate around z axis:
-        vec3.rotateZ(vLightDir, vLightDir, [0, 0, 0], -this.fCamRotZ + Math.PI * 2 * app.getSlider1());
+        const vLightDir = vec3.fromValues(0.0, 1.0, 0.7);
+        // Rotate around z axis:
+        vec3.rotateZ(vLightDir, vLightDir, [0, 0, 0], -this.fCamRotZ + Math.PI/15 );
+        //vec3.rotateX(vLightDir, vLightDir, [0, 0, 0], app.getSlider1() * Math.PI);
+        //vec3.rotateZ(vLightDir, vLightDir, [0, 0, 0], app.getSlider2() * Math.PI*2);
         vec3.normalize(vLightDir, vLightDir);
-        console.log(vec3.dot(vLightDir, viewDir));
 
         this.gl.uniform3f(this.gl.getUniformLocation(this.program, "g_vLightDir"), vLightDir[0], vLightDir[1], vLightDir[2]);
 
