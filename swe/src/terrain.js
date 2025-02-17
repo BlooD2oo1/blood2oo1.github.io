@@ -125,12 +125,19 @@ export class Terrain {
         const mvpMatrixLocation = this.gl.getUniformLocation(this.program, 'uMVPMatrix');
         this.gl.uniformMatrix4fv(mvpMatrixLocation, false, this.mvpMatrix);
 
+        // Extract the view direction from the view matrix and normalize it
+        const viewDir = vec3.fromValues(this.viewMatrix[8], -this.viewMatrix[9], this.viewMatrix[10]);
+        vec3.normalize(viewDir, viewDir);
+        this.gl.uniform3f(this.gl.getUniformLocation(this.program, "g_vViewDir"), viewDir[0], viewDir[1], viewDir[2]);
+
         //g_vLightDir:
         // Extract the left vector from the view matrix and normalize it
-        const vLightDir = vec3.fromValues(this.viewMatrix[0], this.viewMatrix[4], 0.3);
+        const vLightDir = vec3.fromValues(1.0, 0.0, app.getSlider2());
         //rotate around z axis:
-        vec3.rotateZ(vLightDir, vLightDir, [0, 0, 0], Math.PI / 3);
+        vec3.rotateZ(vLightDir, vLightDir, [0, 0, 0], -this.fCamRotZ + Math.PI * 2 * app.getSlider1());
         vec3.normalize(vLightDir, vLightDir);
+        console.log(vec3.dot(vLightDir, viewDir));
+
         this.gl.uniform3f(this.gl.getUniformLocation(this.program, "g_vLightDir"), vLightDir[0], vLightDir[1], vLightDir[2]);
 
         // Bind the SWE texture
