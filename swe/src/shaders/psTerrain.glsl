@@ -130,7 +130,7 @@ float PCFShadow(sampler2D shadowMap, vec4 shadowCoord) {
 
 void main()
 {
-    float fZScale = 2.0;
+    float fZScale = 8.0;
     // Calculate shadow coordinates
     vec4 shadowCoord = vShadowCoord;
     shadowCoord.xyz /= shadowCoord.w;
@@ -140,32 +140,43 @@ void main()
     float shadow = PCFShadow(uShadowMap, shadowCoord);
 
     vec4 vTexC = texture(uTexture, vTexCoord);
-    vec4 vTexDt = texture(uTexNorm, vTexCoord + vec2(0.5)/uRTRes);
-    float fWater = smoothstep( 0.0, 0.003, vTexC.z );
-    float fFoam = length(vTexDt.xy) * length(vTexC.xy) * 10.0 / clamp(0.001, 1.0, vTexC.z * 1000.0);
-	fFoam += smoothstep(0.003, 0.0, vTexC.z);//part
-	fFoam = clamp(fFoam, 0.0, 1.0);
-    vec3 vNormal = normalize( vec3( -vTexDt.xy, g_fGridSizeInMeter/fZScale ) );
+    vec4 vTexDtC = texture(uTexNorm, vTexCoord + vec2(0.5)/uRTRes);
+    vec4 vTexDtR = texture(uTexNorm, vTexCoord + vec2(0.5)/uRTRes + vec2(1.0/uRTRes.x,0.0));
+    vec4 vTexDtB = texture(uTexNorm, vTexCoord + vec2(0.5)/uRTRes + vec2(0.0,1.0/uRTRes.y));
+
+    // Calculate occlusion
+    vec2 dC = vTexDtC.xy;
+    vec2 dR = vTexDtR.xy;
+    vec2 dB = vTexDtB.xy;
+
+    float fOcc = pow( 1.0 - clamp(length(dC - dR) + length(dC - dB), 0.0, 1.0), 1.0 );
     
-    vec3 vCWater = mix( vec3(0.3, 0.7, 0.7), vec3(0.3, 0.6, 0.8)*0.7, smoothstep( 0.0, 0.015, vTexC.z ) )*0.6;
+
+    float fWater = smoothstep( 0.0, 0.0014, vTexC.z );
+    float fFoam = length(vTexDtC.xy) * length(vTexC.xy) * 10.0 / clamp(0.001, 1.0, vTexC.z * 1000.0);
+	fFoam += smoothstep(0.0014, 0.0002, vTexC.z);//part
+	fFoam = clamp(fFoam, 0.0, 1.0);
+    vec3 vNormal = normalize( vec3( -vTexDtC.xy, g_fGridSizeInMeter/fZScale ) );
+    
+    vec3 vCWater = mix( vec3(0.3, 0.7, 0.7), vec3(0.3, 0.6, 0.8)*0.7, smoothstep( 0.0, 0.005, vTexC.z ) )*0.4;
 	vec3 vCFoam = vec3(1.0);
-    vec3 vCLand = vec3(0.6, 0.5, 0.3) * 0.8;
+    vec3 vCLand = vec3(0.6, 0.5, 0.3) * 0.6;
 
     vCWater = mix( vCWater, vCFoam, fFoam );
 
     vec3 vDiffuse = mix(vCLand, vCWater, fWater );
    
-    vec3 g_vCLight = vec3(1.0, 0.8, 0.5) * 4.0;
-    vec3 g_vCAmbientUp = vec3(0.3, 0.5, 0.7) * 0.1;
+    vec3 g_vCLight = vec3(1.0, 0.8, 0.5) * 7.0;
+    vec3 g_vCAmbientUp = vec3(0.3, 0.5, 0.7) * 0.15;
     vec3 g_vCAmbientDown = vCLand * 0.01;
 
-    //vDiffuse = vec3( 0.3 );
+    vDiffuse *= vec3( fOcc );
 
-    vec3 vColor = Shade(g_vLightDir, g_vCLight*shadow, g_vCAmbientUp, g_vCAmbientDown, vNormal, vDiffuse, mix( 0.9, 0.44, fWater ), mix(0.04, 0.1, fWater), g_vViewDir);
+    vec3 vColor = Shade(g_vLightDir, g_vCLight*shadow, g_vCAmbientUp, g_vCAmbientDown, vNormal, vDiffuse, mix( 0.9, 0.4, fWater ), mix(0.04, 0.1, fWater), g_vViewDir);
 
     outColor.rgb = vColor;
     outColor.a = 1.0;
-
+    //outColor.rgb = vec3(fOcc);
 
     outColor.rgb = max(outColor.rgb, 0.0);
     outColor.rgb = 1.0 - exp(-outColor.rgb);

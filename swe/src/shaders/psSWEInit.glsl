@@ -64,7 +64,7 @@ float voronoise( in vec2 p, float u, float v )
 float SampleDepth(vec2 xy)
 {
     float fRet = 0.0;
-    vec2 vUV = xy * g_fGridSizeInMeter * 0.0005 + 3.0;
+    vec2 vUV = xy * g_fGridSizeInMeter * 0.0005 + 5.0;
     vUV += vec2(noise(vUV + 2.0), noise(vUV + 1.0)) * 0.1;
     mat2 m = mat2(2.0, 1.2, -1.2, 2.0);
     fRet = noise(vUV) / 2.0; vUV = (m * vUV);
@@ -75,18 +75,28 @@ float SampleDepth(vec2 xy)
     fRet += noise(vUV) / 128.0; vUV = (m * vUV);
     fRet += noise(vUV) / 256.0; vUV = (m * vUV);
 
-    fRet *= 1.6;
-    vec2 p = vec2( 1.0, 0.44);
-    p = p*p*(3.0-2.0*p);
-	p = p*p*(3.0-2.0*p);
-	p = p*p*(3.0-2.0*p);
-    fRet += voronoise(xy*0.015, p.x, p.y) * 0.3;
-    fRet -= 0.1;
+    fRet *= 1.8;
+    {
+        vec2 p = vec2( 1.0, 0.44);
+        p = p*p*(3.0-2.0*p);
+	    p = p*p*(3.0-2.0*p);
+	    p = p*p*(3.0-2.0*p);
+        fRet += voronoise(xy*0.035, p.x, p.y) * 0.12;
+    }
+
+    {
+        vec2 p = vec2( 1.0, 0.43);
+        p = p*p*(3.0-2.0*p);
+	    p = p*p*(3.0-2.0*p);
+	    p = p*p*(3.0-2.0*p);
+        fRet += voronoise(xy*0.12, p.x, p.y) * 0.04;
+    }
+    fRet += 0.2;
 
     float fNoise = fRet;
     
 
-    fRet = fNoise * 0.01;
+    fRet = fNoise * 0.0032;
 
     //fRet = clamp(fRet, 0.0, 0.001);
     //fRet = ( 1.0-exp(-abs(fRet)/0.001))*0.001;// * sign(fRet);
