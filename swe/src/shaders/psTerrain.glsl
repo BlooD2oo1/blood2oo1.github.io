@@ -117,7 +117,7 @@ const vec2 poissonDisk[16] = vec2[](
 float PCFShadow(sampler2D shadowMap, vec4 shadowCoord) {
     float shadow = 0.0;
     float texelSize = 1.0 / float(textureSize(shadowMap, 0).x);
-    float fRadMul = 2.0;
+    float fRadMul = 1.0;
 	texelSize *= fRadMul;
     for (int i = 0; i < 16; ++i) {
         vec2 offset = poissonDisk[i] * texelSize;
@@ -130,6 +130,7 @@ float PCFShadow(sampler2D shadowMap, vec4 shadowCoord) {
 
 void main()
 {
+    float fZScale = 2.0;
     // Calculate shadow coordinates
     vec4 shadowCoord = vShadowCoord;
     shadowCoord.xyz /= shadowCoord.w;
@@ -141,13 +142,16 @@ void main()
     vec4 vTexC = texture(uTexture, vTexCoord);
     vec4 vTexDt = texture(uTexNorm, vTexCoord + vec2(0.5)/uRTRes);
     float fWater = smoothstep( 0.0, 0.003, vTexC.z );
-    float fFoam = min(1.0, length(vTexDt.xy) * length(vTexC.xy) * 10.0 / clamp(0.001, 1.0, vTexC.z * 1000.0));
-    vec3 vNormal = normalize( vec3( -vTexDt.xy, g_fGridSizeInMeter ) );
+    float fFoam = length(vTexDt.xy) * length(vTexC.xy) * 10.0 / clamp(0.001, 1.0, vTexC.z * 1000.0);
+	fFoam += smoothstep(0.003, 0.0, vTexC.z);//part
+	fFoam = clamp(fFoam, 0.0, 1.0);
+    vec3 vNormal = normalize( vec3( -vTexDt.xy, g_fGridSizeInMeter/fZScale ) );
     
     vec3 vCWater = mix( vec3(0.3, 0.7, 0.7), vec3(0.3, 0.6, 0.8)*0.7, smoothstep( 0.0, 0.015, vTexC.z ) )*0.6;
+	vec3 vCFoam = vec3(1.0);
     vec3 vCLand = vec3(0.6, 0.5, 0.3) * 0.8;
 
-    vCWater = mix( vCWater, vec3(1.0), fFoam );
+    vCWater = mix( vCWater, vCFoam, fFoam );
 
     vec3 vDiffuse = mix(vCLand, vCWater, fWater );
    
