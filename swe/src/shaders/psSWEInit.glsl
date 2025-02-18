@@ -64,7 +64,7 @@ float voronoise( in vec2 p, float u, float v )
 float SampleDepth(vec2 xy)
 {
     float fRet = 0.0;
-    vec2 vUV = xy * g_fGridSizeInMeter * 0.0005 + 2.0;
+    vec2 vUV = xy * g_fGridSizeInMeter * 0.0005 + 3.0;
     vUV += vec2(noise(vUV + 2.0), noise(vUV + 1.0)) * 0.1;
     mat2 m = mat2(2.0, 1.2, -1.2, 2.0);
     fRet = noise(vUV) / 2.0; vUV = (m * vUV);
@@ -86,7 +86,7 @@ float SampleDepth(vec2 xy)
     float fNoise = fRet;
     
 
-    fRet = fNoise * 0.03;
+    fRet = fNoise * 0.02;
 
     //fRet = clamp(fRet, 0.0, 0.001);
     //fRet = ( 1.0-exp(-abs(fRet)/0.001))*0.001;// * sign(fRet);

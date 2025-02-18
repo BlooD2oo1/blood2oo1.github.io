@@ -1,6 +1,5 @@
 import { app } from './webglapp.js';
 import { createShaderProgram } from './webglapp.js';
-import { createTextureAndFramebuffer } from './webglapp.js';
 import * as mat4 from './dependencies/gl-matrix/esm/mat4.js';
 import * as vec3 from './dependencies/gl-matrix/esm/vec3.js';
 import * as vec4 from './dependencies/gl-matrix/esm/vec4.js';
@@ -79,17 +78,41 @@ export class SWE {
 
         // Create the first framebuffer and texture
         this.currentFramebuffer = this.gl.createFramebuffer();
-        this.currentTexture = createTextureAndFramebuffer(this.gl, this.currentFramebuffer, this.width, this.height );
+        this.currentTexture = this.createTextureAndFramebuffer(this.gl, this.currentFramebuffer, this.width, this.height );
 
         // Create the second framebuffer and texture
         this.otherFramebuffer = this.gl.createFramebuffer();
-        this.otherTexture = createTextureAndFramebuffer(this.gl, this.otherFramebuffer, this.width, this.height);
+        this.otherTexture = this.createTextureAndFramebuffer(this.gl, this.otherFramebuffer, this.width, this.height);
 
         // Create the second framebuffer and texture
         this.rtFramebufferNorm = this.gl.createFramebuffer();
-        this.rtTextureNorm = createTextureAndFramebuffer(this.gl, this.rtFramebufferNorm, this.width, this.height);
+        this.rtTextureNorm = this.createTextureAndFramebuffer(this.gl, this.rtFramebufferNorm, this.width, this.height);
 
         this.renderInit();
+    }
+
+    createTextureAndFramebuffer(gl, framebuffer, width, height) {
+        gl.bindFramebuffer(gl.FRAMEBUFFER, framebuffer);
+
+        const texture = gl.createTexture();
+        gl.bindTexture(gl.TEXTURE_2D, texture);
+        gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA32F, width, height, 0, gl.RGBA, gl.FLOAT, null);
+        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
+        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
+
+        gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_2D, texture, 0);
+
+        const status = gl.checkFramebufferStatus(gl.FRAMEBUFFER);
+        if (status !== gl.FRAMEBUFFER_COMPLETE) {
+            console.error('Framebuffer is not complete:', status.toString(16));
+        }
+
+        gl.clearColor(0.0, 0.0, 0.0, 0.0);
+        gl.clear(gl.COLOR_BUFFER_BIT);
+
+        gl.bindFramebuffer(gl.FRAMEBUFFER, null);
+
+        return texture;
     }
 
     getWidth() {

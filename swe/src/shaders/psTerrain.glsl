@@ -2,10 +2,12 @@
 precision highp float;
 
 in vec2 vTexCoord;
+in vec4 vShadowCoord;
 out vec4 outColor;
 
 uniform sampler2D uTexture;
 uniform sampler2D uTexNorm;
+uniform sampler2D uShadowMap;
 uniform vec2 uRTRes;
 uniform mat4 uMVPMatrix;
 uniform vec3 g_vLightDir;
@@ -87,34 +89,75 @@ vec3 Shade(vec3 vLightDir, vec3 vLightColor, vec3 vAmbientColorUp, vec3 vAmbient
 
     // Ambient lighting (up-down blend)
     float upFactor = clamp(vNormal.z * 0.5 + 0.5, 0.0, 1.0);
-    vec3 ambient = mix(vAmbientColorDown, vAmbientColorUp, upFactor);
+    vec3 ambient = mix(vAmbientColorDown, vAmbientColorUp, upFactor) * vDiffuse;
 
     // Final shading result
     return ambient + (diffuse + specular) * vLightColor * NoL;
 }
 
+const vec2 poissonDisk[16] = vec2[](
+    vec2(-0.94201624, -0.39906216),
+    vec2(0.94558609, -0.76890725),
+    vec2(-0.094184101, -0.92938870),
+    vec2(0.34495938, 0.29387760),
+    vec2(-0.91588581, 0.45771432),
+    vec2(-0.81544232, -0.87912464),
+    vec2(-0.38277543, 0.27676845),
+    vec2(0.97484398, 0.75648379),
+    vec2(0.44323325, -0.97511554),
+    vec2(0.53742981, -0.47373420),
+    vec2(-0.26496911, -0.41893023),
+    vec2(0.79197514, 0.19090188),
+    vec2(-0.24188840, 0.99706507),
+    vec2(-0.81409955, 0.91437590),
+    vec2(0.19984126, 0.78641367),
+    vec2(0.14383161, -0.14100790)
+    );
+
+float PCFShadow(sampler2D shadowMap, vec4 shadowCoord) {
+    float shadow = 0.0;
+    float texelSize = 1.0 / float(textureSize(shadowMap, 0).x);
+    float fRadMul = 2.0;
+	texelSize *= fRadMul;
+    for (int i = 0; i < 16; ++i) {
+        vec2 offset = poissonDisk[i] * texelSize;
+        float shadowDepth = texture(shadowMap, shadowCoord.xy + offset).r;
+        shadow += shadowCoord.z > shadowDepth + 0.003 ? 0.0 : 1.0;
+    }
+    shadow /= 16.0;
+    return shadow;
+}
+
 void main()
 {
+    // Calculate shadow coordinates
+    vec4 shadowCoord = vShadowCoord;
+    shadowCoord.xyz /= shadowCoord.w;
+    shadowCoord.xyz = shadowCoord.xyz * 0.5 + 0.5;
+
+    // Apply PCF shadow filtering
+    float shadow = PCFShadow(uShadowMap, shadowCoord);
+
     vec4 vTexC = texture(uTexture, vTexCoord);
     vec4 vTexDt = texture(uTexNorm, vTexCoord + vec2(0.5)/uRTRes);
     float fWater = smoothstep( 0.0, 0.003, vTexC.z );
-
-    vec3 vNormal = normalize( vec3( vTexDt.xy, g_fGridSizeInMeter ) );
+    float fFoam = min(1.0, length(vTexDt.xy) * length(vTexC.xy) * 10.0 / clamp(0.001, 1.0, vTexC.z * 1000.0));
+    vec3 vNormal = normalize( vec3( -vTexDt.xy, g_fGridSizeInMeter ) );
     
-    vec3 vCWater = mix( vec3(0.3, 0.7, 0.7), vec3(0.3, 0.5, 0.8)*0.7, smoothstep( 0.0, 0.05, vTexC.z ) )*0.4;
+    vec3 vCWater = mix( vec3(0.3, 0.7, 0.7), vec3(0.3, 0.6, 0.8)*0.7, smoothstep( 0.0, 0.015, vTexC.z ) )*0.6;
     vec3 vCLand = vec3(0.6, 0.5, 0.3) * 0.8;
 
-    //vCWater = mix( vCWater, vec3(1.0), min( 1.0, length(vTexDt.xy)*length(vTexC.xy)*10.0 ) );
+    vCWater = mix( vCWater, vec3(1.0), fFoam );
 
     vec3 vDiffuse = mix(vCLand, vCWater, fWater );
    
-    vec3 g_vCLight = vec3(1.0, 0.8, 0.5) * 3.0;
+    vec3 g_vCLight = vec3(1.0, 0.8, 0.5) * 4.0;
     vec3 g_vCAmbientUp = vec3(0.3, 0.5, 0.7) * 0.1;
     vec3 g_vCAmbientDown = vCLand * 0.01;
 
-    //vDiffuse = vec3( 0.1 );
+    //vDiffuse = vec3( 0.3 );
 
-    vec3 vColor = Shade(g_vLightDir, g_vCLight, g_vCAmbientUp, g_vCAmbientDown, vNormal, vDiffuse, mix( 0.8, 0.1, fWater ), mix(0.04, 0.5, fWater), g_vViewDir);
+    vec3 vColor = Shade(g_vLightDir, g_vCLight*shadow, g_vCAmbientUp, g_vCAmbientDown, vNormal, vDiffuse, mix( 0.9, 0.44, fWater ), mix(0.04, 0.1, fWater), g_vViewDir);
 
     outColor.rgb = vColor;
     outColor.a = 1.0;
