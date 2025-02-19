@@ -114,15 +114,23 @@ const vec2 poissonDisk[16] = vec2[](
     vec2(0.14383161, -0.14100790)
     );
 
-float PCFShadow(sampler2D shadowMap, vec4 shadowCoord) {
+float random(vec2 st) {
+    return fract(sin(dot(st.xy, vec2(12.9898, 78.233))) * 43758.5453123);
+}
+
+float PCFShadow(sampler2D shadowMap, vec4 shadowCoord, float fRadMul) {
     float shadow = 0.0;
     float texelSize = 1.0 / float(textureSize(shadowMap, 0).x);
-    float fRadMul = 1.0;
-	texelSize *= fRadMul;
+    texelSize *= fRadMul;
+
+    // Generate a random rotation angle based on the texture coordinates
+    float angle = random(vTexCoord) * 6.28318530718; // 2 * PI
+    mat2 rotation = mat2(cos(angle), -sin(angle), sin(angle), cos(angle));
+
     for (int i = 0; i < 16; ++i) {
-        vec2 offset = poissonDisk[i] * texelSize;
+        vec2 offset = rotation * poissonDisk[i] * texelSize;
         float shadowDepth = texture(shadowMap, shadowCoord.xy + offset).r;
-        shadow += shadowCoord.z > shadowDepth + 0.003 ? 0.0 : 1.0;
+        shadow += shadowCoord.z > shadowDepth + 0.003 * fRadMul ? 0.0 : 1.0;
     }
     shadow /= 16.0;
     return shadow;
@@ -136,9 +144,6 @@ void main()
     shadowCoord.xyz /= shadowCoord.w;
     shadowCoord.xyz = shadowCoord.xyz * 0.5 + 0.5;
 
-    // Apply PCF shadow filtering
-    float shadow = PCFShadow(uShadowMap, shadowCoord);
-
     vec4 vTexC = texture(uTexture, vTexCoord);
     vec4 vTexDtC = texture(uTexNorm, vTexCoord + vec2(0.5)/uRTRes);
     vec4 vTexDtR = texture(uTexNorm, vTexCoord + vec2(0.5)/uRTRes + vec2(1.0/uRTRes.x,0.0));
@@ -150,9 +155,8 @@ void main()
     vec2 dB = vTexDtB.xy;
 
     float fOcc = pow( 1.0 - clamp(length(dC - dR) + length(dC - dB), 0.0, 1.0), 1.0 );
-    fOcc *= fOcc*fOcc;
+    fOcc *= pow( fOcc, 2.3 );
     
-
     float fWater = smoothstep( 0.0, 0.0015, vTexC.z );
     float fFoam = length(vTexDtC.xy) * length(vTexC.xy) * 10.0 / clamp(0.001, 1.0, vTexC.z * 1000.0);
 	fFoam += smoothstep(0.0010, 0.0002, vTexC.z);//part
@@ -171,7 +175,9 @@ void main()
     vec3 g_vCAmbientUp = vec3(0.3, 0.5, 0.7) * 0.15;
     vec3 g_vCAmbientDown = vCLand * 0.01;
 
-    vec3 vColor = Shade(g_vLightDir, g_vCLight*shadow, g_vCAmbientUp*fOcc, g_vCAmbientDown*fOcc, vNormal, vDiffuse, mix( 0.9, 0.4, fWater ), mix(0.04, 0.1, fWater), g_vViewDir);
+    // Apply PCF shadow filtering
+    float shadow = PCFShadow(uShadowMap, shadowCoord, mix( 1.0, 2.0, fWater ) );
+    vec3 vColor = Shade(g_vLightDir, g_vCLight*shadow, g_vCAmbientUp * fOcc, g_vCAmbientDown * fOcc, vNormal, vDiffuse, mix( 0.9, 0.4, fWater ), mix(0.04, 0.1, fWater), g_vViewDir);
 
     outColor.rgb = vColor;
     outColor.a = 1.0;

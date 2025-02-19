@@ -47,7 +47,7 @@ void main()
         float fW = max(0.0, (fRad - fDirLen)/fRad );
         //fW = 0.5 - 0.5 * cos(fW*PI);
         fW = 0.5 - 0.5 * cos(fW*PI2);
-        outColor.z += fW * 0.000004;
+        outColor.z += fW * 0.000004 * g_fElapsedTimeInSec;
         //vDir.xy = vec2( vDir.y, -vDir.x );
         //outColor.xy += fW * 0.001 * vDir/fDirLen;
     }
@@ -58,7 +58,7 @@ void main()
         float fDirLen = length(vDir);
         float fW = max(0.0, (fRad - fDirLen)/fRad );
         fW = 0.5 - 0.5 * cos(fW*PI2);
-        outColor.z += fW * 0.0000005;
+        outColor.z += fW * 0.0000005 * g_fElapsedTimeInSec;
     }
 
     {
@@ -67,6 +67,6 @@ void main()
         float fDirLen = length(vDir);
         float fW = max(0.0, (fRad - fDirLen)/fRad );
         fW = 0.5 - 0.5 * cos(fW*PI2);
-        outColor.z -= fW * 0.0000005;
+        outColor.z -= fW * 0.0000005 * g_fElapsedTimeInSec;
     }
 }

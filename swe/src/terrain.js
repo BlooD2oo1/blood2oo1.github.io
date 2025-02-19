@@ -148,7 +148,7 @@ export class Terrain {
             this.viewDir = vec3.fromValues(this.viewMatrix[2], this.viewMatrix[6], this.viewMatrix[10]);
             vec3.normalize(this.viewDir, this.viewDir);
 
-            this.vLightDir = vec3.fromValues(0.0, 1.0, 0.4);
+            this.vLightDir = vec3.fromValues(0.0, 1.0, 0.3);
             //vec3.rotateZ(this.vLightDir, this.vLightDir, [0, 0, 0], -this.fCamRotZ + Math.PI / 15 + Math.PI);
             //vec3.rotateX(vLightDir, vLightDir, [0, 0, 0], app.getSlider1() * Math.PI);
             //vec3.rotateZ(vLightDir, vLightDir, [0, 0, 0], app.getSlider2() * Math.PI*2);
