@@ -150,11 +150,12 @@ void main()
     vec2 dB = vTexDtB.xy;
 
     float fOcc = pow( 1.0 - clamp(length(dC - dR) + length(dC - dB), 0.0, 1.0), 1.0 );
+    fOcc *= fOcc*fOcc;
     
 
-    float fWater = smoothstep( 0.0, 0.0014, vTexC.z );
+    float fWater = smoothstep( 0.0, 0.0015, vTexC.z );
     float fFoam = length(vTexDtC.xy) * length(vTexC.xy) * 10.0 / clamp(0.001, 1.0, vTexC.z * 1000.0);
-	fFoam += smoothstep(0.0014, 0.0002, vTexC.z);//part
+	fFoam += smoothstep(0.0010, 0.0002, vTexC.z);//part
 	fFoam = clamp(fFoam, 0.0, 1.0);
     vec3 vNormal = normalize( vec3( -vTexDtC.xy, g_fGridSizeInMeter/fZScale ) );
     
@@ -170,9 +171,7 @@ void main()
     vec3 g_vCAmbientUp = vec3(0.3, 0.5, 0.7) * 0.15;
     vec3 g_vCAmbientDown = vCLand * 0.01;
 
-    vDiffuse *= vec3( fOcc );
-
-    vec3 vColor = Shade(g_vLightDir, g_vCLight*shadow, g_vCAmbientUp, g_vCAmbientDown, vNormal, vDiffuse, mix( 0.9, 0.4, fWater ), mix(0.04, 0.1, fWater), g_vViewDir);
+    vec3 vColor = Shade(g_vLightDir, g_vCLight*shadow, g_vCAmbientUp*fOcc, g_vCAmbientDown*fOcc, vNormal, vDiffuse, mix( 0.9, 0.4, fWater ), mix(0.04, 0.1, fWater), g_vViewDir);
 
     outColor.rgb = vColor;
     outColor.a = 1.0;
