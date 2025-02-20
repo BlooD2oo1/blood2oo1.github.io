@@ -96,7 +96,7 @@ float SampleDepth(vec2 xy)
     float fNoise = fRet;
     
 
-    fRet = fNoise * 0.0032;
+    fRet = fNoise * 0.017;
 
     //fRet = clamp(fRet, 0.0, 0.001);
     //fRet = ( 1.0-exp(-abs(fRet)/0.001))*0.001;// * sign(fRet);

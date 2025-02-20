@@ -8,14 +8,14 @@ import * as vec4 from './dependencies/gl-matrix/esm/vec4.js';
 export class SWE {
     constructor(gl) {
         this.gl = gl;
-        this.width = 512;
-        this.height = 512;
+        this.width = 1024;
+        this.height = 1024;
 
         this.params = {
             fGridSizeInMeter: 5.0,
             fElapsedTimeInSec: 0.5,
             fAdvectSpeed: -1.0,
-            fG: 10.0,
+            fG: 9.8,
             fHackBlurDepth: 1.0
         };
     }
@@ -177,7 +177,7 @@ export class SWE {
         
         this.gl.viewport(0, 0, this.width, this.height);
 
-        for (let i = 0; i < 50; i++) {
+        for (let i = 0; i < 20; i++) {
             // Pass 01
             this.gl.bindFramebuffer(this.gl.FRAMEBUFFER, this.currentFramebuffer);
             this.gl.useProgram(this.program_SWEPass01);

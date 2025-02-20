@@ -13,15 +13,21 @@ export class Terrain {
     async init() {
         // Load the shader program
         const [
-            [vs, fs, program],
-            [vsShadow, fsShadow, programShadow],
+            [vsTerrain, fsTerrain, programTerrain],
+            [vsTerrainShadow, fsTerrainShadow, programTerrainShadow],
+            [vsTerrainSkirt, fsTerrainSkirt, programTerrainSkirt],
+            [vsTerrainSkirtShadow, fsTerrainSkirtShadow, programTerrainSkirtShadow],
         ] = await Promise.all([
             createShaderProgram(this.gl, 'src/shaders/vsTerrain.glsl', 'src/shaders/psTerrain.glsl'),
-            createShaderProgram(this.gl, 'src/shaders/vsTerrainShadow.glsl', 'src/shaders/psTerrainShadow.glsl')
+            createShaderProgram(this.gl, 'src/shaders/vsTerrainShadow.glsl', 'src/shaders/psTerrainShadow.glsl'),
+            createShaderProgram(this.gl, 'src/shaders/vsTerrainSkirt.glsl', 'src/shaders/psTerrainSkirt.glsl'),
+            createShaderProgram(this.gl, 'src/shaders/vsTerrainSkirtShadow.glsl', 'src/shaders/psTerrainSkirtShadow.glsl')
         ]);
 
-        this.program = program;
-        this.programShadow = programShadow;
+        this.programTerrain = programTerrain;
+        this.programTerrainShadow = programTerrainShadow;
+        this.programTerrainSkirt = programTerrainSkirt;
+        this.programTerrainSkirtShadow = programTerrainSkirtShadow;
 
         // Create the vertex and index buffers
         this.createBuffers();
@@ -40,34 +46,81 @@ export class Terrain {
     createBuffers() {
         const width = app.Present.SWE.getWidth();
         const height = app.Present.SWE.getHeight();
-        const vertices = [];
-        const indices = [];
+        const verticesTerrain = [];
+        const indicesTerrain = [];
+        const verticesSkirt = [];
+        const indicesSkirt = [];
         const stepX = 1.0 / width;
         const stepY = 1.0 / height;
 
         for (let y = 0; y < height; y++) {
             for (let x = 0; x < width; x++) {
-                vertices.push((x + 0.5) * stepX, (y + 0.5) * stepY, 0.0);
+                verticesTerrain.push((x) * stepX, (y) * stepY, 0.0);
             }
         }
 
         for (let y = 0; y < height - 1; y++) {
             for (let x = 0; x < width - 1; x++) {
                 const i = y * width + x;
-                indices.push(i, i + 1, i + width);
-                indices.push(i + 1, i + width + 1, i + width);
+                indicesTerrain.push(i, i + 1, i + width);
+                indicesTerrain.push(i + 1, i + width + 1, i + width);
             }
         }
 
-        this.vertexBuffer = this.gl.createBuffer();
-        this.gl.bindBuffer(this.gl.ARRAY_BUFFER, this.vertexBuffer);
-        this.gl.bufferData(this.gl.ARRAY_BUFFER, new Float32Array(vertices), this.gl.STATIC_DRAW);
+        // Create skirt vertices
+        const skirtHeight = 1.0; // Adjust the height of the skirt as needed
 
-        this.indexBuffer = this.gl.createBuffer();
-        this.gl.bindBuffer(this.gl.ELEMENT_ARRAY_BUFFER, this.indexBuffer);
-        this.gl.bufferData(this.gl.ELEMENT_ARRAY_BUFFER, new Uint32Array(indices), this.gl.STATIC_DRAW);
+        //0,0
+        for (let y = 0; y < height; y++) {
+            verticesSkirt.push(0, (y) * stepY, 0.0, -1.0, 0.0); // Top vertex
+            verticesSkirt.push(0, (y) * stepY, skirtHeight, -1.0, 0.0); // Bottom vertex
+        }
+        //0,1
 
-        this.indexCount = indices.length;
+        //0,1
+        for (let x = 0; x < width; x++) {
+            verticesSkirt.push((x) * stepX, (height - 1) * stepY, 0.0, 0.0, 1.0); // Top vertex
+            verticesSkirt.push((x) * stepX, (height - 1) * stepY, skirtHeight, 0.0, 1.0); // Bottom vertex
+        }
+        //1,1
+
+        //1,1
+        for (let y = height-1; y >= 0; y--) {
+            verticesSkirt.push((width - 1) * stepX, (y) * stepY, 0.0, 1.0, 0.0); // Top vertex
+            verticesSkirt.push((width - 1) * stepX, (y) * stepY, skirtHeight, 1.0, 0.0); // Bottom vertex
+        }
+        //1,0
+
+        //1,0
+        for (let x = width - 1; x >= 0; x--) {
+            verticesSkirt.push((x) * stepX, 0, 0.0, 0.0, -1.0); // Top vertex
+            verticesSkirt.push((x) * stepX, 0, skirtHeight, 0.0, -1.0); // Bottom vertex
+        }
+        //0,0
+
+        // Create skirt indices for TRIANGLE_STRIP
+        for (let i = 0; i < verticesSkirt.length / 3 - 2; i += 2) {
+            indicesSkirt.push(i, i + 1, i + 2, i + 3);
+        }
+
+        this.vertexBufferTerrain = this.gl.createBuffer();
+        this.gl.bindBuffer(this.gl.ARRAY_BUFFER, this.vertexBufferTerrain);
+        this.gl.bufferData(this.gl.ARRAY_BUFFER, new Float32Array(verticesTerrain), this.gl.STATIC_DRAW);
+
+        this.indexBufferTerrain = this.gl.createBuffer();
+        this.gl.bindBuffer(this.gl.ELEMENT_ARRAY_BUFFER, this.indexBufferTerrain);
+        this.gl.bufferData(this.gl.ELEMENT_ARRAY_BUFFER, new Uint32Array(indicesTerrain), this.gl.STATIC_DRAW);
+
+        this.vertexBufferSkirt = this.gl.createBuffer();
+        this.gl.bindBuffer(this.gl.ARRAY_BUFFER, this.vertexBufferSkirt);
+        this.gl.bufferData(this.gl.ARRAY_BUFFER, new Float32Array(verticesSkirt), this.gl.STATIC_DRAW);
+
+        this.indexBufferSkirt = this.gl.createBuffer();
+        this.gl.bindBuffer(this.gl.ELEMENT_ARRAY_BUFFER, this.indexBufferSkirt);
+        this.gl.bufferData(this.gl.ELEMENT_ARRAY_BUFFER, new Uint32Array(indicesSkirt), this.gl.STATIC_DRAW);
+
+        this.indexCountTerrain = indicesTerrain.length;
+        this.indexCountSkirt = indicesSkirt.length;
     }
 
     createShadowMap() {
@@ -148,7 +201,7 @@ export class Terrain {
             this.viewDir = vec3.fromValues(this.viewMatrix[2], this.viewMatrix[6], this.viewMatrix[10]);
             vec3.normalize(this.viewDir, this.viewDir);
 
-            this.vLightDir = vec3.fromValues(0.0, 1.0, 0.3);
+            this.vLightDir = vec3.fromValues(0.3, 1.0, 0.4);
             //vec3.rotateZ(this.vLightDir, this.vLightDir, [0, 0, 0], -this.fCamRotZ + Math.PI / 15 + Math.PI);
             //vec3.rotateX(vLightDir, vLightDir, [0, 0, 0], app.getSlider1() * Math.PI);
             //vec3.rotateZ(vLightDir, vLightDir, [0, 0, 0], app.getSlider2() * Math.PI*2);
@@ -183,7 +236,8 @@ export class Terrain {
         gl.clear(gl.DEPTH_BUFFER_BIT);
 
         // Render the scene from the light's perspective
-        this.renderShadowMap();
+        this.renderTerrainShadow();
+        this.renderTerrainSkirtShadow();
 
         // Render the scene normally
         gl.bindFramebuffer(gl.FRAMEBUFFER, null);
@@ -191,89 +245,185 @@ export class Terrain {
         gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 
         // Use the shadow map in the shader
-        this.renderScene();
+        this.renderTerrain();
+        this.renderTerrainSkirt();
 
     }
 
-    renderShadowMap() {
+    renderTerrainShadow() {
         const gl = this.gl;
+        const program = this.programTerrainShadow;
 
         // Use the shadow map shader program
-        gl.useProgram(this.programShadow);
+        gl.useProgram(program);
 
         // Bind the vertex buffer
-        gl.bindBuffer(gl.ARRAY_BUFFER, this.vertexBuffer);
-        const positionLocation = gl.getAttribLocation(this.programShadow, 'position');
+        gl.bindBuffer(gl.ARRAY_BUFFER, this.vertexBufferTerrain);
+        const positionLocation = gl.getAttribLocation(program, 'position');
         gl.enableVertexAttribArray(positionLocation);
         gl.vertexAttribPointer(positionLocation, 3, gl.FLOAT, false, 0, 0);
         // Bind the index buffer
-        gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, this.indexBuffer);
+        gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, this.indexBufferTerrain);
 
-        gl.uniformMatrix4fv(gl.getUniformLocation(this.programShadow, 'g_matVPShadow'), false, this.shadowMapMatrix);
+        gl.uniformMatrix4fv(gl.getUniformLocation(program, 'g_matVPShadow'), false, this.shadowMapMatrix);
 
         // Bind the SWE texture
         const texture = app.Present.SWE.getSWETex();
-        this.gl.activeTexture(this.gl.TEXTURE0);
-        this.gl.bindTexture(this.gl.TEXTURE_2D, texture);
-        this.gl.uniform1i(this.gl.getUniformLocation(this.programShadow, 'g_tTex'), 0);
+        gl.activeTexture(gl.TEXTURE0);
+        gl.bindTexture(gl.TEXTURE_2D, texture);
+        gl.uniform1i(gl.getUniformLocation(program, 'g_tTex'), 0);
 
         gl.enable(gl.CULL_FACE);
         gl.cullFace(gl.BACK);
         gl.frontFace(gl.CCW);
 
         // Draw the grid
-        gl.drawElements(gl.TRIANGLES, this.indexCount, gl.UNSIGNED_INT, 0);
+        gl.drawElements(gl.TRIANGLES, this.indexCountTerrain, gl.UNSIGNED_INT, 0);
     }
 
-    renderScene() {
-
+    renderTerrainSkirtShadow() {
         const gl = this.gl;
+        const program = this.programTerrainSkirtShadow;
 
-        this.gl.useProgram(this.program);
+        // Use the shadow map shader program
+        gl.useProgram(program);
 
         // Bind the vertex buffer
-        this.gl.bindBuffer(this.gl.ARRAY_BUFFER, this.vertexBuffer);
-        const positionLocation = this.gl.getAttribLocation(this.program, 'position');
-        this.gl.enableVertexAttribArray(positionLocation);
-        this.gl.vertexAttribPointer(positionLocation, 3, this.gl.FLOAT, false, 0, 0);
+        gl.bindBuffer(gl.ARRAY_BUFFER, this.vertexBufferSkirt);
+        const positionLocation = gl.getAttribLocation(program, 'position');
+        gl.enableVertexAttribArray(positionLocation);
+        gl.vertexAttribPointer(positionLocation, 3, gl.FLOAT, false, 5 * Float32Array.BYTES_PER_ELEMENT, 0);
+        //const normalLocation = gl.getAttribLocation(program, 'normal');
+        //gl.enableVertexAttribArray(normalLocation);
+        //gl.vertexAttribPointer(normalLocation, 2, gl.FLOAT, false, 5 * Float32Array.BYTES_PER_ELEMENT, 3 * Float32Array.BYTES_PER_ELEMENT);
         // Bind the index buffer
-        this.gl.bindBuffer(this.gl.ELEMENT_ARRAY_BUFFER, this.indexBuffer);
+        gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, this.indexBufferSkirt);
 
-        this.gl.uniformMatrix4fv(this.gl.getUniformLocation(this.program, 'g_matVP'), false, this.mvpMatrix);
-        this.gl.uniformMatrix4fv(this.gl.getUniformLocation(this.program, 'g_matVPShadow'), false, this.shadowMapMatrix);
-
-        this.gl.uniform3f(this.gl.getUniformLocation(this.program, "g_vViewDir"), this.viewDir[0], this.viewDir[1], this.viewDir[2]);
-        this.gl.uniform3f(this.gl.getUniformLocation(this.program, "g_vLightDir"), this.vLightDir[0], this.vLightDir[1], this.vLightDir[2]);
+        gl.uniformMatrix4fv(gl.getUniformLocation(program, 'g_matVPShadow'), false, this.shadowMapMatrix);
 
         // Bind the SWE texture
         const texture = app.Present.SWE.getSWETex();
-        this.gl.activeTexture(this.gl.TEXTURE0);
-        this.gl.bindTexture(this.gl.TEXTURE_2D, texture);
-        this.gl.uniform1i(this.gl.getUniformLocation(this.program, 'g_tTex'), 0);
+        gl.activeTexture(gl.TEXTURE0);
+        gl.bindTexture(gl.TEXTURE_2D, texture);
+        gl.uniform1i(gl.getUniformLocation(program, 'g_tTex'), 0);
+
+        gl.enable(gl.CULL_FACE);
+        gl.cullFace(gl.BACK);
+        gl.frontFace(gl.CCW);
+
+        // Draw the grid
+        gl.drawElements(gl.TRIANGLE_STRIP, this.indexCountSkirt, gl.UNSIGNED_INT, 0);
+    }
+
+    renderTerrain() {
+
+        const gl = this.gl;
+        const program = this.programTerrain;
+
+        gl.useProgram(program);
+
+        // Bind the vertex buffer
+        gl.bindBuffer(gl.ARRAY_BUFFER, this.vertexBufferTerrain);
+        const positionLocation = gl.getAttribLocation(program, 'position');
+        gl.enableVertexAttribArray(positionLocation);
+        gl.vertexAttribPointer(positionLocation, 3, gl.FLOAT, false, 0, 0);
+        // Bind the index buffer
+        gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, this.indexBufferTerrain);
+
+        gl.uniformMatrix4fv(gl.getUniformLocation(program, 'g_matVP'), false, this.mvpMatrix);
+        gl.uniformMatrix4fv(gl.getUniformLocation(program, 'g_matVPShadow'), false, this.shadowMapMatrix);
+
+        gl.uniform3f(gl.getUniformLocation(program, "g_vViewDir"), this.viewDir[0], this.viewDir[1], this.viewDir[2]);
+        gl.uniform3f(gl.getUniformLocation(program, "g_vLightDir"), this.vLightDir[0], this.vLightDir[1], this.vLightDir[2]);
+
+        // Bind the SWE texture
+        const texture = app.Present.SWE.getSWETex();
+        gl.activeTexture(gl.TEXTURE0);
+        gl.bindTexture(gl.TEXTURE_2D, texture);
+        gl.uniform1i(gl.getUniformLocation(program, 'g_tTex'), 0);
 
         // Bind the SWETex texture
         const texture2 = app.Present.SWE.getNormalTex();
-        this.gl.activeTexture(this.gl.TEXTURE1);
-        this.gl.bindTexture(this.gl.TEXTURE_2D, texture2);
-        this.gl.uniform1i(this.gl.getUniformLocation(this.program, 'g_tTexNorm'), 1);
+        gl.activeTexture(gl.TEXTURE1);
+        gl.bindTexture(gl.TEXTURE_2D, texture2);
+        gl.uniform1i(gl.getUniformLocation(program, 'g_tTexNorm'), 1);
 
-        this.gl.activeTexture(this.gl.TEXTURE2);
-        this.gl.bindTexture(this.gl.TEXTURE_2D, this.shadowMap);
-        this.gl.uniform1i(this.gl.getUniformLocation(this.program, 'g_tShadowMap'), 2);
+        gl.activeTexture(gl.TEXTURE2);
+        gl.bindTexture(gl.TEXTURE_2D, this.shadowMap);
+        gl.uniform1i(gl.getUniformLocation(program, 'g_tShadowMap'), 2);
 
         // Pass parameters to the fragment shader
-        this.gl.uniform1f(this.gl.getUniformLocation(this.program, "g_fGridSizeInMeter"), app.Present.SWE.params.fGridSizeInMeter);
-        this.gl.uniform1f(this.gl.getUniformLocation(this.program, "g_fElapsedTimeInSec"), app.Present.SWE.params.fElapsedTimeInSec);
-        this.gl.uniform1f(this.gl.getUniformLocation(this.program, "g_fAdvectSpeed"), app.Present.SWE.params.fAdvectSpeed);
-        this.gl.uniform1f(this.gl.getUniformLocation(this.program, "g_fG"), app.Present.SWE.params.fG);
-        this.gl.uniform1f(this.gl.getUniformLocation(this.program, "g_fHackBlurDepth"), app.Present.SWE.params.fHackBlurDepth);
+        gl.uniform1f(gl.getUniformLocation(program, "g_fGridSizeInMeter"), app.Present.SWE.params.fGridSizeInMeter);
+        gl.uniform1f(gl.getUniformLocation(program, "g_fElapsedTimeInSec"), app.Present.SWE.params.fElapsedTimeInSec);
+        gl.uniform1f(gl.getUniformLocation(program, "g_fAdvectSpeed"), app.Present.SWE.params.fAdvectSpeed);
+        gl.uniform1f(gl.getUniformLocation(program, "g_fG"), app.Present.SWE.params.fG);
+        gl.uniform1f(gl.getUniformLocation(program, "g_fHackBlurDepth"), app.Present.SWE.params.fHackBlurDepth);
 
         gl.enable(gl.CULL_FACE);
         gl.cullFace(gl.BACK);
         gl.frontFace(gl.CW);
 
         // Draw the grid
-        this.gl.drawElements(this.gl.TRIANGLES, this.indexCount, this.gl.UNSIGNED_INT, 0);
+        gl.drawElements(gl.TRIANGLES, this.indexCountTerrain, gl.UNSIGNED_INT, 0);
+
+        gl.enable(gl.CULL_FACE);
+        gl.cullFace(gl.BACK);
+        gl.frontFace(gl.CCW);
+    }
+
+    renderTerrainSkirt() {
+
+        const gl = this.gl;
+        const program = this.programTerrainSkirt;
+
+        gl.useProgram(program);
+
+        // Bind the vertex buffer
+        gl.bindBuffer(gl.ARRAY_BUFFER, this.vertexBufferSkirt);
+        const positionLocation = gl.getAttribLocation(program, 'position');
+        gl.enableVertexAttribArray(positionLocation);
+        gl.vertexAttribPointer(positionLocation, 3, gl.FLOAT, false, 5 * Float32Array.BYTES_PER_ELEMENT, 0);
+        const normalLocation = gl.getAttribLocation(program, 'normal');
+        gl.enableVertexAttribArray(normalLocation);
+        gl.vertexAttribPointer(normalLocation, 2, gl.FLOAT, false, 5 * Float32Array.BYTES_PER_ELEMENT, 3 * Float32Array.BYTES_PER_ELEMENT);
+        // Bind the index buffer
+        gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, this.indexBufferSkirt);
+
+        gl.uniformMatrix4fv(gl.getUniformLocation(program, 'g_matVP'), false, this.mvpMatrix);
+        gl.uniformMatrix4fv(gl.getUniformLocation(program, 'g_matVPShadow'), false, this.shadowMapMatrix);
+
+        gl.uniform3f(gl.getUniformLocation(program, "g_vViewDir"), this.viewDir[0], this.viewDir[1], this.viewDir[2]);
+        gl.uniform3f(gl.getUniformLocation(program, "g_vLightDir"), this.vLightDir[0], this.vLightDir[1], this.vLightDir[2]);
+
+        // Bind the SWE texture
+        const texture = app.Present.SWE.getSWETex();
+        gl.activeTexture(gl.TEXTURE0);
+        gl.bindTexture(gl.TEXTURE_2D, texture);
+        gl.uniform1i(gl.getUniformLocation(program, 'g_tTex'), 0);
+
+        // Bind the SWETex texture
+        const texture2 = app.Present.SWE.getNormalTex();
+        gl.activeTexture(gl.TEXTURE1);
+        gl.bindTexture(gl.TEXTURE_2D, texture2);
+        gl.uniform1i(gl.getUniformLocation(program, 'g_tTexNorm'), 1);
+
+        gl.activeTexture(gl.TEXTURE2);
+        gl.bindTexture(gl.TEXTURE_2D, this.shadowMap);
+        gl.uniform1i(gl.getUniformLocation(program, 'g_tShadowMap'), 2);
+
+        // Pass parameters to the fragment shader
+        gl.uniform1f(gl.getUniformLocation(program, "g_fGridSizeInMeter"), app.Present.SWE.params.fGridSizeInMeter);
+        gl.uniform1f(gl.getUniformLocation(program, "g_fElapsedTimeInSec"), app.Present.SWE.params.fElapsedTimeInSec);
+        gl.uniform1f(gl.getUniformLocation(program, "g_fAdvectSpeed"), app.Present.SWE.params.fAdvectSpeed);
+        gl.uniform1f(gl.getUniformLocation(program, "g_fG"), app.Present.SWE.params.fG);
+        gl.uniform1f(gl.getUniformLocation(program, "g_fHackBlurDepth"), app.Present.SWE.params.fHackBlurDepth);
+
+        gl.enable(gl.CULL_FACE);
+        gl.cullFace(gl.BACK);
+        gl.frontFace(gl.CW);
+
+        // Draw the grid
+        gl.drawElements(gl.TRIANGLE_STRIP, this.indexCountSkirt, gl.UNSIGNED_INT, 0);
 
         gl.enable(gl.CULL_FACE);
         gl.cullFace(gl.BACK);
