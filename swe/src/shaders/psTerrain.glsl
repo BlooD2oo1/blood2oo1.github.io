@@ -5,11 +5,10 @@ in vec2 vTexCoord;
 in vec4 vShadowCoord;
 out vec4 outColor;
 
-uniform sampler2D uTexture;
-uniform sampler2D uTexNorm;
-uniform sampler2D uShadowMap;
-uniform vec2 uRTRes;
-uniform mat4 uMVPMatrix;
+uniform sampler2D g_tTex;
+uniform sampler2D g_tTexNorm;
+uniform sampler2D g_tShadowMap;
+uniform mat4 g_matVP;
 uniform vec3 g_vLightDir;
 uniform vec3 g_vViewDir;
 
@@ -144,10 +143,15 @@ void main()
     shadowCoord.xyz /= shadowCoord.w;
     shadowCoord.xyz = shadowCoord.xyz * 0.5 + 0.5;
 
-    vec4 vTexC = texture(uTexture, vTexCoord);
-    vec4 vTexDtC = texture(uTexNorm, vTexCoord + vec2(0.5)/uRTRes);
-    vec4 vTexDtR = texture(uTexNorm, vTexCoord + vec2(0.5)/uRTRes + vec2(1.0/uRTRes.x,0.0));
-    vec4 vTexDtB = texture(uTexNorm, vTexCoord + vec2(0.5)/uRTRes + vec2(0.0,1.0/uRTRes.y));
+    ivec2 vTexSize = textureSize(g_tTex, 0);
+    ivec2 tc = ivec2(vTexCoord * vec2(vTexSize));
+    vec4 vTexC = texelFetch(g_tTex, tc, 0);
+    ivec2 tcDt = ivec2(vTexCoord * (vec2(vTexSize)+vec2(0.5)));
+    vec4 vTexDtC = texelFetch(g_tTexNorm, tcDt, 0);
+    //vec4 vTexDtR = texture(g_tTexNorm, vTexCoord + vec2(0.5)/vTexRes + vec2(1.0/vTexRes.x,0.0));
+    //vec4 vTexDtB = texture(g_tTexNorm, vTexCoord + vec2(0.5)/vTexRes + vec2(0.0,1.0/vTexRes.y));
+    vec4 vTexDtR = (tc.x < vTexSize.x - 1) ? texelFetchOffset(g_tTexNorm, tcDt, 0, ivec2(1, 0)) : vTexC * vec4(0.0, 0.0, 1.0, 1.0);
+    vec4 vTexDtB = (tc.y < vTexSize.y - 1) ? texelFetchOffset(g_tTexNorm, tcDt, 0, ivec2(0, 1)) : vTexC * vec4(0.0, 0.0, 1.0, 1.0);
 
     // Calculate occlusion
     vec2 dC = vTexDtC.xy;
@@ -155,7 +159,7 @@ void main()
     vec2 dB = vTexDtB.xy;
 
     float fOcc = pow( 1.0 - clamp(length(dC - dR) + length(dC - dB), 0.0, 1.0), 1.0 );
-    fOcc *= pow( fOcc, 2.3 );
+    fOcc = pow( fOcc, 2.0 );
     
     float fWater = smoothstep( 0.0, 0.0015, vTexC.z );
     float fFoam = length(vTexDtC.xy) * length(vTexC.xy) * 10.0 / clamp(0.001, 1.0, vTexC.z * 1000.0);
@@ -176,8 +180,8 @@ void main()
     vec3 g_vCAmbientDown = vCLand * 0.01;
 
     // Apply PCF shadow filtering
-    float shadow = PCFShadow(uShadowMap, shadowCoord, mix( 1.0, 2.0, fWater ) );
-    vec3 vColor = Shade(g_vLightDir, g_vCLight*shadow, g_vCAmbientUp * fOcc, g_vCAmbientDown * fOcc, vNormal, vDiffuse, mix( 0.9, 0.4, fWater ), mix(0.04, 0.1, fWater), g_vViewDir);
+    float shadow = PCFShadow(g_tShadowMap, shadowCoord, mix( 1.0, 2.0, fWater ) );
+    vec3 vColor = Shade(g_vLightDir, g_vCLight*shadow, g_vCAmbientUp * fOcc, g_vCAmbientDown * fOcc, vNormal, vDiffuse, mix( 0.9, 0.3, fWater ), mix(0.04, 0.1, fWater), g_vViewDir);
 
     outColor.rgb = vColor;
     outColor.a = 1.0;

@@ -88,6 +88,9 @@ class WebGLApp {
         this.Present = new Present(this.gl);
 
         this.init();
+
+        this.lastFrameTime = performance.now();
+        this.frameCount = 0;
     }
 
     isMobileDevice() {
@@ -129,6 +132,12 @@ class WebGLApp {
         // Create sliders with labels
         this.createSlider('slider1', 'Slider 1', 0.0, 1.0, 1.0);
         this.createSlider('slider2', 'Slider 2', 0.0, 1.0, 1.0);
+
+        // Create FPS display
+        this.fpsDisplay = document.createElement('div');
+        this.fpsDisplay.id = 'fpsDisplay';
+        this.fpsDisplay.innerText = 'FPS: 0';
+        this.uiContainer.appendChild(this.fpsDisplay);
 
         // Add event listeners to the buttons
         this.button1.addEventListener('click', () => {
@@ -267,19 +276,38 @@ class WebGLApp {
     }
 
     resize() {
-        //let iSize = Math.min(window.innerWidth, window.innerHeight);
         const contentRect = this.webapp.getBoundingClientRect();
-        //let iSize = Math.min(contentRect.width, contentRect.height);
 
-        //iSize = Math.floor(iSize * 0.9);
-        //iSize = iSize - (iSize % 256);
-        //iSize = Math.max(256, iSize);
-        this.canvas.width = contentRect.width - 10;
-        this.canvas.height = contentRect.height - 10;
+        let width = contentRect.width - 10;
+        let height = contentRect.height - 10;
+
+        // Limit the canvas size to a maximum of 1024x1024
+        const maxSize = 1024;
+        if (width > maxSize) {
+            width = maxSize;
+        }
+        if (height > maxSize) {
+            height = maxSize;
+        }
+
+        this.canvas.width = width;
+        this.canvas.height = height;
+
         this.gl.viewport(0, 0, this.canvas.width, this.canvas.height);
     }
 
     render() {
+        const now = performance.now();
+        const deltaTime = now - this.lastFrameTime;
+        this.frameCount++;
+
+        if (deltaTime >= 1000) {
+            const fps = (this.frameCount / deltaTime) * 1000;
+            this.fpsDisplay.innerText = `FPS: ${fps.toFixed(2)}`;
+            this.lastFrameTime = now;
+            this.frameCount = 0;
+        }
+
         this.Present.render();
         requestAnimationFrame(this.render.bind(this));
     }

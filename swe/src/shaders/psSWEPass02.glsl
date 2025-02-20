@@ -2,8 +2,8 @@
 precision highp float;
 in vec2 vTexCoord;
 out vec4 outColor;
-uniform sampler2D uTexture;
-uniform vec2 uRTRes;
+uniform sampler2D g_tTex;
+uniform vec2 g_vRTRes;
 uniform float g_fGridSizeInMeter;
 uniform float g_fElapsedTimeInSec;
 uniform float g_fAdvectSpeed;
@@ -14,17 +14,17 @@ uniform float g_fHackBlurDepth;
 
 void main()
 {
-    ivec2 tc = ivec2(vTexCoord * uRTRes);
+    ivec2 tc = ivec2(vTexCoord * g_vRTRes);
 
-    vec4 vTexC = texelFetch(uTexture, tc, 0);
-    vec4 vTexL = (tc.x > 0) ? texelFetchOffset(uTexture, tc, 0, ivec2(-1, 0)) : vTexC * vec4(0.0, 0.0, 1.0, 1.0);
-    vec4 vTexR = (tc.x < int(uRTRes.x) - 1) ? texelFetchOffset(uTexture, tc, 0, ivec2(1, 0)) : vTexC * vec4(0.0, 0.0, 1.0, 1.0);
-    vec4 vTexT = (tc.y > 0) ? texelFetchOffset(uTexture, tc, 0, ivec2(0, -1)) : vTexC * vec4(0.0, 0.0, 1.0, 1.0);
-    vec4 vTexB = (tc.y < int(uRTRes.y) - 1) ? texelFetchOffset(uTexture, tc, 0, ivec2(0, 1)) : vTexC * vec4(0.0, 0.0, 1.0, 1.0);
+    vec4 vTexC = texelFetch(g_tTex, tc, 0);
+    vec4 vTexL = (tc.x > 0) ? texelFetchOffset(g_tTex, tc, 0, ivec2(-1, 0)) : vTexC * vec4(0.0, 0.0, 1.0, 1.0);
+    vec4 vTexR = (tc.x < int(g_vRTRes.x) - 1) ? texelFetchOffset(g_tTex, tc, 0, ivec2(1, 0)) : vTexC * vec4(0.0, 0.0, 1.0, 1.0);
+    vec4 vTexT = (tc.y > 0) ? texelFetchOffset(g_tTex, tc, 0, ivec2(0, -1)) : vTexC * vec4(0.0, 0.0, 1.0, 1.0);
+    vec4 vTexB = (tc.y < int(g_vRTRes.y) - 1) ? texelFetchOffset(g_tTex, tc, 0, ivec2(0, 1)) : vTexC * vec4(0.0, 0.0, 1.0, 1.0);
 
-    vec2 vOffset = vTexC.xy / uRTRes.xy * g_fAdvectSpeed * g_fElapsedTimeInSec / g_fGridSizeInMeter;
+    vec2 vOffset = vTexC.xy / g_vRTRes.xy * g_fAdvectSpeed * g_fElapsedTimeInSec / g_fGridSizeInMeter;
 
-    vec4 vTex = textureLod(uTexture, vTexCoord + vOffset, 0.0);
+    vec4 vTex = textureLod(g_tTex, vTexCoord + vOffset, 0.0);
 
     if (vTexC.x == 0.0) vTex.xyz = vTexC.xyz;
     if (vTexC.y == 0.0) vTex.xyz = vTexC.xyz;

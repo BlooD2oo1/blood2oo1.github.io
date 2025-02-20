@@ -206,18 +206,16 @@ export class Terrain {
         const positionLocation = gl.getAttribLocation(this.programShadow, 'position');
         gl.enableVertexAttribArray(positionLocation);
         gl.vertexAttribPointer(positionLocation, 3, gl.FLOAT, false, 0, 0);
-
         // Bind the index buffer
         gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, this.indexBuffer);
 
-        // Set the shadow map matrix uniform
-        gl.uniformMatrix4fv(gl.getUniformLocation(this.programShadow, 'uShadowMapMatrix'), false, this.shadowMapMatrix);
+        gl.uniformMatrix4fv(gl.getUniformLocation(this.programShadow, 'g_matVPShadow'), false, this.shadowMapMatrix);
 
         // Bind the SWE texture
         const texture = app.Present.SWE.getSWETex();
         this.gl.activeTexture(this.gl.TEXTURE0);
         this.gl.bindTexture(this.gl.TEXTURE_2D, texture);
-        this.gl.uniform1i(this.gl.getUniformLocation(this.programShadow, 'uTexture'), 0);
+        this.gl.uniform1i(this.gl.getUniformLocation(this.programShadow, 'g_tTex'), 0);
 
         gl.enable(gl.CULL_FACE);
         gl.cullFace(gl.BACK);
@@ -238,13 +236,11 @@ export class Terrain {
         const positionLocation = this.gl.getAttribLocation(this.program, 'position');
         this.gl.enableVertexAttribArray(positionLocation);
         this.gl.vertexAttribPointer(positionLocation, 3, this.gl.FLOAT, false, 0, 0);
-
         // Bind the index buffer
         this.gl.bindBuffer(this.gl.ELEMENT_ARRAY_BUFFER, this.indexBuffer);
 
-        // Set the MVP matrix uniform
-        this.gl.uniformMatrix4fv(this.gl.getUniformLocation(this.program, 'uMVPMatrix'), false, this.mvpMatrix);
-        this.gl.uniformMatrix4fv(this.gl.getUniformLocation(this.program, 'uShadowMapMatrix'), false, this.shadowMapMatrix);
+        this.gl.uniformMatrix4fv(this.gl.getUniformLocation(this.program, 'g_matVP'), false, this.mvpMatrix);
+        this.gl.uniformMatrix4fv(this.gl.getUniformLocation(this.program, 'g_matVPShadow'), false, this.shadowMapMatrix);
 
         this.gl.uniform3f(this.gl.getUniformLocation(this.program, "g_vViewDir"), this.viewDir[0], this.viewDir[1], this.viewDir[2]);
         this.gl.uniform3f(this.gl.getUniformLocation(this.program, "g_vLightDir"), this.vLightDir[0], this.vLightDir[1], this.vLightDir[2]);
@@ -253,19 +249,17 @@ export class Terrain {
         const texture = app.Present.SWE.getSWETex();
         this.gl.activeTexture(this.gl.TEXTURE0);
         this.gl.bindTexture(this.gl.TEXTURE_2D, texture);
-        this.gl.uniform1i(this.gl.getUniformLocation(this.program, 'uTexture'), 0);
+        this.gl.uniform1i(this.gl.getUniformLocation(this.program, 'g_tTex'), 0);
 
         // Bind the SWETex texture
         const texture2 = app.Present.SWE.getNormalTex();
         this.gl.activeTexture(this.gl.TEXTURE1);
         this.gl.bindTexture(this.gl.TEXTURE_2D, texture2);
-        this.gl.uniform1i(this.gl.getUniformLocation(this.program, 'uTexNorm'), 1);
+        this.gl.uniform1i(this.gl.getUniformLocation(this.program, 'g_tTexNorm'), 1);
 
         this.gl.activeTexture(this.gl.TEXTURE2);
         this.gl.bindTexture(this.gl.TEXTURE_2D, this.shadowMap);
-        this.gl.uniform1i(this.gl.getUniformLocation(this.program, 'uShadowMap'), 2);
-
-        this.gl.uniform2f(this.gl.getUniformLocation(this.program, "uRTRes"), app.Present.SWE.getWidth(), app.Present.SWE.getHeight());
+        this.gl.uniform1i(this.gl.getUniformLocation(this.program, 'g_tShadowMap'), 2);
 
         // Pass parameters to the fragment shader
         this.gl.uniform1f(this.gl.getUniformLocation(this.program, "g_fGridSizeInMeter"), app.Present.SWE.params.fGridSizeInMeter);

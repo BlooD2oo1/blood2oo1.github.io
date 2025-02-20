@@ -138,7 +138,7 @@ export class SWE {
         // Render to the framebuffer
         this.gl.useProgram(this.program_SWEPassInit);
         this.gl.bindVertexArray(this.vao);
-        this.gl.uniform2f(this.gl.getUniformLocation(this.program_SWEPassInit, "uRTRes"), this.getWidth(), this.getHeight());
+        this.gl.uniform2f(this.gl.getUniformLocation(this.program_SWEPassInit, "g_vRTRes"), this.getWidth(), this.getHeight());
 
         // Pass parameters to the fragment shader
         this.gl.uniform1f(this.gl.getUniformLocation(this.program_SWEPassInit, "g_fGridSizeInMeter"), this.params.fGridSizeInMeter);
@@ -184,10 +184,10 @@ export class SWE {
             this.gl.bindVertexArray(this.vao);
             this.gl.activeTexture(this.gl.TEXTURE0);
             this.gl.bindTexture(this.gl.TEXTURE_2D, this.otherTexture);
-            this.gl.uniform1i(this.gl.getUniformLocation(this.program_SWEPass01, "uTexture"), 0);
+            this.gl.uniform1i(this.gl.getUniformLocation(this.program_SWEPass01, "g_tTex"), 0);
             this.gl.texParameteri(this.gl.TEXTURE_2D, this.gl.TEXTURE_MIN_FILTER, this.gl.LINEAR);
             this.gl.texParameteri(this.gl.TEXTURE_2D, this.gl.TEXTURE_MAG_FILTER, this.gl.LINEAR);
-            this.gl.uniform2f(this.gl.getUniformLocation(this.program_SWEPass01, "uRTRes"), this.getWidth(), this.getHeight());
+            this.gl.uniform2f(this.gl.getUniformLocation(this.program_SWEPass01, "g_vRTRes"), this.getWidth(), this.getHeight());
 
             // Pass parameters to the fragment shader
             this.gl.uniform1f(this.gl.getUniformLocation(this.program_SWEPass01, "g_fGridSizeInMeter"), this.params.fGridSizeInMeter);
@@ -251,10 +251,10 @@ export class SWE {
             this.gl.bindVertexArray(this.vao);
             this.gl.activeTexture(this.gl.TEXTURE0);
             this.gl.bindTexture(this.gl.TEXTURE_2D, this.otherTexture);
-            this.gl.uniform1i(this.gl.getUniformLocation(this.program_SWEPass02, "uTexture"), 0);
+            this.gl.uniform1i(this.gl.getUniformLocation(this.program_SWEPass02, "g_tTex"), 0);
             this.gl.texParameteri(this.gl.TEXTURE_2D, this.gl.TEXTURE_MIN_FILTER, this.gl.LINEAR);
             this.gl.texParameteri(this.gl.TEXTURE_2D, this.gl.TEXTURE_MAG_FILTER, this.gl.LINEAR);
-            this.gl.uniform2f(this.gl.getUniformLocation(this.program_SWEPass02, "uRTRes"), this.getWidth(), this.getHeight());
+            this.gl.uniform2f(this.gl.getUniformLocation(this.program_SWEPass02, "g_vRTRes"), this.getWidth(), this.getHeight());
 
             // Pass parameters to the fragment shader
             this.gl.uniform1f(this.gl.getUniformLocation(this.program_SWEPass02, "g_fGridSizeInMeter"), this.params.fGridSizeInMeter);
@@ -273,10 +273,10 @@ export class SWE {
             this.gl.bindVertexArray(this.vao);
             this.gl.activeTexture(this.gl.TEXTURE0);
             this.gl.bindTexture(this.gl.TEXTURE_2D, this.otherTexture);
-            this.gl.uniform1i(this.gl.getUniformLocation(this.program_SWEPass03, "uTexture"), 0);
+            this.gl.uniform1i(this.gl.getUniformLocation(this.program_SWEPass03, "g_tTex"), 0);
             this.gl.texParameteri(this.gl.TEXTURE_2D, this.gl.TEXTURE_MIN_FILTER, this.gl.LINEAR);
             this.gl.texParameteri(this.gl.TEXTURE_2D, this.gl.TEXTURE_MAG_FILTER, this.gl.LINEAR);
-            this.gl.uniform2f(this.gl.getUniformLocation(this.program_SWEPass03, "uRTRes"), this.getWidth(), this.getHeight());
+            this.gl.uniform2f(this.gl.getUniformLocation(this.program_SWEPass03, "g_vRTRes"), this.getWidth(), this.getHeight());
 
             // Pass parameters to the fragment shader
             this.gl.uniform1f(this.gl.getUniformLocation(this.program_SWEPass03, "g_fGridSizeInMeter"), this.params.fGridSizeInMeter);
@@ -296,10 +296,10 @@ export class SWE {
         this.gl.bindVertexArray(this.vao);
         this.gl.activeTexture(this.gl.TEXTURE0);
         this.gl.bindTexture(this.gl.TEXTURE_2D, this.otherTexture);
-        this.gl.uniform1i(this.gl.getUniformLocation(this.program_SWEProc01, "uTexture"), 0);
+        this.gl.uniform1i(this.gl.getUniformLocation(this.program_SWEProc01, "g_tTex"), 0);
         this.gl.texParameteri(this.gl.TEXTURE_2D, this.gl.TEXTURE_MIN_FILTER, this.gl.LINEAR);
         this.gl.texParameteri(this.gl.TEXTURE_2D, this.gl.TEXTURE_MAG_FILTER, this.gl.LINEAR);
-        this.gl.uniform2f(this.gl.getUniformLocation(this.program_SWEProc01, "uRTRes"), this.getWidth(), this.getHeight());
+        this.gl.uniform2f(this.gl.getUniformLocation(this.program_SWEProc01, "g_vRTRes"), this.getWidth(), this.getHeight());
 
         // Pass parameters to the fragment shader
         this.gl.uniform1f(this.gl.getUniformLocation(this.program_SWEProc01, "g_fGridSizeInMeter"), this.params.fGridSizeInMeter);

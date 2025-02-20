@@ -103,7 +103,7 @@ input[type="range"]::-moz-range-thumb {
     border-radius: 2px;
     flex-grow: 1;
     height: calc(100% - 10rem); /* Adjust the height to fit within the viewport */
-    width: calc(100% - 4rem); /* Adjust the width to fit within the viewport */
+    width: calc(100% - 10rem); /* Adjust the width to fit within the viewport */
     position: relative; /* Add this line */
 }
 

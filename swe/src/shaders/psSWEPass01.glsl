@@ -2,8 +2,8 @@
 precision highp float;
 in vec2 vTexCoord;
 out vec4 outColor;
-uniform sampler2D uTexture;
-uniform vec2 uRTRes;
+uniform sampler2D g_tTex;
+uniform vec2 g_vRTRes;
 uniform float g_fGridSizeInMeter;
 uniform float g_fElapsedTimeInSec;
 uniform float g_fAdvectSpeed;
@@ -26,17 +26,17 @@ const float LN2 = 0.69314718055994530941723212145817658;
 
 void main()
 {
-    ivec2 tc = ivec2(vTexCoord*uRTRes);
-    vec4 vTexC = texelFetch(uTexture, tc, 0);
+    ivec2 tc = ivec2(vTexCoord*g_vRTRes);
+    vec4 vTexC = texelFetch(g_tTex, tc, 0);
 
     float dt = -g_fAdvectSpeed * g_fElapsedTimeInSec / g_fGridSizeInMeter;
     vec2 v1 = vTexC.xy;
-    vec2 v2 = textureLod(uTexture, vTexCoord - ( 0.5 * v1 * dt ) / uRTRes, 0.0 ).xy;
-    vec2 v3 = textureLod(uTexture, vTexCoord - ( 0.5 * v2 * dt ) / uRTRes, 0.0 ).xy;
-    vec2 v4 = textureLod(uTexture, vTexCoord - ( v3 * dt ) / uRTRes, 0.0 ).xy;
+    vec2 v2 = textureLod(g_tTex, vTexCoord - ( 0.5 * v1 * dt ) / g_vRTRes, 0.0 ).xy;
+    vec2 v3 = textureLod(g_tTex, vTexCoord - ( 0.5 * v2 * dt ) / g_vRTRes, 0.0 ).xy;
+    vec2 v4 = textureLod(g_tTex, vTexCoord - ( v3 * dt ) / g_vRTRes, 0.0 ).xy;
     vec2 v = (1.0 * v1 + 2.0 * v2 + 2.0 * v3 + 1.0 * v4) / 6.0;
     
-    outColor = textureLod(uTexture, vTexCoord + ( v * dt ) / uRTRes, 0.0);
+    outColor = textureLod(g_tTex, vTexCoord + ( v * dt ) / g_vRTRes, 0.0);
 	outColor.zw = vTexC.zw;
 
     if ( uMouseButtons.x!=0)

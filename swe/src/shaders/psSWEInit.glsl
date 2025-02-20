@@ -2,8 +2,8 @@
 precision highp float;
 in vec2 vTexCoord;
 out vec4 outColor;
-uniform sampler2D uTexture;
-uniform vec2 uRTRes;
+uniform sampler2D g_tTex;
+uniform vec2 g_vRTRes;
 uniform float g_fGridSizeInMeter;
 uniform float g_fElapsedTimeInSec;
 uniform float g_fAdvectSpeed;
@@ -117,7 +117,7 @@ void main()
 {
 	//outColor = vec4( fract( vTexCoord*8.0 ), 0.0, 1.0);
 	outColor = vec4(0);
-    ivec2 tc = ivec2(vTexCoord * uRTRes);
+    ivec2 tc = ivec2(vTexCoord * g_vRTRes);
 	outColor.w = SampleDepth(vec2(tc));
 	outColor.z = max(0.0, -outColor.w);
 }

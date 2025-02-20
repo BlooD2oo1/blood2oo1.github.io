@@ -93,7 +93,7 @@ export class Present {
         const texture = this.SWE.getSWETex();
         this.gl.activeTexture(this.gl.TEXTURE0);
         this.gl.bindTexture(this.gl.TEXTURE_2D, texture);
-        this.gl.uniform1i(this.gl.getUniformLocation(this.program_Present, "uTexture"), 0);
+        this.gl.uniform1i(this.gl.getUniformLocation(this.program_Present, "g_tTex"), 0);
         this.gl.texParameteri(this.gl.TEXTURE_2D, this.gl.TEXTURE_MIN_FILTER, this.gl.LINEAR);
         this.gl.texParameteri(this.gl.TEXTURE_2D, this.gl.TEXTURE_MAG_FILTER, this.gl.LINEAR);
 
@@ -106,7 +106,7 @@ export class Present {
         this.gl.uniform1f(this.gl.getUniformLocation(this.program_Present, "fSlider2"), app.getSlider2());
 
         // create vec2 shader input for SWE width height:
-        this.gl.uniform2f(this.gl.getUniformLocation(this.program_Present, "uRTRes"), app.getWidth(), app.getHeight());
+        this.gl.uniform2f(this.gl.getUniformLocation(this.program_Present, "g_vRTRes"), app.getWidth(), app.getHeight());
 
         this.gl.drawArrays(this.gl.TRIANGLES, 0, 6);
 

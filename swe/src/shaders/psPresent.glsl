@@ -2,8 +2,8 @@
 precision highp float;
 in vec2 vTexCoord;
 out vec4 outColor;
-uniform sampler2D uTexture;
-uniform vec2 uRTRes;
+uniform sampler2D g_tTex;
+uniform vec2 g_vRTRes;
 uniform vec2 uMousePosition;
 uniform float fSlider1;
 uniform float fSlider2;
@@ -12,10 +12,10 @@ uniform float fSlider2;
 void main()
 {
     // Get the texture resolution
-    vec2 vTexRes = vec2(textureSize(uTexture, 0));
+    vec2 vTexRes = vec2(textureSize(g_tTex, 0));
 
     // Calculate the pixel coordinates
-    vec2 vPixelCoord = vTexCoord * uRTRes;
+    vec2 vPixelCoord = vTexCoord * g_vRTRes;
     ivec2 viPixelCoord = ivec2(vPixelCoord);
 
     // Convert pixel coordinates back to texture coordinates
@@ -24,7 +24,7 @@ void main()
     outColor = vec4(0.1, 0.1, 0.1, 1.0);
     if ( texCoord.x >= 0.0 && texCoord.x < 1.0 && texCoord.y >= 0.0 && texCoord.y < 1.0 )
     {
-        outColor = texelFetch(uTexture, viPixelCoord, 0);
+        outColor = texelFetch(g_tTex, viPixelCoord, 0);
         float fWater = outColor.b * 100.0;
         outColor.rgb = outColor.www+0.3;
         outColor.b += fWater;
