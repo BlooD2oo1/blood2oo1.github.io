@@ -169,7 +169,7 @@ void main()
     
     vec3 vCWater = mix( vec3(0.3, 0.7, 0.7), vec3(0.3, 0.6, 0.8)*0.7, smoothstep( 0.0, 0.01, vTexC.z ) )*0.4;
 	vec3 vCFoam = vec3(1.0);
-    vec3 vCLand = vec3(0.6, 0.5, 0.3) * 0.6;
+    vec3 vCLand = mix( vec3(0.6, 0.5, 0.3), vec3(0.6, 0.6, 0.5), clamp( vTexC.w*10.1, 0.0, 1.0 ) ) * 0.6;
 
     vCWater = mix( vCWater, vCFoam, fFoam );
 

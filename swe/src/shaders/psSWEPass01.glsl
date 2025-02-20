@@ -49,8 +49,6 @@ void main()
         outColor.z += fW * 0.00002 * g_fElapsedTimeInSec;
     }
 
-
-
     {
         float fRad = 0.09;
         vec2 vDir = vTexCoord - vec2(0.85,0.7);
