@@ -45,12 +45,11 @@ void main()
         vec2 vDir = vTexCoord - uClickPosition;
         float fDirLen = length(vDir);
         float fW = max(0.0, (fRad - fDirLen)/fRad );
-        //fW = 0.5 - 0.5 * cos(fW*PI);
         fW = 0.5 - 0.5 * cos(fW*PI2);
         outColor.z += fW * 0.00002 * g_fElapsedTimeInSec;
-        //vDir.xy = vec2( vDir.y, -vDir.x );
-        //outColor.xy += fW * 0.001 * vDir/fDirLen;
     }
+
+
 
     {
         float fRad = 0.09;

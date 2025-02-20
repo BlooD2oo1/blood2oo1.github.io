@@ -158,8 +158,8 @@ void main()
     vec2 dR = vTexDtR.xy;
     vec2 dB = vTexDtB.xy;
 
-    float fOcc = pow( 1.0 - clamp(length(dC - dR) + length(dC - dB), 0.0, 1.0), 1.0 );
-    fOcc = pow( fOcc, 0.5 );
+    float fOcc = 1.0 - clamp(length(dC - dR) + length(dC - dB), 0.0, 1.0);
+    fOcc = pow( fOcc*0.8+0.2, 0.5 );
     
     float fWater = smoothstep( 0.0, 0.005, vTexC.z );
     float fFoam = length(vTexDtC.xy) * length(vTexC.xy) * 10.0 / clamp(0.001, 1.0, vTexC.z * 1000.0);
