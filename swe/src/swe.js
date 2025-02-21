@@ -16,7 +16,8 @@ export class SWE {
             fElapsedTimeInSec: 0.5,
             fAdvectSpeed: -1.0,
             fG: 9.8,
-            fHackBlurDepth: 1.0
+            fHackBlurDepth: 1.0,
+            iInitSetting: 0,
         };
     }
 
@@ -146,6 +147,8 @@ export class SWE {
         this.gl.uniform1f(this.gl.getUniformLocation(this.program_SWEPassInit, "g_fAdvectSpeed"), this.params.fAdvectSpeed);
         this.gl.uniform1f(this.gl.getUniformLocation(this.program_SWEPassInit, "g_fG"), this.params.fG);
         this.gl.uniform1f(this.gl.getUniformLocation(this.program_SWEPassInit, "g_fHackBlurDepth"), this.params.fHackBlurDepth);
+        this.gl.uniform1i(this.gl.getUniformLocation(this.program_SWEPassInit, "g_iInitSetting"), this.params.iInitSetting);
+        console.log(this.params.iInitSetting);
         this.gl.drawArrays(this.gl.TRIANGLES, 0, 6);
         // Unbind the framebuffer
         this.gl.bindFramebuffer(this.gl.FRAMEBUFFER, null);
@@ -195,6 +198,7 @@ export class SWE {
             this.gl.uniform1f(this.gl.getUniformLocation(this.program_SWEPass01, "g_fAdvectSpeed"), this.params.fAdvectSpeed);
             this.gl.uniform1f(this.gl.getUniformLocation(this.program_SWEPass01, "g_fG"), this.params.fG);
             this.gl.uniform1f(this.gl.getUniformLocation(this.program_SWEPass01, "g_fHackBlurDepth"), this.params.fHackBlurDepth);
+            this.gl.uniform1i(this.gl.getUniformLocation(this.program_SWEPass01, "g_iInitSetting"), this.params.iInitSetting);
 
             // Pass mouse position to the fragment shader
             const mousePosition = app.getMousePosition();
@@ -262,6 +266,7 @@ export class SWE {
             this.gl.uniform1f(this.gl.getUniformLocation(this.program_SWEPass02, "g_fAdvectSpeed"), this.params.fAdvectSpeed);
             this.gl.uniform1f(this.gl.getUniformLocation(this.program_SWEPass02, "g_fG"), this.params.fG);
             this.gl.uniform1f(this.gl.getUniformLocation(this.program_SWEPass02, "g_fHackBlurDepth"), this.params.fHackBlurDepth);
+            this.gl.uniform1i(this.gl.getUniformLocation(this.program_SWEPass02, "g_iInitSetting"), this.params.iInitSetting);
 
             this.gl.drawArrays(this.gl.TRIANGLES, 0, 6);
             [this.currentFramebuffer, this.otherFramebuffer] = [this.otherFramebuffer, this.currentFramebuffer];
@@ -284,6 +289,7 @@ export class SWE {
             this.gl.uniform1f(this.gl.getUniformLocation(this.program_SWEPass03, "g_fAdvectSpeed"), this.params.fAdvectSpeed);
             this.gl.uniform1f(this.gl.getUniformLocation(this.program_SWEPass03, "g_fG"), this.params.fG);
             this.gl.uniform1f(this.gl.getUniformLocation(this.program_SWEPass03, "g_fHackBlurDepth"), this.params.fHackBlurDepth);
+            this.gl.uniform1i(this.gl.getUniformLocation(this.program_SWEPass03, "g_iInitSetting"), this.params.iInitSetting);
 
             this.gl.drawArrays(this.gl.TRIANGLES, 0, 6);
             [this.currentFramebuffer, this.otherFramebuffer] = [this.otherFramebuffer, this.currentFramebuffer];
@@ -307,6 +313,7 @@ export class SWE {
         this.gl.uniform1f(this.gl.getUniformLocation(this.program_SWEProc01, "g_fAdvectSpeed"), this.params.fAdvectSpeed);
         this.gl.uniform1f(this.gl.getUniformLocation(this.program_SWEProc01, "g_fG"), this.params.fG);
         this.gl.uniform1f(this.gl.getUniformLocation(this.program_SWEProc01, "g_fHackBlurDepth"), this.params.fHackBlurDepth);
+        this.gl.uniform1i(this.gl.getUniformLocation(this.program_SWEProc01, "g_iInitSetting"), this.params.iInitSetting);
 
         this.gl.drawArrays(this.gl.TRIANGLES, 0, 6);
 

@@ -13,6 +13,7 @@ uniform float g_fElapsedTimeInSec;
 uniform float g_fAdvectSpeed;
 uniform float g_fG;
 uniform float g_fHackBlurDepth;
+uniform int g_iInitSetting;
 
 const float PI05 = 1.5707963267948966192313216916398;
 const float PI = 3.1415926535897932384626433832795;
@@ -77,52 +78,96 @@ float voronoise( in vec2 p, float u, float v )
 float SampleDepth(vec2 xy)
 {
     float fRet = 0.0;
-    vec2 vUV = xy * g_fGridSizeInMeter * 0.0005 + 7.0;
-    vUV += vec2(noise(vUV + 2.0), noise(vUV + 1.0)) * 0.1;
-    mat2 m = mat2(2.0, 1.2, -1.2, 2.0);
-    fRet = noise(vUV) / 2.0; vUV = (m * vUV);
-    fRet += noise(vUV) / 8.0; vUV = (m * vUV);
-    vUV += vec2(noise(vUV + 0.5), noise(vUV + 2.5)) * 0.1;
-    fRet += noise(vUV) / 16.0; vUV = (m * vUV);
-    fRet += noise(vUV) / 64.0; vUV = (m * vUV);
-    fRet += noise(vUV) / 128.0; vUV = (m * vUV);
-    fRet += noise(vUV) / 256.0; vUV = (m * vUV);
-
-    fRet *= 1.8;
+    if ( g_iInitSetting == 0 )
     {
-        vec2 p = vec2( 1.0, 0.44);
-        p = p*p*(3.0-2.0*p);
-	    p = p*p*(3.0-2.0*p);
-	    p = p*p*(3.0-2.0*p);
-        fRet += voronoise(xy*0.035, p.x, p.y) * 0.12;
-    }
+        vec2 vUV = xy * g_fGridSizeInMeter * 0.0005 + 7.0;
+        vUV += vec2(noise(vUV + 2.0), noise(vUV + 1.0)) * 0.1;
+        mat2 m = mat2(2.0, 1.2, -1.2, 2.0);
+        fRet = noise(vUV) / 2.0; vUV = (m * vUV);
+        fRet += noise(vUV) / 8.0; vUV = (m * vUV);
+        vUV += vec2(noise(vUV + 0.5), noise(vUV + 2.5)) * 0.1;
+        fRet += noise(vUV) / 16.0; vUV = (m * vUV);
+        fRet += noise(vUV) / 64.0; vUV = (m * vUV);
+        fRet += noise(vUV) / 128.0; vUV = (m * vUV);
+        fRet += noise(vUV) / 256.0; vUV = (m * vUV);
 
-    {
-        vec2 p = vec2( 1.0, 0.43);
-        p = p*p*(3.0-2.0*p);
-	    p = p*p*(3.0-2.0*p);
-	    p = p*p*(3.0-2.0*p);
-        fRet += voronoise(xy*0.12, p.x, p.y) * 0.04;
-    }
-    fRet += 0.2;
+        fRet *= 1.8;
+        {
+            vec2 p = vec2( 1.0, 0.44);
+            p = p*p*(3.0-2.0*p);
+	        p = p*p*(3.0-2.0*p);
+	        p = p*p*(3.0-2.0*p);
+            fRet += voronoise(xy*0.035, p.x, p.y) * 0.12;
+        }
 
-    float fNoise = fRet;
+        {
+            vec2 p = vec2( 1.0, 0.43);
+            p = p*p*(3.0-2.0*p);
+	        p = p*p*(3.0-2.0*p);
+	        p = p*p*(3.0-2.0*p);
+            fRet += voronoise(xy*0.12, p.x, p.y) * 0.04;
+        }
+        fRet += 0.2;
+
+        float fNoise = fRet;
     
 
-    fRet = fNoise * 0.017;
+        fRet = fNoise * 0.017;
 
-    //fRet = clamp(fRet, 0.0, 0.001);
-    //fRet = ( 1.0-exp(-abs(fRet)/0.001))*0.001;// * sign(fRet);
-    //fRet = ( 1.0-exp(-abs(fRet)/0.001))*0.001 * sign(fRet);
+        //fRet = clamp(fRet, 0.0, 0.001);
+        //fRet = ( 1.0-exp(-abs(fRet)/0.001))*0.001;// * sign(fRet);
+        //fRet = ( 1.0-exp(-abs(fRet)/0.001))*0.001 * sign(fRet);
 
-    //fRet = textureLod(m_tDepthMap, vec4( uv, 0, 0 )).r*0.04 * _MainTex_TexelSize.w-130.0;
-    //fRet += pow(-cos(uv.x*PI2)*0.5+0.5, 0.5)*100.0-110.0;
-    //fRet += ( 1.0-exp( -pow( abs(uv.y*2.0-1.0)*1.0, 4.0 )*5.0 ) ) * 35.0;
-    //fRet += ( 1.0-exp( -pow( abs(uv.y*2.0-1.0+sin(uv.x*3.14*3.0+fNoise*0.5)*0.3)*1.5, 3.5 )*150.0 ) ) * 35.0;
-    //fRet = mix( fRet, 1.8, -sminCubic( -smoothstep( 0.6, 0.72, abs(uv.x*2.0-1.0) ), -smoothstep( 0.6, 0.72, abs(uv.y*2.0-1.0) ), 1.0 ) );
-    //fRet = mix( fRet, 0.0, -sminCubic( -smoothstep( 0.9, 0.98, abs(uv.x*2.0-1.0) ), -smoothstep( 0.9, 0.98, abs(uv.y*2.0-1.0) ), 1.0 ) );
-    //fRet += pow( length( 1.0-(uv) ), 2.5 )*0.1+0.0;
+        //fRet = textureLod(m_tDepthMap, vec4( uv, 0, 0 )).r*0.04 * _MainTex_TexelSize.w-130.0;
+        //fRet += pow(-cos(uv.x*PI2)*0.5+0.5, 0.5)*100.0-110.0;
+        //fRet += ( 1.0-exp( -pow( abs(uv.y*2.0-1.0)*1.0, 4.0 )*5.0 ) ) * 35.0;
+        //fRet += ( 1.0-exp( -pow( abs(uv.y*2.0-1.0+sin(uv.x*3.14*3.0+fNoise*0.5)*0.3)*1.5, 3.5 )*150.0 ) ) * 35.0;
+        //fRet = mix( fRet, 1.8, -sminCubic( -smoothstep( 0.6, 0.72, abs(uv.x*2.0-1.0) ), -smoothstep( 0.6, 0.72, abs(uv.y*2.0-1.0) ), 1.0 ) );
+        //fRet = mix( fRet, 0.0, -sminCubic( -smoothstep( 0.9, 0.98, abs(uv.x*2.0-1.0) ), -smoothstep( 0.9, 0.98, abs(uv.y*2.0-1.0) ), 1.0 ) );
+        //fRet += pow( length( 1.0-(uv) ), 2.5 )*0.1+0.0;
+    }
+    else if ( g_iInitSetting == 1 )
+    {
+        vec2 vUV = xy * g_fGridSizeInMeter * 0.0003 + 10.0;
+        vUV += vec2(noise(vUV + 2.0), noise(vUV + 1.0)) * 0.1;
+        mat2 m = mat2(2.0, 1.2, -1.2, 2.0);
+        fRet = noise(vUV) / 2.0; vUV = (m * vUV);
+        fRet += noise(vUV) / 8.0; vUV = (m * vUV);
+        vUV += vec2(noise(vUV + 0.5), noise(vUV + 2.5)) * 0.1;
+        fRet += noise(vUV) / 16.0; vUV = (m * vUV);
+        fRet += noise(vUV) / 64.0; vUV = (m * vUV);
+        fRet += noise(vUV) / 128.0; vUV = (m * vUV);
+        fRet += noise(vUV) / 256.0; vUV = (m * vUV);
 
+        fRet = fRet*2.7*0.2 + sin(fRet*2.7*8.0)*0.3;
+
+        fRet = ( 1.0-exp(-abs(fRet)/0.3))*0.3 * sign(fRet);
+
+        {
+            vec2 p = vec2( 1.0, 0.44);
+            p = p*p*(3.0-2.0*p);
+	        p = p*p*(3.0-2.0*p);
+	        p = p*p*(3.0-2.0*p);
+            fRet += voronoise(xy*0.035, p.x, p.y) * 0.05;
+        }
+
+        {
+            vec2 p = vec2( 1.0, 0.43);
+            p = p*p*(3.0-2.0*p);
+	        p = p*p*(3.0-2.0*p);
+	        p = p*p*(3.0-2.0*p);
+            fRet += voronoise(xy*0.12, p.x, p.y) * 0.03;
+        }
+
+        fRet += 0.0;
+
+        float fNoise = fRet;
+    
+
+        fRet = fNoise * 0.017;
+
+        
+    }
     return fRet * g_fGridSizeInMeter;
 }
 

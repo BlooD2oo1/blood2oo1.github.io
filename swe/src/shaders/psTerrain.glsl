@@ -1,5 +1,6 @@
 #version 300 es
 precision highp float;
+precision highp int;
 
 in vec2 vTexCoord;
 in vec4 vShadowCoord;
@@ -39,7 +40,7 @@ void main()
 	fFoam = clamp(fFoam, 0.0, 1.0);
     vec3 vNormal = normalize( vec3( -vTexDtC.xy, g_fGridSizeInMeter/fZScale ) );
     
-    vec3 vCWater = mix( vec3(0.3, 0.7, 0.7), vec3(0.3, 0.6, 0.8)*0.7, smoothstep( 0.0, 0.03, vTexC.z ) )*0.4;
+    vec3 vCWater = mix( vec3(0.3, 0.8, 0.8), vec3(0.3, 0.6, 0.8)*0.7, smoothstep( 0.0, 0.03, vTexC.z ) )*0.4;
 	vec3 vCFoam = vec3(1.0);
     vec3 vCLand = mix( vec3(0.6, 0.5, 0.3), vec3(0.6, 0.6, 0.5), clamp( vTexC.w*10.1, 0.0, 1.0 ) ) * 0.6;
 

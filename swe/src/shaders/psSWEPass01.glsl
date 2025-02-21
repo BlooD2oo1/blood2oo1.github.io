@@ -1,5 +1,7 @@
 #version 300 es
 precision highp float;
+precision highp int;
+
 in vec2 vTexCoord;
 out vec4 outColor;
 
@@ -48,7 +50,7 @@ void main()
 
     {
         float fRad = 0.09;
-        vec2 vDir = vTexCoord - vec2(0.15,0.5);
+        vec2 vDir = vTexCoord - vec2(0.15,0.3);
         float fDirLen = length(vDir);
         float fW = max(0.0, (fRad - fDirLen)/fRad );
         fW = 0.5 - 0.5 * cos(fW*PI2);

@@ -358,6 +358,7 @@ export class Terrain {
         gl.uniform1f(gl.getUniformLocation(program, "g_fAdvectSpeed"), app.Present.SWE.params.fAdvectSpeed);
         gl.uniform1f(gl.getUniformLocation(program, "g_fG"), app.Present.SWE.params.fG);
         gl.uniform1f(gl.getUniformLocation(program, "g_fHackBlurDepth"), app.Present.SWE.params.fHackBlurDepth);
+        gl.uniform1i(gl.getUniformLocation(program, "g_iInitSetting"), app.Present.SWE.params.iInitSetting);
 
         gl.enable(gl.CULL_FACE);
         gl.cullFace(gl.BACK);
@@ -417,6 +418,7 @@ export class Terrain {
         gl.uniform1f(gl.getUniformLocation(program, "g_fAdvectSpeed"), app.Present.SWE.params.fAdvectSpeed);
         gl.uniform1f(gl.getUniformLocation(program, "g_fG"), app.Present.SWE.params.fG);
         gl.uniform1f(gl.getUniformLocation(program, "g_fHackBlurDepth"), app.Present.SWE.params.fHackBlurDepth);
+        gl.uniform1i(gl.getUniformLocation(program, "g_iInitSetting"), app.Present.SWE.params.iInitSetting);
 
         gl.enable(gl.CULL_FACE);
         gl.cullFace(gl.BACK);

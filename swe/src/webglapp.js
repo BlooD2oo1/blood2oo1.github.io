@@ -98,7 +98,7 @@ class WebGLApp {
         this.canvas.addEventListener("mouseup", (event) => this.handleMouseUp(event));
         this.canvas.addEventListener("contextmenu", (event) => event.preventDefault());
 
-        this.createUIElements();
+        
 
         this.showLoadingMessage();
 
@@ -158,13 +158,13 @@ class WebGLApp {
 
         // Add event listeners to the buttons
         this.button1.addEventListener('click', () => {
-            //console.log('Button 1 clicked');
-            // Add your processing logic here
+            this.Present.SWE.params.iInitSetting = 0;
+            this.Present.SWE.renderInit();
         });
 
         this.button2.addEventListener('click', () => {
-            //console.log('Button 2 clicked');
-            // Add your processing logic here
+            this.Present.SWE.params.iInitSetting = 1;
+            this.Present.SWE.renderInit();
         });
     }
 
@@ -236,6 +236,7 @@ class WebGLApp {
 
         console.log("All resources loaded, starting render loop.");
         this.hideLoadingMessage();
+        this.createUIElements();
         requestAnimationFrame(this.render.bind(this));
     }
 

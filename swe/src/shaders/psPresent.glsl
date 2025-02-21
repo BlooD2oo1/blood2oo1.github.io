@@ -1,5 +1,7 @@
 #version 300 es
 precision highp float;
+precision highp int;
+
 in vec2 vTexCoord;
 out vec4 outColor;
 uniform sampler2D g_tTex;
