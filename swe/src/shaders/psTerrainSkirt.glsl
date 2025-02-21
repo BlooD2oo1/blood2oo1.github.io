@@ -5,14 +5,13 @@ precision highp int;
 in vec2 vTexCoord;
 in vec4 vShadowCoord;
 in vec2 vNormalXY;
-in vec2 vW;
+in float fZPos;
 out vec4 outColor;
 
 #GLOBALS
 
 void main()
 {
-    float fZScale = 1.0;
     // Calculate shadow coordinates
     vec4 shadowCoord = vShadowCoord;
     shadowCoord.xyz /= shadowCoord.w;
@@ -36,16 +35,25 @@ void main()
     float fOcc = 1.0;//pow(1.0 - clamp(length(dC - dR) + length(dC - dB), 0.0, 1.0), 1.0);
     //fOcc = pow(fOcc, 2.0);
 
-    float fWater = smoothstep(0.0, 0.0015, vTexC.z);
-	fWater = clamp( (vW.x-vW.y)/0.0015, 0.0, 1.0 );
+    float fWater = clamp((fZPos-vTexC.w) / 0.0015, 0.0, 1.0);
     float fFoam = 0.0;//length(vTexDtC.xy) * length(vTexC.xy) * 10.0 / clamp(0.001, 1.0, vTexC.z * 1000.0);
     fFoam += smoothstep(0.0010, 0.0002, vTexC.z);//part
     fFoam = clamp(fFoam, 0.0, 1.0);
-    vec3 vNormal = vec3(vNormalXY,0);//normalize(vec3(-vTexDtC.xy, g_fGridSizeInMeter / fZScale));
+    vec3 vNormal = vec3(vNormalXY,0);//normalize(vec3(-vTexDtC.xy, g_fGridSizeInMeter));
 
-    vec3 vCWater = mix( vec3(0.3, 0.7, 0.7), vec3(0.3, 0.6, 0.8)*0.7, smoothstep( 0.0, 0.02, vTexC.z ) )*0.4;
+
+    vec3 g_vCWaterShallow = vec3(0.3, 0.8, 0.8)*0.4;
+    vec3 g_vCWaterDeep = vec3(0.3, 0.6, 0.8) * 0.7*0.4;
+	vec3 g_vCLand01 = vec3(0.6, 0.5, 0.3)*0.6;
+	vec3 g_vCLand02 = vec3(0.6, 0.6, 0.5)*0.6;
+
+    vec3 vCWater = mix(g_vCWaterShallow, g_vCWaterDeep, smoothstep(0.0, 0.03, vTexC.z));
+    float fWaterDepth = (vTexC.z + vTexC.w) - fZPos;
+	vCWater = mix(vCWater, g_vCWaterDeep*0.8, clamp(fWaterDepth / 0.01, 0.0, 1.0) );
 	vec3 vCFoam = vec3(1.0);
-    vec3 vCLand = mix( vec3(0.6, 0.5, 0.3), vec3(0.6, 0.6, 0.5), clamp( vTexC.w*10.1, 0.0, 1.0 ) ) * 0.6;
+    vec3 vCLand = mix( g_vCLand01, g_vCLand02, clamp( vTexC.w*10.1, 0.0, 1.0 ) );
+    float fLandDepth = vTexC.w - fZPos;
+	vCLand = mix(vCLand, g_vCLand02*0.9, clamp( fLandDepth/0.2, 0.0, 1.0 ) * sin( fLandDepth/0.006 ) );
 
     vCWater = mix(vCWater, vCFoam, fFoam);
 

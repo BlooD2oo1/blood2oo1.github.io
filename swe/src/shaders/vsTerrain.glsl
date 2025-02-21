@@ -10,11 +10,10 @@ out vec4 vShadowCoord;
 
 void main()
 {
-    float fZScale = 1.0;
     vTexCoord = position.xy;
     ivec2 tc = ivec2( vTexCoord * vec2( textureSize(g_tTex, 0) ) );
 	vec4 vTexC = texelFetch(g_tTex, tc, 0);
-	float fZ = (vTexC.w + vTexC.z) * fZScale;
+	float fZ = (vTexC.w + vTexC.z);
 
     vec3 modifiedPosition = vec3(position.xy-vec2(0.5), fZ );
     vShadowCoord = g_matVPShadow * vec4( modifiedPosition, 1.0 );

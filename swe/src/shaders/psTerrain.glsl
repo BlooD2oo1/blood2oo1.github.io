@@ -10,7 +10,6 @@ out vec4 outColor;
 
 void main()
 {
-    float fZScale = 1.0;
     // Calculate shadow coordinates
     vec4 shadowCoord = vShadowCoord;
     shadowCoord.xyz /= shadowCoord.w;
@@ -38,11 +37,15 @@ void main()
     float fFoam = ( length(vTexDtC.xy) * length(vTexC.xy) ) * 5.0 / clamp(0.001, 1.0, vTexC.z * 1000.0);
 	fFoam += smoothstep(0.005, 0.0002, vTexC.z);//part
 	fFoam = clamp(fFoam, 0.0, 1.0);
-    vec3 vNormal = normalize( vec3( -vTexDtC.xy, g_fGridSizeInMeter/fZScale ) );
+    vec3 vNormal = normalize( vec3( -vTexDtC.xy, g_fGridSizeInMeter ) );
     
-    vec3 vCWater = mix( vec3(0.3, 0.8, 0.8), vec3(0.3, 0.6, 0.8)*0.7, smoothstep( 0.0, 0.03, vTexC.z ) )*0.4;
+    vec3 g_vCWaterShallow = vec3(0.3, 0.8, 0.8) * 0.4;
+    vec3 g_vCWaterDeep = vec3(0.3, 0.6, 0.8) * 0.7 * 0.4;
+    vec3 g_vCLand01 = vec3(0.6, 0.5, 0.3) * 0.6;
+    vec3 g_vCLand02 = vec3(0.6, 0.6, 0.5) * 0.6;
+    vec3 vCWater = mix( g_vCWaterShallow, g_vCWaterDeep, smoothstep( 0.0, 0.03, vTexC.z ) );
 	vec3 vCFoam = vec3(1.0);
-    vec3 vCLand = mix( vec3(0.6, 0.5, 0.3), vec3(0.6, 0.6, 0.5), clamp( vTexC.w*10.1, 0.0, 1.0 ) ) * 0.6;
+    vec3 vCLand = mix(g_vCLand01, g_vCLand02, clamp(vTexC.w * 10.1, 0.0, 1.0));
 
     vCWater = mix( vCWater, vCFoam, fFoam );
 
