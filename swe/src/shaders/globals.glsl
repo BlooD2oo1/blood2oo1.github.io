@@ -24,6 +24,14 @@ const float SQRT2 = 1.4142135623730950488016887242097;
 const float E_NUMBER = 2.7182818284590452353602874713527;
 const float LN2 = 0.69314718055994530941723212145817658;
 
+const vec3 g_vCWaterShallow = vec3(0.3, 0.8, 0.8) * 0.4;
+const vec3 g_vCWaterDeep = vec3(0.3, 0.6, 0.8) * 0.7 * 0.4;
+const vec3 g_vCLand01 = vec3(0.6, 0.5, 0.3) * 0.6;
+const vec3 g_vCLand02 = vec3(0.6, 0.6, 0.5) * 0.6;
+const vec3 g_vCLight = vec3(1.0, 0.8, 0.5) * 7.0;
+const vec3 g_vCAmbientUp = vec3(0.3, 0.5, 0.7) * 0.15;
+const vec3 g_vCAmbientDown = (g_vCLand01 + g_vCLand02) * 0.5 * 0.01;
+
 vec2 hash(vec2 p) // replace this by something better
 {
     p = vec2(dot(p, vec2(127.1, 311.7)), dot(p, vec2(269.5, 183.3)));
