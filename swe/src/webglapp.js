@@ -1,6 +1,6 @@
 import { Present } from './present.js';
 
-async function loadShader(gl, type, url) {
+async function loadShaderFile(url) {
     console.log(url, "\nloading...\n");
     try {
         const response = await fetch(url);
@@ -8,19 +8,8 @@ async function loadShader(gl, type, url) {
             throw new Error(`Failed to fetch shader: ${url}`);
         }
         const source = await response.text();
-
-        const shader = gl.createShader(type);
-        gl.shaderSource(shader, source);
-        gl.compileShader(shader);
-
-        if (!gl.getShaderParameter(shader, gl.COMPILE_STATUS)) {
-            console.error(`Error compiling shader ${url}:`, gl.getShaderInfoLog(shader));
-            gl.deleteShader(shader);
-            return null;
-        }
-
         console.log(url, "\nloaded!\n");
-        return shader;
+        return source;
     } catch (error) {
         console.error(error);
         return null;
@@ -28,21 +17,49 @@ async function loadShader(gl, type, url) {
 }
 
 export async function createShaderProgram(gl, vsPath, fsPath) {
-    const [vs, ps] = await Promise.all([
-        loadShader(gl, gl.VERTEX_SHADER, vsPath),
-        loadShader(gl, gl.FRAGMENT_SHADER, fsPath)
+    const [vsSource, fsSource, globals] = await Promise.all([
+        loadShaderFile(vsPath),
+        loadShaderFile(fsPath),
+        loadShaderFile('src/shaders/globals.glsl')
     ]);
+
+    if (!vsSource || !fsSource || !globals) {
+        return null;
+    }
+
+    // Replace #GLOBALS with the content of globals
+    const vsSourceWithGlobals = vsSource.replace('#GLOBALS', globals);
+    const fsSourceWithGlobals = fsSource.replace('#GLOBALS', globals);
+
+    const vs = gl.createShader(gl.VERTEX_SHADER);
+    gl.shaderSource(vs, vsSourceWithGlobals);
+    gl.compileShader(vs);
+    if (!gl.getShaderParameter(vs, gl.COMPILE_STATUS)) {
+        console.error(`Error compiling vertex shader ${vsPath}:`, gl.getShaderInfoLog(vs));
+        gl.deleteShader(vs);
+        return null;
+    }
+
+    const fs = gl.createShader(gl.FRAGMENT_SHADER);
+    gl.shaderSource(fs, fsSourceWithGlobals);
+    gl.compileShader(fs);
+    if (!gl.getShaderParameter(fs, gl.COMPILE_STATUS)) {
+        console.error(`Error compiling fragment shader ${fsPath}:`, gl.getShaderInfoLog(fs));
+        gl.deleteShader(fs);
+        return null;
+    }
 
     const program = gl.createProgram();
     gl.attachShader(program, vs);
-    gl.attachShader(program, ps);
+    gl.attachShader(program, fs);
     gl.linkProgram(program);
 
     if (!gl.getProgramParameter(program, gl.LINK_STATUS)) {
         console.error(gl.getProgramInfoLog(program));
+        return null;
     }
 
-    return [vs, ps, program];
+    return [vs, fs, program];
 }
 
 class WebGLApp {

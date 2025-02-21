@@ -4,10 +4,10 @@ precision highp float;
 layout(location = 0) in vec3 position;
 //layout(location = 1) in vec2 normal;
 
-uniform mat4 g_matVPShadow;
-uniform sampler2D g_tTex;
+#GLOBALS
 
-void main() {
+void main()
+{
     float fZScale = 1.0;
     vec2 vTexCoord = position.xy;
     ivec2 tc = ivec2(vTexCoord * vec2(textureSize(g_tTex, 0)));

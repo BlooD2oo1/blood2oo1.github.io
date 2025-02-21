@@ -2,15 +2,8 @@
 precision highp float;
 in vec2 vTexCoord;
 out vec4 outColor;
-uniform sampler2D g_tTex;
-uniform vec2 g_vRTRes;
-uniform float g_fGridSizeInMeter;
-uniform float g_fElapsedTimeInSec;
-uniform float g_fAdvectSpeed;
-uniform float g_fG;
-uniform float g_fHackBlurDepth;
 
-
+#GLOBALS
 
 void main()
 {

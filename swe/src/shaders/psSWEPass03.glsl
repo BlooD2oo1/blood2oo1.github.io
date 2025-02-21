@@ -2,24 +2,10 @@
 precision highp float;
 in vec2 vTexCoord;
 out vec4 outColor;
-uniform sampler2D g_tTex;
-uniform vec2 g_vRTRes;
-uniform float g_fGridSizeInMeter;
-uniform float g_fElapsedTimeInSec;
-uniform float g_fAdvectSpeed;
-uniform float g_fG;
-uniform float g_fHackBlurDepth;
 
-const float PI05 = 1.5707963267948966192313216916398;
-const float PI = 3.1415926535897932384626433832795;
-const float PI2 = 6.283185307179586476925286766559;
-const float PIRECIP = 0.31830988618379067153776752674503;
-const float PIPER180 = 0.01745329251994329576923690768489;
-const float SQRT2 = 1.4142135623730950488016887242097;
-const float E_NUMBER = 2.7182818284590452353602874713527;
-const float LN2 = 0.69314718055994530941723212145817658;
+#GLOBALS
 
-// Height Integration
+// Velocity Integration
 
 void main()
 {
