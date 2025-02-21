@@ -128,7 +128,7 @@ float SampleDepth(vec2 xy)
     }
     else if ( g_iInitSetting == 1 )
     {
-        vec2 vUV = xy * g_fGridSizeInMeter * 0.0003 + 10.0;
+        vec2 vUV = xy * g_fGridSizeInMeter * 0.0003 + 1.2;
         vUV += vec2(noise(vUV + 2.0), noise(vUV + 1.0)) * 0.1;
         mat2 m = mat2(2.0, 1.2, -1.2, 2.0);
         fRet = noise(vUV) / 2.0; vUV = (m * vUV);
@@ -139,9 +139,10 @@ float SampleDepth(vec2 xy)
         fRet += noise(vUV) / 128.0; vUV = (m * vUV);
         fRet += noise(vUV) / 256.0; vUV = (m * vUV);
 
-        fRet = fRet*2.7*0.2 + sin(fRet*2.7*8.0)*0.3;
-
-        fRet = ( 1.0-exp(-abs(fRet)/0.3))*0.3 * sign(fRet);
+        float f = fRet;
+        fRet = sin(fRet*2.7*7.0)*0.3;
+        fRet = ( 1.0-exp(-abs(fRet)/0.2))*0.2 * sign(fRet);
+        fRet += f*0.5;
 
         {
             vec2 p = vec2( 1.0, 0.44);
