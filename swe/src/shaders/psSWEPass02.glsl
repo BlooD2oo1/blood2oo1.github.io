@@ -43,10 +43,11 @@ void main()
     float hB = (vTexC.y <= 0.0) ? vTexB.z : vTexC.z;
 
     {
-        // 2.2. Overshooting Reduction
+        // 2.1.5. Stability Enhancements
         float beta = 2.0;
-        float hAvgMax = beta * g_fGridSizeInMeter / (g_fG * (g_fElapsedTimeInSec));
-        float hAdj = max(0.0, (vTexL.z + vTexR.z + vTexT.z + vTexB.z) / 4.0 - hAvgMax);
+        float hAvgMax = beta * g_fGridSizeInMeter / ( g_fG * g_fElapsedTimeInSec );
+        float hAdj = max( 0.0, (hR+hL+hB+hT)/4.0 - hAvgMax );
+        //float hAdj = max( 0.0, (vTexL.z+vTexR.z+vTexT.z+vTexB.z)/4.0 - hAvgMax );
 
         hL -= hAdj;
         hR -= hAdj;
@@ -57,6 +58,38 @@ void main()
     float dH = -((hR * fxR - hL * fxL) / g_fGridSizeInMeter + (hB * fyB - hT * fyT) / g_fGridSizeInMeter);
 
     vTexC.z += dH * (g_fElapsedTimeInSec);
+
+    // 2.2. Overshooting Reduction
+    {
+        float hC = vTexC.z+vTexC.w;
+        float hL = vTexL.z+vTexL.w;
+        float hR = vTexR.z+vTexR.w;
+        float hT = vTexT.z+vTexT.w;
+        float hB = vTexB.z+vTexB.w;
+        float lamdaedge = 2.0*g_fGridSizeInMeter;
+        float alphaedge = 0.5;
+        if ( ( ( hC - hL ) > lamdaedge ) && ( hC > hR ) )
+        {
+            vTexC.z += alphaedge * ( max( 0.0, (vTexC.z+vTexR.z)/2.0 ) - vTexC.z );
+        }
+        if ( ( ( hC - hR ) > lamdaedge ) && ( hC > hL ) )
+        {
+            vTexC.z += alphaedge * ( max( 0.0, (vTexC.z+vTexL.z)/2.0 ) - vTexC.z );
+        }
+        if ( ( ( hC - hT ) > lamdaedge ) && ( hC > hB ) )
+        {
+            vTexC.z += alphaedge * ( max( 0.0, (vTexC.z+vTexB.z)/2.0 ) - vTexC.z );
+        }
+        if ( ( ( hC - hB ) > lamdaedge ) && ( hC > hT ) )
+        {
+            vTexC.z += alphaedge * ( max( 0.0, (vTexC.z+vTexT.z)/2.0 ) - vTexC.z );
+        }
+    }
+
+    if ( vTexC.z <= 0.0 )
+    {
+        vTexC.z = 0.0;
+    }
 
     outColor = vTexC;
 }
