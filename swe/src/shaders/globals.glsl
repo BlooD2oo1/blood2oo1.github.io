@@ -225,8 +225,9 @@ float random(vec2 st) {
     return fract(sin(dot(st.xy, vec2(12.9898, 78.233))) * 43758.5453123);
 }
 
-float PCFShadow(sampler2D shadowMap, vec4 shadowCoord, float fRadMul, vec2 vTexCoord) {
-    float shadow = 0.0;
+vec2 PCFShadow(sampler2D shadowMap, vec4 shadowCoord, float fRadMul, vec2 vTexCoord)
+{
+    vec2 fShadow_fDist = vec2(0.0);
     float texelSize = 1.0 / float(textureSize(shadowMap, 0).x);
     texelSize *= fRadMul;
 
@@ -237,8 +238,10 @@ float PCFShadow(sampler2D shadowMap, vec4 shadowCoord, float fRadMul, vec2 vTexC
     for (int i = 0; i < 16; ++i) {
         vec2 offset = rotation * poissonDisk[i] * texelSize;
         float shadowDepth = texture(shadowMap, shadowCoord.xy + offset).r;
-        shadow += shadowCoord.z > shadowDepth + 0.003 * fRadMul ? 0.0 : 1.0;
+        fShadow_fDist.x += shadowCoord.z > shadowDepth + 0.003 * fRadMul ? 0.0 : 1.0;
+        fShadow_fDist.y += shadowCoord.z - shadowDepth;
     }
-    shadow /= 16.0;
-    return shadow;
+    fShadow_fDist.x /= 16.0;
+    fShadow_fDist.y /= 16.0;
+    return fShadow_fDist;
 }

@@ -9,7 +9,7 @@ layout(location = 1) in vec2 normal;
 out vec2 vTexCoord;
 out vec4 vShadowCoord;
 out vec2 vNormalXY;
-out float fW;
+out vec2 vW;
 
 
 void main()
@@ -19,10 +19,11 @@ void main()
     ivec2 tc = ivec2(vTexCoord * vec2(textureSize(g_tTex, 0)));
     vec4 vTexC = texelFetch(g_tTex, tc, 0);
     float fZ1 = (vTexC.w + vTexC.z) * fZScale;
-    float fZ0 = -0.25;
-    fW = position.z;
+    float fZC = vTexC.w * fZScale;
+    float fZ0 = -0.1;
+    float fW = position.z;
     float fZ = mix( fZ0, fZ1, fW);
-
+    vW = vec2(fZ, fZC);
     vec3 modifiedPosition = vec3(position.xy - vec2(0.5), fZ);
     vShadowCoord = g_matVPShadow * vec4(modifiedPosition, 1.0);
     gl_Position = g_matVP * vec4(modifiedPosition, 1.0);
