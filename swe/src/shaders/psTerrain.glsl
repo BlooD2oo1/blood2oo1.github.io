@@ -41,7 +41,7 @@ void main()
     vec3 vNormal = normalize( vec3( -vTexDtC.xy, g_fGridSizeInMeter* fNormalBoostOnWater) );
     
     vec3 vCWater = mix( g_vCWaterShallow, g_vCWaterDeep, smoothstep( 0.0, 0.03, vTexC.z ) );
-	vec3 vCFoam = vec3(1.0);
+	vec3 vCFoam = vec3(0.9);
     vec3 vCLand = mix(g_vCLand01, g_vCLand02, clamp(vTexC.w * 10.1, 0.0, 1.0));
 
     vCWater = mix( vCWater, vCFoam, fFoam );
@@ -62,7 +62,7 @@ void main()
     vCAmbientUp += fSSS * g_vCWaterSSS * fSSSShadowW;
     vCAmbientDown += fSSS * g_vCWaterSSS * fSSSShadowW;
     
-    vec3 vColor = Shade(g_vLightDir, g_vCLight*fShadow_fDist.x, vCAmbientUp, vCAmbientDown, vNormal, vDiffuse, mix( 0.9, 0.3, fWater ), mix(0.04, 0.1, fWater), g_vViewDir);
+    vec3 vColor = Shade(g_vLightDir, g_vCLight*fShadow_fDist.x, vCAmbientUp, vCAmbientDown, vNormal, vDiffuse, mix( 0.9, mix( 0.3, 0.7, fFoam ), fWater ), mix(0.04, 0.05, fWater), g_vViewDir);
 
     outColor.rgb = vColor;
     outColor.a = 1.0;
