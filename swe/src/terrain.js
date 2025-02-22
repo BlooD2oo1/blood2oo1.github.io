@@ -17,17 +17,20 @@ export class Terrain {
             [vsTerrainShadow, fsTerrainShadow, programTerrainShadow],
             [vsTerrainSkirt, fsTerrainSkirt, programTerrainSkirt],
             [vsTerrainSkirtShadow, fsTerrainSkirtShadow, programTerrainSkirtShadow],
+            [vsFogCube, fsFogCube, program_FogCube],
         ] = await Promise.all([
             createShaderProgram(this.gl, 'src/shaders/vsTerrain.glsl', 'src/shaders/psTerrain.glsl'),
             createShaderProgram(this.gl, 'src/shaders/vsTerrainShadow.glsl', 'src/shaders/psTerrainShadow.glsl'),
             createShaderProgram(this.gl, 'src/shaders/vsTerrainSkirt.glsl', 'src/shaders/psTerrainSkirt.glsl'),
-            createShaderProgram(this.gl, 'src/shaders/vsTerrainSkirtShadow.glsl', 'src/shaders/psTerrainSkirtShadow.glsl')
+            createShaderProgram(this.gl, 'src/shaders/vsTerrainSkirtShadow.glsl', 'src/shaders/psTerrainSkirtShadow.glsl'),
+            createShaderProgram(this.gl, 'src/shaders/vsFogCube.glsl', 'src/shaders/psFogCube.glsl'),
         ]);
 
         this.programTerrain = programTerrain;
         this.programTerrainShadow = programTerrainShadow;
         this.programTerrainSkirt = programTerrainSkirt;
         this.programTerrainSkirtShadow = programTerrainSkirtShadow;
+        this.programFogCube = program_FogCube;
 
         // Create the vertex and index buffers
         this.createBuffers();
@@ -122,6 +125,38 @@ export class Terrain {
 
         this.indexCountTerrain = indicesTerrain.length;
         this.indexCountSkirt = indicesSkirt.length;
+
+        // Create cube vertex and index buffers
+        const cubeVertices = new Float32Array([
+            // Positions
+            -1.0, -1.0, -1.0,
+            1.0, -1.0, -1.0,
+            1.0, 1.0, -1.0,
+            -1.0, 1.0, -1.0,
+            -1.0, -1.0, 1.0,
+            1.0, -1.0, 1.0,
+            1.0, 1.0, 1.0,
+            -1.0, 1.0, 1.0,
+        ]);
+
+        const cubeIndices = new Uint16Array([
+            0, 1, 2, 2, 3, 0, // Front
+            1, 5, 6, 6, 2, 1, // Right
+            5, 4, 7, 7, 6, 5, // Back
+            4, 0, 3, 3, 7, 4, // Left
+            3, 2, 6, 6, 7, 3, // Top
+            4, 5, 1, 1, 0, 4  // Bottom
+        ]);
+
+        this.vertexBufferCube = this.gl.createBuffer();
+        this.gl.bindBuffer(this.gl.ARRAY_BUFFER, this.vertexBufferCube);
+        this.gl.bufferData(this.gl.ARRAY_BUFFER, cubeVertices, this.gl.STATIC_DRAW);
+
+        this.indexBufferCube = this.gl.createBuffer();
+        this.gl.bindBuffer(this.gl.ELEMENT_ARRAY_BUFFER, this.indexBufferCube);
+        this.gl.bufferData(this.gl.ELEMENT_ARRAY_BUFFER, cubeIndices, this.gl.STATIC_DRAW);
+
+        this.indexCountCube = cubeIndices.length;
     }
 
     createShadowMap() {
@@ -253,6 +288,12 @@ export class Terrain {
         gl.enable(gl.DEPTH_TEST);
         this.renderTerrain();
         this.renderTerrainSkirt();
+    }
+
+    renderFog() {
+        const gl = this.gl;
+        gl.enable(gl.DEPTH_TEST);
+        this.renderFogCube();
     }
 
     renderTerrainShadow() {
@@ -411,6 +452,33 @@ export class Terrain {
 
         // Draw the grid
         gl.drawElements(gl.TRIANGLE_STRIP, this.indexCountSkirt, gl.UNSIGNED_INT, 0);
+    }
 
+    renderFogCube() {
+        const gl = this.gl;
+        const program = this.programFogCube;
+
+        gl.useProgram(program);
+
+        // Bind the vertex buffer
+        gl.bindBuffer(gl.ARRAY_BUFFER, this.vertexBufferCube);
+        const positionLocation = gl.getAttribLocation(program, 'position');
+        gl.enableVertexAttribArray(positionLocation);
+        gl.vertexAttribPointer(positionLocation, 3, gl.FLOAT, false, 0, 0);
+
+        // Bind the index buffer
+        gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, this.indexBufferCube);
+
+        // Bind the textureMisc texture
+        const textureMisc = app.Present.textureMisc;
+        gl.activeTexture(gl.TEXTURE0);
+        gl.bindTexture(gl.TEXTURE_2D, textureMisc);
+        gl.uniform1i(gl.getUniformLocation(program, 'g_tTex'), 0);
+
+        // Set the MVP matrix
+        gl.uniformMatrix4fv(gl.getUniformLocation(program, 'g_matVP'), false, this.mvpMatrix);
+
+        // Draw the cube
+        gl.drawElements(gl.TRIANGLES, this.indexCountCube, gl.UNSIGNED_SHORT, 0);
     }
 }

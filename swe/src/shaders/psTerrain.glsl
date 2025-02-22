@@ -4,7 +4,8 @@ precision highp int;
 
 in vec2 vTexCoord;
 in vec4 vShadowCoord;
-out vec4 outColor;
+layout(location = 0) out vec4 outColor0;
+layout(location = 1) out vec4 outColor1;
 
 #GLOBALS
 
@@ -68,8 +69,9 @@ void main()
     
     vec3 vColor = Shade(g_vLightDir, g_vCLight*fShadow_fDist.x, vCAmbientUp, vCAmbientDown, vNormal, vDiffuse, mix( 0.9, mix( 0.3, 0.7, fFoam ), fWater ), mix(0.04, 0.05, fWater), g_vViewDir);
 
-    outColor.rgb = vColor;
-    outColor.a = 1.0;
+    outColor0.rgb = vColor;
+    outColor0.a = 1.0;
+	outColor1 = vec4(vNormal, 0.5 );
     
     //outColor.rgb = vec3(1.0-clamp( fShadow_fDist.y, 0.0, 0.05 )/0.05);
 }

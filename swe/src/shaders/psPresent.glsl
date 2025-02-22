@@ -10,7 +10,6 @@ uniform vec2 uMousePosition;
 uniform float fSlider1;
 uniform float fSlider2;
 
-
 void main()
 {
     // Get the texture resolution

@@ -45,7 +45,7 @@ export class Present {
         gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, quadIndices, gl.STATIC_DRAW);
 
         {
-            this.framebufferMSAA = gl.createFramebuffer();
+            /*this.framebufferMSAA = gl.createFramebuffer();
             this.colorRenderbuffer = gl.createRenderbuffer();
             gl.bindRenderbuffer(gl.RENDERBUFFER, this.colorRenderbuffer);
             gl.renderbufferStorageMultisample(gl.RENDERBUFFER, 8, gl.RGBA32F, app.getWidth(), app.getHeight());
@@ -56,18 +56,52 @@ export class Present {
 
             gl.bindFramebuffer(gl.FRAMEBUFFER, this.framebufferMSAA);
             gl.framebufferRenderbuffer(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.RENDERBUFFER, this.colorRenderbuffer);
-            gl.framebufferRenderbuffer(gl.FRAMEBUFFER, gl.DEPTH_ATTACHMENT, gl.RENDERBUFFER, this.renderbufferMSAA);
+            gl.framebufferRenderbuffer(gl.FRAMEBUFFER, gl.DEPTH_ATTACHMENT, gl.RENDERBUFFER, this.renderbufferMSAA);*/
 
-            this.framebufferResolve = gl.createFramebuffer();
-            gl.bindFramebuffer(gl.FRAMEBUFFER, this.framebufferResolve);
+            // Create framebuffer and textures
+            this.framebufferSceneMisc = gl.createFramebuffer();
+            gl.bindFramebuffer(gl.FRAMEBUFFER, this.framebufferSceneMisc);
 
-            this.textureResolve = gl.createTexture();
-            gl.bindTexture(gl.TEXTURE_2D, this.textureResolve);
+            // Create the first texture (this.textureScene)
+            this.textureScene = gl.createTexture();
+            gl.bindTexture(gl.TEXTURE_2D, this.textureScene);
+            gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA32F, app.getWidth(), app.getHeight(), 0, gl.RGBA, gl.FLOAT, null);
+            gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
+            gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
+            
+
+            // Create the second texture (this.textureMisc)
+            this.textureMisc = gl.createTexture();
+            gl.bindTexture(gl.TEXTURE_2D, this.textureMisc);
             gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA32F, app.getWidth(), app.getHeight(), 0, gl.RGBA, gl.FLOAT, null);
             gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
             gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
 
-            gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_2D, this.textureResolve, 0);
+            // Create and attach depth buffer
+            this.depthRenderbuffer = gl.createRenderbuffer();
+            gl.bindRenderbuffer(gl.RENDERBUFFER, this.depthRenderbuffer);
+            gl.renderbufferStorage(gl.RENDERBUFFER, gl.DEPTH_COMPONENT16, app.getWidth(), app.getHeight());
+
+            gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_2D, this.textureScene, 0);
+            gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT1, gl.TEXTURE_2D, this.textureMisc, 0);
+            gl.framebufferRenderbuffer(gl.FRAMEBUFFER, gl.DEPTH_ATTACHMENT, gl.RENDERBUFFER, this.depthRenderbuffer);
+
+            // Set the draw buffers
+            gl.drawBuffers([gl.COLOR_ATTACHMENT0, gl.COLOR_ATTACHMENT1]);
+
+
+
+
+            // Create the second framebuffer and attach textureScene and depthRenderbuffer
+            this.framebufferScene = gl.createFramebuffer();
+            gl.bindFramebuffer(gl.FRAMEBUFFER, this.framebufferScene);
+            gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_2D, this.textureScene, 0);
+            gl.framebufferRenderbuffer(gl.FRAMEBUFFER, gl.DEPTH_ATTACHMENT, gl.RENDERBUFFER, this.depthRenderbuffer);
+
+            const status = gl.checkFramebufferStatus(gl.FRAMEBUFFER);
+            if (status !== gl.FRAMEBUFFER_COMPLETE) {
+                console.error('Framebuffer is not complete:', status.toString(16));
+            }
 
             gl.bindFramebuffer(gl.FRAMEBUFFER, null);
         }
@@ -114,18 +148,27 @@ export class Present {
         this.Terrain.renderShadow();
 
         // Bind the multi-sampled framebuffer and set the viewport
-        gl.bindFramebuffer(gl.FRAMEBUFFER, this.framebufferMSAA);
+        //gl.bindFramebuffer(gl.FRAMEBUFFER, this.framebufferMSAA);
+        gl.bindFramebuffer(gl.FRAMEBUFFER, this.framebufferSceneMisc);
         gl.viewport(0, 0, app.getWidth(), app.getHeight());
-        gl.clearColor(0.0, 0.0, 0.0, 0.0);
+        gl.clearColor(0.0, 0.0, 0.0, 1.0);
         gl.clearDepth(1.0);
         gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 
+        gl.drawBuffers([gl.COLOR_ATTACHMENT0, gl.COLOR_ATTACHMENT1]);
         this.Terrain.renderScene();
 
+        gl.bindFramebuffer(gl.FRAMEBUFFER, this.framebufferScene);
+        gl.drawBuffers([gl.COLOR_ATTACHMENT0]);
+        gl.enable(gl.BLEND);
+        gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
+        this.Terrain.renderFog();
+        gl.disable(gl.BLEND);
+
         // Resolve the multi-sampled framebuffer to the resolve framebuffer
-        gl.bindFramebuffer(gl.READ_FRAMEBUFFER, this.framebufferMSAA);
-        gl.bindFramebuffer(gl.DRAW_FRAMEBUFFER, this.framebufferResolve);
-        gl.blitFramebuffer(0, 0, app.getWidth(), app.getHeight(), 0, 0, app.getWidth(), app.getHeight(), gl.COLOR_BUFFER_BIT, gl.LINEAR);
+        //gl.bindFramebuffer(gl.READ_FRAMEBUFFER, this.framebufferMSAA);
+        //gl.bindFramebuffer(gl.DRAW_FRAMEBUFFER, this.framebufferScene);
+        //gl.blitFramebuffer(0, 0, app.getWidth(), app.getHeight(), 0, 0, app.getWidth(), app.getHeight(), gl.COLOR_BUFFER_BIT, gl.LINEAR);
 
         // Set the default framebuffer (screen) and viewport
         gl.bindFramebuffer(gl.FRAMEBUFFER, null);
@@ -142,7 +185,7 @@ export class Present {
         gl.vertexAttribPointer(positionLocation, 2, gl.FLOAT, false, 0, 0);
 
         gl.activeTexture(gl.TEXTURE0);
-        gl.bindTexture(gl.TEXTURE_2D, this.textureResolve);
+        gl.bindTexture(gl.TEXTURE_2D, this.textureScene);
         gl.uniform1i(gl.getUniformLocation(this.program_Present, "g_tTex"), 0);
         gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
         gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);

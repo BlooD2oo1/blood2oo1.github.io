@@ -6,7 +6,8 @@ in vec2 vTexCoord;
 in vec4 vShadowCoord;
 in vec2 vNormalXY;
 in float fZPos;
-out vec4 outColor;
+layout(location = 0) out vec4 outColor0;
+layout(location = 1) out vec4 outColor1;
 
 #GLOBALS
 
@@ -45,6 +46,8 @@ void main()
 
     vec3 vColor = Shade(g_vLightDir, g_vCLight * fShadow_fDist.x, g_vCAmbientUp * fOcc, g_vCAmbientDown * fOcc, vNormal, vDiffuse, mix(0.9, 0.3, fWater), mix(0.04, 0.1, fWater), g_vViewDir);
 
-    outColor.rgb = vColor;
-    outColor.a = 1.0;
+    outColor0.rgb = vColor;
+    outColor0.a = 1.0;
+
+    outColor1 = vec4(vNormal, 0.5);
 }
