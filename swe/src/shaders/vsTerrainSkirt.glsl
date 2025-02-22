@@ -9,6 +9,7 @@ layout(location = 1) in vec2 normal;
 
 out vec2 vTexCoord;
 out vec4 vShadowCoord;
+out vec4 screencoord;
 out vec2 vNormalXY;
 out float fZPos;
 
@@ -28,5 +29,6 @@ void main()
     vec3 modifiedPosition = vec3(position.xy - vec2(0.5), fZPos);
     vShadowCoord = g_matVPShadow * vec4(modifiedPosition, 1.0);
     gl_Position = g_matVP * vec4(modifiedPosition, 1.0);
+    screencoord = gl_Position;
 	vNormalXY = normal;
 }

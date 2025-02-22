@@ -5,6 +5,7 @@ precision highp int;
 layout(location = 0) in vec3 position;
 out vec2 vTexCoord;
 out vec4 vShadowCoord;
+out vec4 screencoord;
 
 #GLOBALS
 
@@ -20,4 +21,5 @@ void main()
     vec3 modifiedPosition = vec3(position.xy-vec2(0.5), fZ );
     vShadowCoord = g_matVPShadow * vec4( modifiedPosition, 1.0 );
     gl_Position = g_matVP * vec4(modifiedPosition, 1.0);
+	screencoord = gl_Position;
 }

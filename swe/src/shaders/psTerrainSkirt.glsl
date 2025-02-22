@@ -4,6 +4,7 @@ precision highp int;
 
 in vec2 vTexCoord;
 in vec4 vShadowCoord;
+in vec4 screencoord;
 in vec2 vNormalXY;
 in float fZPos;
 layout(location = 0) out vec4 outColor0;
@@ -13,6 +14,8 @@ layout(location = 1) out vec4 outColor1;
 
 void main()
 {
+    vec3 vScreenCoord = screencoord.xyz / screencoord.w;
+
     // Calculate shadow coordinates
     vec4 shadowCoord = vShadowCoord;
     shadowCoord.xyz /= shadowCoord.w;
@@ -49,5 +52,5 @@ void main()
     outColor0.rgb = vColor;
     outColor0.a = 1.0;
 
-    outColor1 = vec4(vNormal, 0.5);
+    outColor1 = vec4(vNormal, vScreenCoord.z);
 }

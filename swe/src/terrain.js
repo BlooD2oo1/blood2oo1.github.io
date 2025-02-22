@@ -228,6 +228,9 @@ export class Terrain {
             mat4.rotateZ(this.viewMatrix, this.viewMatrix, this.fCamRotZ); // 30 degrees
             // Combine the ortho and view matrices into the MVP matrix
             mat4.multiply(this.mvpMatrix, this.orthoMatrix, this.viewMatrix);
+
+            this.mvpMatrixInv = mat4.create();
+            mat4.invert(this.mvpMatrixInv, this.mvpMatrix);
         }
 
         {
@@ -477,6 +480,7 @@ export class Terrain {
 
         // Set the MVP matrix
         gl.uniformMatrix4fv(gl.getUniformLocation(program, 'g_matVP'), false, this.mvpMatrix);
+        gl.uniformMatrix4fv(gl.getUniformLocation(program, 'g_matVPInv'), false, this.mvpMatrixInv);
 
         // Draw the cube
         gl.drawElements(gl.TRIANGLES, this.indexCountCube, gl.UNSIGNED_SHORT, 0);

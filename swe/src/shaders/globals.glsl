@@ -4,6 +4,7 @@ uniform sampler2D g_tShadowMap;
 
 uniform vec2 g_vRTRes;
 uniform mat4 g_matVP;
+uniform mat4 g_matVPInv;
 uniform mat4 g_matVPShadow;
 uniform vec3 g_vLightDir;
 uniform vec3 g_vViewDir;
