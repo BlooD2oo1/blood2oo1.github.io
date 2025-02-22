@@ -17,13 +17,13 @@ void main()
     shadowCoord.xyz /= shadowCoord.w;
     shadowCoord.xyz = shadowCoord.xyz * 0.5 + 0.5;
 
-    ivec2 vTexSize = textureSize(g_tTex, 0);
-    ivec2 tc = ivec2(vTexCoord * vec2(vTexSize));
-    vec4 vTexC = texelFetch(g_tTex, tc, 0);
+    ivec2 viTexRes = textureSize(g_tTex, 0);
+    vec2 vTexRes = vec2(viTexRes);
+    vec4 vTexC = texture(g_tTex, vTexCoord);
 
     float fOcc = 1.0;
 
-    float fWater = clamp((fZPos - vTexC.w) / 0.0015, 0.0, 1.0);
+    float fWater = clamp((fZPos - vTexC.w) / 0.005, 0.0, 1.0);
     float fFoam = 0.0;
     fFoam += smoothstep(0.0010, 0.0002, vTexC.z);
     fFoam = clamp(fFoam, 0.0, 1.0);
@@ -47,8 +47,4 @@ void main()
 
     outColor.rgb = vColor;
     outColor.a = 1.0;
-
-    outColor.rgb = max(outColor.rgb, 0.0);
-    outColor.rgb = 1.0 - exp(-outColor.rgb);
-    outColor.rgb = pow(outColor.rgb, vec3(0.454545));
 }

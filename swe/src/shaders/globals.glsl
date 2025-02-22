@@ -292,7 +292,7 @@ vec2 PCFShadow(sampler2D shadowMap, vec4 shadowCoord, float fRadMul, vec2 vTexCo
     for (int i = 0; i < 16; ++i) {
         vec2 offset = rotation * poissonDisk[i] * texelSize;
         float shadowDepth = texture(shadowMap, shadowCoord.xy + offset).r;
-        fShadow_fDist.x += shadowCoord.z > shadowDepth + 0.003 * fRadMul ? 0.0 : 1.0;
+        fShadow_fDist.x += shadowCoord.z > shadowDepth + 0.004 * fRadMul ? 0.0 : 1.0;
         fShadow_fDist.y += shadowCoord.z - shadowDepth;
     }
     fShadow_fDist.x /= 16.0;

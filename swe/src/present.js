@@ -6,15 +6,16 @@ import { Terrain } from './terrain.js';
 export class Present {
     constructor(gl) {
         this.gl = gl;
-        this.SWE = new SWE(this.gl);
-        this.Terrain = new Terrain(this.gl);
+        this.SWE = new SWE(gl);
+        this.Terrain = new Terrain(gl);
         this.counter = 0;
     }
 
     async init() {
 
+        const gl = this.gl;
         const [[vs, ps, program] ] = await Promise.all([
-            createShaderProgram(this.gl, 'src/shaders/vsPresent.glsl', 'src/shaders/psPresent.glsl'),
+            createShaderProgram(gl, 'src/shaders/vsPresent.glsl', 'src/shaders/psPresent.glsl'),
             this.SWE.init(),
             this.Terrain.init()
         ]);
@@ -24,31 +25,54 @@ export class Present {
         this.PS_Present = ps;
 
         const quadVertices = new Float32Array([
-            // Positions   // TexCoords
-            -1, -1, 0, 0,
-            1, -1, 1, 0,
-            -1, 1, 0, 1,
-            -1, 1, 0, 1,
-            1, -1, 1, 0,
-            1, 1, 1, 1
+            -1, -1,
+            1, -1,
+            -1, 1,
+            1, 1
         ]);
 
-        this.screenVao = this.gl.createVertexArray();
-        this.gl.bindVertexArray(this.screenVao);
+        const quadIndices = new Uint16Array([
+            0, 1, 2,
+            2, 1, 3
+        ]);
 
-        this.screenVbo = this.gl.createBuffer();
-        this.gl.bindBuffer(this.gl.ARRAY_BUFFER, this.screenVbo);
-        this.gl.bufferData(this.gl.ARRAY_BUFFER, quadVertices, this.gl.STATIC_DRAW);
+        this.screenVbo = gl.createBuffer();
+        gl.bindBuffer(gl.ARRAY_BUFFER, this.screenVbo);
+        gl.bufferData(gl.ARRAY_BUFFER, quadVertices, gl.STATIC_DRAW);
 
-        const positionLocation = this.gl.getAttribLocation(this.program_Present, "position");
-        const texCoordLocation = this.gl.getAttribLocation(this.program_Present, "texCoord");
+        this.screenIbo = gl.createBuffer();
+        gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, this.screenIbo);
+        gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, quadIndices, gl.STATIC_DRAW);
 
-        this.gl.enableVertexAttribArray(positionLocation);
-        this.gl.vertexAttribPointer(positionLocation, 2, this.gl.FLOAT, false, 4 * Float32Array.BYTES_PER_ELEMENT, 0);
+        {
+            this.framebufferMSAA = gl.createFramebuffer();
+            this.colorRenderbuffer = gl.createRenderbuffer();
+            gl.bindRenderbuffer(gl.RENDERBUFFER, this.colorRenderbuffer);
+            gl.renderbufferStorageMultisample(gl.RENDERBUFFER, 8, gl.RGBA32F, app.getWidth(), app.getHeight());
 
-        this.gl.enableVertexAttribArray(texCoordLocation);
-        this.gl.vertexAttribPointer(texCoordLocation, 2, this.gl.FLOAT, false, 4 * Float32Array.BYTES_PER_ELEMENT, 2 * Float32Array.BYTES_PER_ELEMENT);
+            this.renderbufferMSAA = gl.createRenderbuffer();
+            gl.bindRenderbuffer(gl.RENDERBUFFER, this.renderbufferMSAA);
+            gl.renderbufferStorageMultisample(gl.RENDERBUFFER, 8, gl.DEPTH_COMPONENT16, app.getWidth(), app.getHeight());
+
+            gl.bindFramebuffer(gl.FRAMEBUFFER, this.framebufferMSAA);
+            gl.framebufferRenderbuffer(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.RENDERBUFFER, this.colorRenderbuffer);
+            gl.framebufferRenderbuffer(gl.FRAMEBUFFER, gl.DEPTH_ATTACHMENT, gl.RENDERBUFFER, this.renderbufferMSAA);
+
+            this.framebufferResolve = gl.createFramebuffer();
+            gl.bindFramebuffer(gl.FRAMEBUFFER, this.framebufferResolve);
+
+            this.textureResolve = gl.createTexture();
+            gl.bindTexture(gl.TEXTURE_2D, this.textureResolve);
+            gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA32F, app.getWidth(), app.getHeight(), 0, gl.RGBA, gl.FLOAT, null);
+            gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
+            gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
+
+            gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_2D, this.textureResolve, 0);
+
+            gl.bindFramebuffer(gl.FRAMEBUFFER, null);
+        }
     }
+
 
     handleMouseMove(mousePosition) {
         this.SWE.handleMouseMove(mousePosition);
@@ -78,58 +102,64 @@ export class Present {
     }
 
     render() {
+        const gl = this.gl;
+
+        gl.enable(gl.CULL_FACE);
+        gl.cullFace(gl.BACK);
+        gl.frontFace(gl.CCW);
+        gl.depthFunc(this.gl.LEQUAL);
 
         this.SWE.render();
+        this.Terrain.update();
+        this.Terrain.renderShadow();
 
-        //set the viewport to the size of the canvas
-        this.gl.viewport(0, 0, app.getWidth(), app.getHeight());
-        // Render the framebuffer texture to the screen
-        this.gl.clearColor(0.02, 0.02, 0.02, 1.0);
-        this.gl.clear(this.gl.COLOR_BUFFER_BIT);
+        // Bind the multi-sampled framebuffer and set the viewport
+        gl.bindFramebuffer(gl.FRAMEBUFFER, this.framebufferMSAA);
+        gl.viewport(0, 0, app.getWidth(), app.getHeight());
+        gl.clearColor(0.0, 0.0, 0.0, 0.0);
+        gl.clearDepth(1.0);
+        gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 
-        this.gl.useProgram(this.program_Present);
-        this.gl.bindVertexArray(this.screenVao);
+        this.Terrain.renderScene();
 
-        const texture = this.SWE.getSWETex();
-        this.gl.activeTexture(this.gl.TEXTURE0);
-        this.gl.bindTexture(this.gl.TEXTURE_2D, texture);
-        this.gl.uniform1i(this.gl.getUniformLocation(this.program_Present, "g_tTex"), 0);
-        this.gl.texParameteri(this.gl.TEXTURE_2D, this.gl.TEXTURE_MIN_FILTER, this.gl.LINEAR);
-        this.gl.texParameteri(this.gl.TEXTURE_2D, this.gl.TEXTURE_MAG_FILTER, this.gl.LINEAR);
+        // Resolve the multi-sampled framebuffer to the resolve framebuffer
+        gl.bindFramebuffer(gl.READ_FRAMEBUFFER, this.framebufferMSAA);
+        gl.bindFramebuffer(gl.DRAW_FRAMEBUFFER, this.framebufferResolve);
+        gl.blitFramebuffer(0, 0, app.getWidth(), app.getHeight(), 0, 0, app.getWidth(), app.getHeight(), gl.COLOR_BUFFER_BIT, gl.LINEAR);
+
+        // Set the default framebuffer (screen) and viewport
+        gl.bindFramebuffer(gl.FRAMEBUFFER, null);
+        gl.viewport(0, 0, app.getWidth(), app.getHeight());
+        gl.disable(gl.DEPTH_TEST);
+
+        // Render the resolved texture to the screen
+        gl.useProgram(this.program_Present);
+
+        gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, this.screenIbo);
+        gl.bindBuffer(gl.ARRAY_BUFFER, this.screenVbo);
+        const positionLocation = gl.getAttribLocation(this.program_Present, "position");
+        gl.enableVertexAttribArray(positionLocation);
+        gl.vertexAttribPointer(positionLocation, 2, gl.FLOAT, false, 0, 0);
+
+        gl.activeTexture(gl.TEXTURE0);
+        gl.bindTexture(gl.TEXTURE_2D, this.textureResolve);
+        gl.uniform1i(gl.getUniformLocation(this.program_Present, "g_tTex"), 0);
+        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
+        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
 
         // Pass mouse position to the fragment shader
         const mousePosition = app.getMousePosition();
-        this.gl.uniform2f(this.gl.getUniformLocation(this.program_Present, "uMousePosition"), mousePosition.x, mousePosition.y);
+        gl.uniform2f(gl.getUniformLocation(this.program_Present, "uMousePosition"), mousePosition.x, mousePosition.y);
 
-        //fSlider1, fSlider1:
-        this.gl.uniform1f(this.gl.getUniformLocation(this.program_Present, "fSlider1"), app.getSlider1());
-        this.gl.uniform1f(this.gl.getUniformLocation(this.program_Present, "fSlider2"), app.getSlider2());
+        // fSlider1, fSlider2:
+        gl.uniform1f(gl.getUniformLocation(this.program_Present, "fSlider1"), app.getSlider1());
+        gl.uniform1f(gl.getUniformLocation(this.program_Present, "fSlider2"), app.getSlider2());
 
-        // create vec2 shader input for SWE width height:
-        this.gl.uniform2f(this.gl.getUniformLocation(this.program_Present, "g_vRTRes"), app.getWidth(), app.getHeight());
+        // Create vec2 shader input for SWE width height:
+        gl.uniform2f(gl.getUniformLocation(this.program_Present, "g_vRTRes"), app.getWidth(), app.getHeight());
 
-        this.gl.drawArrays(this.gl.TRIANGLES, 0, 6);
-
-        // Render the terrain every 100 frames
-        this.counter++;
-        if (this.counter > 20) {
-            const currentProgram = this.gl.getParameter(this.gl.CURRENT_PROGRAM);
-            const currentVAO = this.gl.getParameter(this.gl.VERTEX_ARRAY_BINDING);
-            const currentFramebuffer = this.gl.getParameter(this.gl.FRAMEBUFFER_BINDING);
-            const currentViewport = this.gl.getParameter(this.gl.VIEWPORT);
-
-            // Render the terrain
-            this.gl.enable(this.gl.DEPTH_TEST);
-            this.gl.depthFunc(this.gl.LEQUAL);
-            this.Terrain.render();
-            this.gl.disable(this.gl.DEPTH_TEST);
-
-            // Restore previous WebGL state
-            this.gl.useProgram(currentProgram);
-            this.gl.bindVertexArray(currentVAO);
-            this.gl.bindFramebuffer(this.gl.FRAMEBUFFER, currentFramebuffer);
-            this.gl.viewport(currentViewport[0], currentViewport[1], currentViewport[2], currentViewport[3]);
-        }
+        gl.drawElements(gl.TRIANGLES, 6, gl.UNSIGNED_SHORT, 0);
     }
+
 }
 

@@ -15,15 +15,19 @@ void main()
     shadowCoord.xyz /= shadowCoord.w;
     shadowCoord.xyz = shadowCoord.xyz * 0.5 + 0.5;
 
-    ivec2 vTexSize = textureSize(g_tTex, 0);
-    ivec2 tc = ivec2(vTexCoord * vec2(vTexSize));
-    vec4 vTexC = texelFetch(g_tTex, tc, 0);
-    ivec2 tcDt = ivec2(vTexCoord * (vec2(vTexSize)+vec2(0.5)));
-    vec4 vTexDtC = texelFetch(g_tTexNorm, tcDt, 0);
-    //vec4 vTexDtR = texture(g_tTexNorm, vTexCoord + vec2(0.5)/vTexRes + vec2(1.0/vTexRes.x,0.0));
-    //vec4 vTexDtB = texture(g_tTexNorm, vTexCoord + vec2(0.5)/vTexRes + vec2(0.0,1.0/vTexRes.y));
-    vec4 vTexDtR = (tc.x < vTexSize.x - 1) ? texelFetchOffset(g_tTexNorm, tcDt, 0, ivec2(1, 0)) : vTexC * vec4(0.0, 0.0, 1.0, 1.0);
-    vec4 vTexDtB = (tc.y < vTexSize.y - 1) ? texelFetchOffset(g_tTexNorm, tcDt, 0, ivec2(0, 1)) : vTexC * vec4(0.0, 0.0, 1.0, 1.0);
+    ivec2 viTexRes = textureSize(g_tTex, 0);
+	vec2 vTexRes = vec2(viTexRes);
+    vec4 vTexC = texture(g_tTex, vTexCoord);
+    vec4 vTexDtC = texture(g_tTexNorm, vTexCoord + vec2(0.5) / vTexRes);
+    vec4 vTexDtR = texture(g_tTexNorm, vTexCoord + vec2(0.5) / vTexRes + vec2(1.0 / vTexRes.x, 0.0));
+    vec4 vTexDtB = texture(g_tTexNorm, vTexCoord + vec2(0.5) / vTexRes + vec2(0.0, 1.0 / vTexRes.y));
+
+    //ivec2 tc = ivec2(vTexCoord * vec2(vTexSize));
+    //vec4 vTexC = texelFetch(g_tTex, tc, 0);	
+    //ivec2 tcDt = ivec2(vTexCoord * (vec2(vTexSize)+vec2(0.5)));
+    //vec4 vTexDtC = texelFetch(g_tTexNorm, tcDt, 0);
+    //vec4 vTexDtR = (tc.x < vTexSize.x - 1) ? texelFetchOffset(g_tTexNorm, tcDt, 0, ivec2(1, 0)) : vTexC * vec4(0.0, 0.0, 1.0, 1.0);
+    //vec4 vTexDtB = (tc.y < vTexSize.y - 1) ? texelFetchOffset(g_tTexNorm, tcDt, 0, ivec2(0, 1)) : vTexC * vec4(0.0, 0.0, 1.0, 1.0);
 
     // Calculate occlusion
     vec2 dC = vTexDtC.xy;
@@ -67,9 +71,5 @@ void main()
     outColor.rgb = vColor;
     outColor.a = 1.0;
     
-    outColor.rgb = max(outColor.rgb, 0.0);
-    outColor.rgb = 1.0 - exp(-outColor.rgb);
-    outColor.rgb = pow(outColor.rgb, vec3(0.454545));
-
     //outColor.rgb = vec3(1.0-clamp( fShadow_fDist.y, 0.0, 0.05 )/0.05);
 }

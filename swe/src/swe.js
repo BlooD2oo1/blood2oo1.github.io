@@ -22,19 +22,19 @@ export class SWE {
     }
 
     async init() {
-
+        const gl = this.gl;
         const [
-            [vs_passInit, ps_passInit, program_passInit],
+                [vs_passInit, ps_passInit, program_passInit],
                 [vs_pass01, ps_pass01, program_pass01],
                 [vs_pass02, ps_pass02, program_pass02],
                 [vs_pass03, ps_pass03, program_pass03],
                 [vs_proc01, ps_proc01, program_proc01],
         ] = await Promise.all([
-            createShaderProgram(this.gl, 'src/shaders/vsSWE.glsl', 'src/shaders/psSWEInit.glsl'),
-            createShaderProgram(this.gl, 'src/shaders/vsSWE.glsl', 'src/shaders/psSWEPass01.glsl'),
-            createShaderProgram(this.gl, 'src/shaders/vsSWE.glsl', 'src/shaders/psSWEPass02.glsl'),
-            createShaderProgram(this.gl, 'src/shaders/vsSWE.glsl', 'src/shaders/psSWEPass03.glsl'),
-            createShaderProgram(this.gl, 'src/shaders/vsSWE.glsl', 'src/shaders/psSWEProc01.glsl')
+            createShaderProgram(gl, 'src/shaders/vsSWE.glsl', 'src/shaders/psSWEInit.glsl'),
+            createShaderProgram(gl, 'src/shaders/vsSWE.glsl', 'src/shaders/psSWEPass01.glsl'),
+            createShaderProgram(gl, 'src/shaders/vsSWE.glsl', 'src/shaders/psSWEPass02.glsl'),
+            createShaderProgram(gl, 'src/shaders/vsSWE.glsl', 'src/shaders/psSWEPass03.glsl'),
+            createShaderProgram(gl, 'src/shaders/vsSWE.glsl', 'src/shaders/psSWEProc01.glsl')
         ]);
 
         this.program_SWEPassInit = program_passInit;
@@ -61,38 +61,36 @@ export class SWE {
             -1, -1,
             1, -1,
             -1, 1,
-            -1, 1,
-            1, -1,
             1, 1
         ]);
 
-        this.vao = this.gl.createVertexArray();
-        this.gl.bindVertexArray(this.vao);
+        const quadIndices = new Uint16Array([
+            0, 1, 2,
+            2, 1, 3
+        ]);
 
-        this.vbo = this.gl.createBuffer();
-        this.gl.bindBuffer(this.gl.ARRAY_BUFFER, this.vbo);
-        this.gl.bufferData(this.gl.ARRAY_BUFFER, quadVertices, this.gl.STATIC_DRAW);
+        this.screenVbo = gl.createBuffer();
+        gl.bindBuffer(gl.ARRAY_BUFFER, this.screenVbo);
+        gl.bufferData(gl.ARRAY_BUFFER, quadVertices, gl.STATIC_DRAW);
 
-        const positionLocation = this.gl.getAttribLocation(this.program_SWEPass01, "position");
-        this.gl.enableVertexAttribArray(positionLocation);
-        this.gl.vertexAttribPointer(positionLocation, 2, this.gl.FLOAT, false, 0, 0);
+        this.screenIbo = gl.createBuffer();
+        gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, this.screenIbo);
+        gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, quadIndices, gl.STATIC_DRAW);
 
         // Create the first framebuffer and texture
-        this.currentFramebuffer = this.gl.createFramebuffer();
-        this.currentTexture = this.createTextureAndFramebuffer(this.gl, this.currentFramebuffer, this.width, this.height );
+        [this.currentTexture, this.currentFramebuffer] = this.createTextureAndFramebuffer(gl, this.width, this.height );
 
         // Create the second framebuffer and texture
-        this.otherFramebuffer = this.gl.createFramebuffer();
-        this.otherTexture = this.createTextureAndFramebuffer(this.gl, this.otherFramebuffer, this.width, this.height);
+        [this.otherTexture, this.otherFramebuffer] = this.createTextureAndFramebuffer(gl, this.width, this.height);
 
         // Create the second framebuffer and texture
-        this.rtFramebufferNorm = this.gl.createFramebuffer();
-        this.rtTextureNorm = this.createTextureAndFramebuffer(this.gl, this.rtFramebufferNorm, this.width, this.height);
+        [this.rtTextureNorm, this.rtFramebufferNorm] = this.createTextureAndFramebuffer(gl, this.width, this.height);
 
         this.renderInit();
     }
 
-    createTextureAndFramebuffer(gl, framebuffer, width, height) {
+    createTextureAndFramebuffer(gl, width, height) {
+        const framebuffer = gl.createFramebuffer();
         gl.bindFramebuffer(gl.FRAMEBUFFER, framebuffer);
 
         const texture = gl.createTexture();
@@ -113,7 +111,7 @@ export class SWE {
 
         gl.bindFramebuffer(gl.FRAMEBUFFER, null);
 
-        return texture;
+        return [texture, framebuffer];
     }
 
     getWidth() {
@@ -133,25 +131,33 @@ export class SWE {
     }
 
     renderInit() {
+        const gl = this.gl;
         // Bind the current framebuffer and set the viewport
-        this.gl.viewport(0, 0, this.width, this.height);
-        this.gl.bindFramebuffer(this.gl.FRAMEBUFFER, this.otherFramebuffer);
+        gl.viewport(0, 0, this.width, this.height);
+        gl.disable(gl.DEPTH_TEST);
+        gl.bindFramebuffer(gl.FRAMEBUFFER, this.otherFramebuffer);
         // Render to the framebuffer
-        this.gl.useProgram(this.program_SWEPassInit);
-        this.gl.bindVertexArray(this.vao);
-        this.gl.uniform2f(this.gl.getUniformLocation(this.program_SWEPassInit, "g_vRTRes"), this.getWidth(), this.getHeight());
+        gl.useProgram(this.program_SWEPassInit);
+
+        gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, this.screenIbo);
+        gl.bindBuffer(gl.ARRAY_BUFFER, this.screenVbo);
+        const positionLocation = gl.getAttribLocation(this.program_SWEPassInit, "position");
+        gl.enableVertexAttribArray(positionLocation);
+        gl.vertexAttribPointer(positionLocation, 2, gl.FLOAT, false, 0, 0);        
+
+        gl.uniform2f(gl.getUniformLocation(this.program_SWEPassInit, "g_vRTRes"), this.getWidth(), this.getHeight());
 
         // Pass parameters to the fragment shader
-        this.gl.uniform1f(this.gl.getUniformLocation(this.program_SWEPassInit, "g_fGridSizeInMeter"), this.params.fGridSizeInMeter);
-        this.gl.uniform1f(this.gl.getUniformLocation(this.program_SWEPassInit, "g_fElapsedTimeInSec"), this.params.fElapsedTimeInSec);
-        this.gl.uniform1f(this.gl.getUniformLocation(this.program_SWEPassInit, "g_fAdvectSpeed"), this.params.fAdvectSpeed);
-        this.gl.uniform1f(this.gl.getUniformLocation(this.program_SWEPassInit, "g_fG"), this.params.fG);
-        this.gl.uniform1f(this.gl.getUniformLocation(this.program_SWEPassInit, "g_fHackBlurDepth"), this.params.fHackBlurDepth);
-        this.gl.uniform1i(this.gl.getUniformLocation(this.program_SWEPassInit, "g_iInitSetting"), this.params.iInitSetting);
+        gl.uniform1f(gl.getUniformLocation(this.program_SWEPassInit, "g_fGridSizeInMeter"), this.params.fGridSizeInMeter);
+        gl.uniform1f(gl.getUniformLocation(this.program_SWEPassInit, "g_fElapsedTimeInSec"), this.params.fElapsedTimeInSec);
+        gl.uniform1f(gl.getUniformLocation(this.program_SWEPassInit, "g_fAdvectSpeed"), this.params.fAdvectSpeed);
+        gl.uniform1f(gl.getUniformLocation(this.program_SWEPassInit, "g_fG"), this.params.fG);
+        gl.uniform1f(gl.getUniformLocation(this.program_SWEPassInit, "g_fHackBlurDepth"), this.params.fHackBlurDepth);
+        gl.uniform1i(gl.getUniformLocation(this.program_SWEPassInit, "g_iInitSetting"), this.params.iInitSetting);
         console.log(this.params.iInitSetting);
-        this.gl.drawArrays(this.gl.TRIANGLES, 0, 6);
+        gl.drawElements(gl.TRIANGLES, 6, gl.UNSIGNED_SHORT, 0);
         // Unbind the framebuffer
-        this.gl.bindFramebuffer(this.gl.FRAMEBUFFER, null);
+        gl.bindFramebuffer(gl.FRAMEBUFFER, null);
     }
 
     handleMouseMove(mousePosition) {
@@ -176,148 +182,177 @@ export class SWE {
     }
 
     render() {
-        // Bind the current framebuffer and set the viewport
-        
-        this.gl.viewport(0, 0, this.width, this.height);
+        const gl = this.gl;
+        // Bind the current framebuffer and set the viewport        
+        gl.viewport(0, 0, this.width, this.height);
+        gl.disable(gl.DEPTH_TEST);
 
         for (let i = 0; i < 20; i++) {
             // Pass 01
-            this.gl.bindFramebuffer(this.gl.FRAMEBUFFER, this.currentFramebuffer);
-            this.gl.useProgram(this.program_SWEPass01);
-            this.gl.bindVertexArray(this.vao);
-            this.gl.activeTexture(this.gl.TEXTURE0);
-            this.gl.bindTexture(this.gl.TEXTURE_2D, this.otherTexture);
-            this.gl.uniform1i(this.gl.getUniformLocation(this.program_SWEPass01, "g_tTex"), 0);
-            this.gl.texParameteri(this.gl.TEXTURE_2D, this.gl.TEXTURE_MIN_FILTER, this.gl.LINEAR);
-            this.gl.texParameteri(this.gl.TEXTURE_2D, this.gl.TEXTURE_MAG_FILTER, this.gl.LINEAR);
-            this.gl.uniform2f(this.gl.getUniformLocation(this.program_SWEPass01, "g_vRTRes"), this.getWidth(), this.getHeight());
+            {
+                gl.bindFramebuffer(gl.FRAMEBUFFER, this.currentFramebuffer);
+                gl.useProgram(this.program_SWEPass01);
 
-            // Pass parameters to the fragment shader
-            this.gl.uniform1f(this.gl.getUniformLocation(this.program_SWEPass01, "g_fGridSizeInMeter"), this.params.fGridSizeInMeter);
-            this.gl.uniform1f(this.gl.getUniformLocation(this.program_SWEPass01, "g_fElapsedTimeInSec"), this.params.fElapsedTimeInSec);
-            this.gl.uniform1f(this.gl.getUniformLocation(this.program_SWEPass01, "g_fAdvectSpeed"), this.params.fAdvectSpeed);
-            this.gl.uniform1f(this.gl.getUniformLocation(this.program_SWEPass01, "g_fG"), this.params.fG);
-            this.gl.uniform1f(this.gl.getUniformLocation(this.program_SWEPass01, "g_fHackBlurDepth"), this.params.fHackBlurDepth);
-            this.gl.uniform1i(this.gl.getUniformLocation(this.program_SWEPass01, "g_iInitSetting"), this.params.iInitSetting);
+                gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, this.screenIbo);
+                gl.bindBuffer(gl.ARRAY_BUFFER, this.screenVbo);
+                const positionLocation = gl.getAttribLocation(this.program_SWEPass01, "position");
+                gl.enableVertexAttribArray(positionLocation);
+                gl.vertexAttribPointer(positionLocation, 2, gl.FLOAT, false, 0, 0);        
 
-            // Pass mouse position to the fragment shader
-            const mousePosition = app.getMousePosition();
-            const matMVP = app.Present.Terrain.mvpMatrix;
+                gl.activeTexture(gl.TEXTURE0);
+                gl.bindTexture(gl.TEXTURE_2D, this.otherTexture);
+                gl.uniform1i(gl.getUniformLocation(this.program_SWEPass01, "g_tTex"), 0);
+                gl.uniform2f(gl.getUniformLocation(this.program_SWEPass01, "g_vRTRes"), this.getWidth(), this.getHeight());
 
-            // Convert mouse position to NDC
-            const ndcX = (mousePosition.x / app.getWidth()) * 2 - 1;
-            const ndcY = ((mousePosition.y / app.getHeight()) * 2 - 1); // Flip Y coordinate
+                // Pass parameters to the fragment shader
+                gl.uniform1f(gl.getUniformLocation(this.program_SWEPass01, "g_fGridSizeInMeter"), this.params.fGridSizeInMeter);
+                gl.uniform1f(gl.getUniformLocation(this.program_SWEPass01, "g_fElapsedTimeInSec"), this.params.fElapsedTimeInSec);
+                gl.uniform1f(gl.getUniformLocation(this.program_SWEPass01, "g_fAdvectSpeed"), this.params.fAdvectSpeed);
+                gl.uniform1f(gl.getUniformLocation(this.program_SWEPass01, "g_fG"), this.params.fG);
+                gl.uniform1f(gl.getUniformLocation(this.program_SWEPass01, "g_fHackBlurDepth"), this.params.fHackBlurDepth);
+                gl.uniform1i(gl.getUniformLocation(this.program_SWEPass01, "g_iInitSetting"), this.params.iInitSetting);
 
-            // Create NDC ray
-            const rayStartNDC = vec4.fromValues(ndcX, ndcY, -1, 1);
-            const rayEndNDC = vec4.fromValues(ndcX, ndcY, 1, 1);
+                // Pass mouse position to the fragment shader
+                const mousePosition = app.getMousePosition();
+                const matMVP = app.Present.Terrain.mvpMatrix;
 
-            // Inverse MVP matrix
-            const invMVP = mat4.create();
-            mat4.invert(invMVP, matMVP);
+                // Convert mouse position to NDC
+                const ndcX = (mousePosition.x / app.getWidth()) * 2 - 1;
+                const ndcY = ((mousePosition.y / app.getHeight()) * 2 - 1); // Flip Y coordinate
 
-            // Transform NDC ray to world coordinates
-            const rayStartWorld = vec4.create();
-            const rayEndWorld = vec4.create();
-            vec4.transformMat4(rayStartWorld, rayStartNDC, invMVP);
-            vec4.transformMat4(rayEndWorld, rayEndNDC, invMVP);
+                // Create NDC ray
+                const rayStartNDC = vec4.fromValues(ndcX, ndcY, -1, 1);
+                const rayEndNDC = vec4.fromValues(ndcX, ndcY, 1, 1);
 
-            // Convert homogeneous coordinates to 3D coordinates
-            vec3.scale(rayStartWorld, rayStartWorld, 1 / rayStartWorld[3]);
-            vec3.scale(rayEndWorld, rayEndWorld, 1 / rayEndWorld[3]);
+                // Inverse MVP matrix
+                const invMVP = mat4.create();
+                mat4.invert(invMVP, matMVP);
 
-            // Calculate ray direction
-            const rayDirWorld = vec3.create();
-            vec3.subtract(rayDirWorld, rayEndWorld, rayStartWorld);
-            vec3.normalize(rayDirWorld, rayDirWorld);
+                // Transform NDC ray to world coordinates
+                const rayStartWorld = vec4.create();
+                const rayEndWorld = vec4.create();
+                vec4.transformMat4(rayStartWorld, rayStartNDC, invMVP);
+                vec4.transformMat4(rayEndWorld, rayEndNDC, invMVP);
 
-            // Calculate intersection with XY plane (z = 0)
-            const t = -rayStartWorld[2] / rayDirWorld[2];
-            const intersection = vec3.create();
-            vec3.scaleAndAdd(intersection, rayStartWorld, rayDirWorld, t);
+                // Convert homogeneous coordinates to 3D coordinates
+                vec3.scale(rayStartWorld, rayStartWorld, 1 / rayStartWorld[3]);
+                vec3.scale(rayEndWorld, rayEndWorld, 1 / rayEndWorld[3]);
 
-            // Convert world coordinates to texture UV coordinates
-            const clickPosition = {
-                x: (intersection[0] + 0.5),
-                y: (intersection[1] + 0.5)
-            };
+                // Calculate ray direction
+                const rayDirWorld = vec3.create();
+                vec3.subtract(rayDirWorld, rayEndWorld, rayStartWorld);
+                vec3.normalize(rayDirWorld, rayDirWorld);
 
-            this.gl.uniform2f(this.gl.getUniformLocation(this.program_SWEPass01, "uClickPosition"), clickPosition.x, clickPosition.y);
-            this.gl.uniform2i(this.gl.getUniformLocation(this.program_SWEPass01, "uMouseButtons"), app.getMouseButtonLeft(), app.getMouseButtonRight());
+                // Calculate intersection with XY plane (z = 0)
+                const t = -rayStartWorld[2] / rayDirWorld[2];
+                const intersection = vec3.create();
+                vec3.scaleAndAdd(intersection, rayStartWorld, rayDirWorld, t);
 
-            this.gl.drawArrays(this.gl.TRIANGLES, 0, 6);
-            [this.currentFramebuffer, this.otherFramebuffer] = [this.otherFramebuffer, this.currentFramebuffer];
+                // Convert world coordinates to texture UV coordinates
+                const clickPosition = {
+                    x: (intersection[0] + 0.5),
+                    y: (intersection[1] + 0.5)
+                };
+
+                gl.uniform2f(gl.getUniformLocation(this.program_SWEPass01, "uClickPosition"), clickPosition.x, clickPosition.y);
+                gl.uniform2i(gl.getUniformLocation(this.program_SWEPass01, "uMouseButtons"), app.getMouseButtonLeft(), app.getMouseButtonRight());
+
+                gl.drawElements(gl.TRIANGLES, 6, gl.UNSIGNED_SHORT, 0);
+
+            }
+
+            [this.currentFramebuffer, this.otherFramebuffer] =[this.otherFramebuffer, this.currentFramebuffer];
             [this.currentTexture, this.otherTexture] = [this.otherTexture, this.currentTexture];
 
             // Pass 02
-            this.gl.bindFramebuffer(this.gl.FRAMEBUFFER, this.currentFramebuffer);
-            this.gl.useProgram(this.program_SWEPass02);
-            this.gl.bindVertexArray(this.vao);
-            this.gl.activeTexture(this.gl.TEXTURE0);
-            this.gl.bindTexture(this.gl.TEXTURE_2D, this.otherTexture);
-            this.gl.uniform1i(this.gl.getUniformLocation(this.program_SWEPass02, "g_tTex"), 0);
-            this.gl.texParameteri(this.gl.TEXTURE_2D, this.gl.TEXTURE_MIN_FILTER, this.gl.LINEAR);
-            this.gl.texParameteri(this.gl.TEXTURE_2D, this.gl.TEXTURE_MAG_FILTER, this.gl.LINEAR);
-            this.gl.uniform2f(this.gl.getUniformLocation(this.program_SWEPass02, "g_vRTRes"), this.getWidth(), this.getHeight());
+            {
+                gl.bindFramebuffer(gl.FRAMEBUFFER, this.currentFramebuffer);
+                gl.useProgram(this.program_SWEPass02);
 
-            // Pass parameters to the fragment shader
-            this.gl.uniform1f(this.gl.getUniformLocation(this.program_SWEPass02, "g_fGridSizeInMeter"), this.params.fGridSizeInMeter);
-            this.gl.uniform1f(this.gl.getUniformLocation(this.program_SWEPass02, "g_fElapsedTimeInSec"), this.params.fElapsedTimeInSec);
-            this.gl.uniform1f(this.gl.getUniformLocation(this.program_SWEPass02, "g_fAdvectSpeed"), this.params.fAdvectSpeed);
-            this.gl.uniform1f(this.gl.getUniformLocation(this.program_SWEPass02, "g_fG"), this.params.fG);
-            this.gl.uniform1f(this.gl.getUniformLocation(this.program_SWEPass02, "g_fHackBlurDepth"), this.params.fHackBlurDepth);
-            this.gl.uniform1i(this.gl.getUniformLocation(this.program_SWEPass02, "g_iInitSetting"), this.params.iInitSetting);
+                gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, this.screenIbo);
+                gl.bindBuffer(gl.ARRAY_BUFFER, this.screenVbo);
+                const positionLocation = gl.getAttribLocation(this.program_SWEPass02, "position");
+                gl.enableVertexAttribArray(positionLocation);
+                gl.vertexAttribPointer(positionLocation, 2, gl.FLOAT, false, 0, 0);        
 
-            this.gl.drawArrays(this.gl.TRIANGLES, 0, 6);
+                gl.activeTexture(gl.TEXTURE0);
+                gl.bindTexture(gl.TEXTURE_2D, this.otherTexture);
+                gl.uniform1i(gl.getUniformLocation(this.program_SWEPass02, "g_tTex"), 0);
+                gl.uniform2f(gl.getUniformLocation(this.program_SWEPass02, "g_vRTRes"), this.getWidth(), this.getHeight());
+
+                // Pass parameters to the fragment shader
+                gl.uniform1f(gl.getUniformLocation(this.program_SWEPass02, "g_fGridSizeInMeter"), this.params.fGridSizeInMeter);
+                gl.uniform1f(gl.getUniformLocation(this.program_SWEPass02, "g_fElapsedTimeInSec"), this.params.fElapsedTimeInSec);
+                gl.uniform1f(gl.getUniformLocation(this.program_SWEPass02, "g_fAdvectSpeed"), this.params.fAdvectSpeed);
+                gl.uniform1f(gl.getUniformLocation(this.program_SWEPass02, "g_fG"), this.params.fG);
+                gl.uniform1f(gl.getUniformLocation(this.program_SWEPass02, "g_fHackBlurDepth"), this.params.fHackBlurDepth);
+                gl.uniform1i(gl.getUniformLocation(this.program_SWEPass02, "g_iInitSetting"), this.params.iInitSetting);
+
+                gl.drawElements(gl.TRIANGLES, 6, gl.UNSIGNED_SHORT, 0);
+            }
+
             [this.currentFramebuffer, this.otherFramebuffer] = [this.otherFramebuffer, this.currentFramebuffer];
             [this.currentTexture, this.otherTexture] = [this.otherTexture, this.currentTexture];
 
             // Pass 03
-            this.gl.bindFramebuffer(this.gl.FRAMEBUFFER, this.currentFramebuffer);
-            this.gl.useProgram(this.program_SWEPass03);
-            this.gl.bindVertexArray(this.vao);
-            this.gl.activeTexture(this.gl.TEXTURE0);
-            this.gl.bindTexture(this.gl.TEXTURE_2D, this.otherTexture);
-            this.gl.uniform1i(this.gl.getUniformLocation(this.program_SWEPass03, "g_tTex"), 0);
-            this.gl.texParameteri(this.gl.TEXTURE_2D, this.gl.TEXTURE_MIN_FILTER, this.gl.LINEAR);
-            this.gl.texParameteri(this.gl.TEXTURE_2D, this.gl.TEXTURE_MAG_FILTER, this.gl.LINEAR);
-            this.gl.uniform2f(this.gl.getUniformLocation(this.program_SWEPass03, "g_vRTRes"), this.getWidth(), this.getHeight());
+            {
+                gl.bindFramebuffer(gl.FRAMEBUFFER, this.currentFramebuffer);
+                gl.useProgram(this.program_SWEPass03);
 
-            // Pass parameters to the fragment shader
-            this.gl.uniform1f(this.gl.getUniformLocation(this.program_SWEPass03, "g_fGridSizeInMeter"), this.params.fGridSizeInMeter);
-            this.gl.uniform1f(this.gl.getUniformLocation(this.program_SWEPass03, "g_fElapsedTimeInSec"), this.params.fElapsedTimeInSec);
-            this.gl.uniform1f(this.gl.getUniformLocation(this.program_SWEPass03, "g_fAdvectSpeed"), this.params.fAdvectSpeed);
-            this.gl.uniform1f(this.gl.getUniformLocation(this.program_SWEPass03, "g_fG"), this.params.fG);
-            this.gl.uniform1f(this.gl.getUniformLocation(this.program_SWEPass03, "g_fHackBlurDepth"), this.params.fHackBlurDepth);
-            this.gl.uniform1i(this.gl.getUniformLocation(this.program_SWEPass03, "g_iInitSetting"), this.params.iInitSetting);
+                gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, this.screenIbo);
+                gl.bindBuffer(gl.ARRAY_BUFFER, this.screenVbo);
+                const positionLocation = gl.getAttribLocation(this.program_SWEPass03, "position");
+                gl.enableVertexAttribArray(positionLocation);
+                gl.vertexAttribPointer(positionLocation, 2, gl.FLOAT, false, 0, 0);        
 
-            this.gl.drawArrays(this.gl.TRIANGLES, 0, 6);
+                gl.activeTexture(gl.TEXTURE0);
+                gl.bindTexture(gl.TEXTURE_2D, this.otherTexture);
+                gl.uniform1i(gl.getUniformLocation(this.program_SWEPass03, "g_tTex"), 0);
+                gl.uniform2f(gl.getUniformLocation(this.program_SWEPass03, "g_vRTRes"), this.getWidth(), this.getHeight());
+
+                // Pass parameters to the fragment shader
+                gl.uniform1f(gl.getUniformLocation(this.program_SWEPass03, "g_fGridSizeInMeter"), this.params.fGridSizeInMeter);
+                gl.uniform1f(gl.getUniformLocation(this.program_SWEPass03, "g_fElapsedTimeInSec"), this.params.fElapsedTimeInSec);
+                gl.uniform1f(gl.getUniformLocation(this.program_SWEPass03, "g_fAdvectSpeed"), this.params.fAdvectSpeed);
+                gl.uniform1f(gl.getUniformLocation(this.program_SWEPass03, "g_fG"), this.params.fG);
+                gl.uniform1f(gl.getUniformLocation(this.program_SWEPass03, "g_fHackBlurDepth"), this.params.fHackBlurDepth);
+                gl.uniform1i(gl.getUniformLocation(this.program_SWEPass03, "g_iInitSetting"), this.params.iInitSetting);
+
+                gl.drawElements(gl.TRIANGLES, 6, gl.UNSIGNED_SHORT, 0);
+            }
+
             [this.currentFramebuffer, this.otherFramebuffer] = [this.otherFramebuffer, this.currentFramebuffer];
             [this.currentTexture, this.otherTexture] = [this.otherTexture, this.currentTexture];
         }
 
         // Proc 01
-        this.gl.bindFramebuffer(this.gl.FRAMEBUFFER, this.rtFramebufferNorm);
-        this.gl.useProgram(this.program_SWEProc01);
-        this.gl.bindVertexArray(this.vao);
-        this.gl.activeTexture(this.gl.TEXTURE0);
-        this.gl.bindTexture(this.gl.TEXTURE_2D, this.otherTexture);
-        this.gl.uniform1i(this.gl.getUniformLocation(this.program_SWEProc01, "g_tTex"), 0);
-        this.gl.texParameteri(this.gl.TEXTURE_2D, this.gl.TEXTURE_MIN_FILTER, this.gl.LINEAR);
-        this.gl.texParameteri(this.gl.TEXTURE_2D, this.gl.TEXTURE_MAG_FILTER, this.gl.LINEAR);
-        this.gl.uniform2f(this.gl.getUniformLocation(this.program_SWEProc01, "g_vRTRes"), this.getWidth(), this.getHeight());
+        {
+            gl.bindFramebuffer(gl.FRAMEBUFFER, this.rtFramebufferNorm);
+            gl.useProgram(this.program_SWEProc01);
 
-        // Pass parameters to the fragment shader
-        this.gl.uniform1f(this.gl.getUniformLocation(this.program_SWEProc01, "g_fGridSizeInMeter"), this.params.fGridSizeInMeter);
-        this.gl.uniform1f(this.gl.getUniformLocation(this.program_SWEProc01, "g_fElapsedTimeInSec"), this.params.fElapsedTimeInSec);
-        this.gl.uniform1f(this.gl.getUniformLocation(this.program_SWEProc01, "g_fAdvectSpeed"), this.params.fAdvectSpeed);
-        this.gl.uniform1f(this.gl.getUniformLocation(this.program_SWEProc01, "g_fG"), this.params.fG);
-        this.gl.uniform1f(this.gl.getUniformLocation(this.program_SWEProc01, "g_fHackBlurDepth"), this.params.fHackBlurDepth);
-        this.gl.uniform1i(this.gl.getUniformLocation(this.program_SWEProc01, "g_iInitSetting"), this.params.iInitSetting);
+            gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, this.screenIbo);
+            gl.bindBuffer(gl.ARRAY_BUFFER, this.screenVbo);
+            const positionLocation = gl.getAttribLocation(this.program_SWEProc01, "position");
+            gl.enableVertexAttribArray(positionLocation);
+            gl.vertexAttribPointer(positionLocation, 2, gl.FLOAT, false, 0, 0);        
 
-        this.gl.drawArrays(this.gl.TRIANGLES, 0, 6);
+            gl.activeTexture(gl.TEXTURE0);
+            gl.bindTexture(gl.TEXTURE_2D, this.otherTexture);
+            gl.uniform1i(gl.getUniformLocation(this.program_SWEProc01, "g_tTex"), 0);
+            gl.uniform2f(gl.getUniformLocation(this.program_SWEProc01, "g_vRTRes"), this.getWidth(), this.getHeight());
+
+            // Pass parameters to the fragment shader
+            gl.uniform1f(gl.getUniformLocation(this.program_SWEProc01, "g_fGridSizeInMeter"), this.params.fGridSizeInMeter);
+            gl.uniform1f(gl.getUniformLocation(this.program_SWEProc01, "g_fElapsedTimeInSec"), this.params.fElapsedTimeInSec);
+            gl.uniform1f(gl.getUniformLocation(this.program_SWEProc01, "g_fAdvectSpeed"), this.params.fAdvectSpeed);
+            gl.uniform1f(gl.getUniformLocation(this.program_SWEProc01, "g_fG"), this.params.fG);
+            gl.uniform1f(gl.getUniformLocation(this.program_SWEProc01, "g_fHackBlurDepth"), this.params.fHackBlurDepth);
+            gl.uniform1i(gl.getUniformLocation(this.program_SWEProc01, "g_iInitSetting"), this.params.iInitSetting);
+
+            gl.drawElements(gl.TRIANGLES, 6, gl.UNSIGNED_SHORT, 0);
+        }
 
         // Unbind the framebuffer
-        this.gl.bindFramebuffer(this.gl.FRAMEBUFFER, null);
+        gl.bindFramebuffer(gl.FRAMEBUFFER, null);
     }
 }

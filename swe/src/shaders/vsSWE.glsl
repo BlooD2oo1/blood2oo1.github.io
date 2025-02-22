@@ -2,8 +2,7 @@
 precision highp float;
 precision highp int;
 
-in vec2 position;
-in vec2 texCoord;
+layout(location = 0) in vec2 position;
 out vec2 vTexCoord;
 
 #GLOBALS

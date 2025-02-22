@@ -53,6 +53,7 @@ export class Terrain {
         const stepX = 1.0 / width;
         const stepY = 1.0 / height;
 
+        // 0.0 .. 0.99
         for (let y = 0; y < height; y++) {
             for (let x = 0; x < width; x++) {
                 verticesTerrain.push((x) * stepX, (y) * stepY, 0.0);
@@ -62,8 +63,8 @@ export class Terrain {
         for (let y = 0; y < height - 1; y++) {
             for (let x = 0; x < width - 1; x++) {
                 const i = y * width + x;
-                indicesTerrain.push(i, i + 1, i + width);
-                indicesTerrain.push(i + 1, i + width + 1, i + width);
+                indicesTerrain.push(i +1, i, i + width);
+                indicesTerrain.push(i + width + 1, i + 1, i + width);
             }
         }
 
@@ -72,35 +73,35 @@ export class Terrain {
 
         //0,0
         for (let y = 0; y < height; y++) {
-            verticesSkirt.push(0, (y) * stepY, 0.0, -1.0, 0.0); // Top vertex
             verticesSkirt.push(0, (y) * stepY, skirtHeight, -1.0, 0.0); // Bottom vertex
+            verticesSkirt.push(0, (y) * stepY, 0.0, -1.0, 0.0); // Top vertex            
         }
         //0,1
 
         //0,1
         for (let x = 0; x < width; x++) {
-            verticesSkirt.push((x) * stepX, (height - 1) * stepY, 0.0, 0.0, 1.0); // Top vertex
             verticesSkirt.push((x) * stepX, (height - 1) * stepY, skirtHeight, 0.0, 1.0); // Bottom vertex
+            verticesSkirt.push((x) * stepX, (height - 1) * stepY, 0.0, 0.0, 1.0); // Top vertex            
         }
         //1,1
 
         //1,1
         for (let y = height-1; y >= 0; y--) {
-            verticesSkirt.push((width - 1) * stepX, (y) * stepY, 0.0, 1.0, 0.0); // Top vertex
             verticesSkirt.push((width - 1) * stepX, (y) * stepY, skirtHeight, 1.0, 0.0); // Bottom vertex
+            verticesSkirt.push((width - 1) * stepX, (y) * stepY, 0.0, 1.0, 0.0); // Top vertex            
         }
         //1,0
 
         //1,0
         for (let x = width - 1; x >= 0; x--) {
-            verticesSkirt.push((x) * stepX, 0, 0.0, 0.0, -1.0); // Top vertex
             verticesSkirt.push((x) * stepX, 0, skirtHeight, 0.0, -1.0); // Bottom vertex
+            verticesSkirt.push((x) * stepX, 0, 0.0, 0.0, -1.0); // Top vertex            
         }
         //0,0
 
         // Create skirt indices for TRIANGLE_STRIP
-        for (let i = 0; i < verticesSkirt.length / 3 - 2; i += 2) {
-            indicesSkirt.push(i, i + 1, i + 2, i + 3);
+        for (let i = 0; i < verticesSkirt.length ; i++ ) {
+            indicesSkirt.push(i);
         }
 
         this.vertexBufferTerrain = this.gl.createBuffer();
@@ -178,9 +179,7 @@ export class Terrain {
         }
     }
 
-    render() {
-        const gl = this.gl;
-
+    update() {
         {
             const width = app.getWidth();
             const height = app.getHeight();
@@ -218,36 +217,42 @@ export class Terrain {
             //mat4.lookAt(lightViewMatrix, vec3.fromValues(0, 0, 0), vLightDir, [0, 0, 1]);
             //mat4.lookAt(lightViewMatrix, vec3.scale(vec3.create(), this.vLightDir, -1), vec3.fromValues(0, 0, 0), vec3.fromValues(0, 0, 1));
 
-            const size = Math.sqrt(2)*0.5;
+            const size = Math.sqrt(2) * 0.5;
             const lightProjectionMatrix = mat4.create();
             mat4.ortho(lightProjectionMatrix, -size, size, -size, size, -size, size); // Adjust near and far planes as needed
 
             mat4.multiply(this.shadowMapMatrix, lightProjectionMatrix, lightViewMatrix);
         }
+    }
+
+    renderShadow() {
+        const gl = this.gl;
 
         // Render to the shadow map
         gl.bindFramebuffer(gl.FRAMEBUFFER, this.shadowFramebuffer);
         gl.viewport(0, 0, this.shadowMapSize, this.shadowMapSize);
-        //gl.clear(gl.DEPTH_BUFFER_BIT);
-
+        gl.enable(gl.DEPTH_TEST);
 
         //clear the shadowmap:
         gl.clearDepth(1.0);
         gl.clear(gl.DEPTH_BUFFER_BIT);
 
+        const cullFace = gl.getParameter(gl.CULL_FACE_MODE);
+        gl.cullFace(gl.FRONT);
+
         // Render the scene from the light's perspective
         this.renderTerrainShadow();
         this.renderTerrainSkirtShadow();
 
-        // Render the scene normally
-        gl.bindFramebuffer(gl.FRAMEBUFFER, null);
-        gl.viewport(0, 0, app.getWidth(), app.getHeight());
-        gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
+        gl.cullFace(cullFace);
 
-        // Use the shadow map in the shader
+    }
+
+    renderScene() {
+        const gl = this.gl;
+        gl.enable(gl.DEPTH_TEST);
         this.renderTerrain();
         this.renderTerrainSkirt();
-
     }
 
     renderTerrainShadow() {
@@ -272,10 +277,6 @@ export class Terrain {
         gl.activeTexture(gl.TEXTURE0);
         gl.bindTexture(gl.TEXTURE_2D, texture);
         gl.uniform1i(gl.getUniformLocation(program, 'g_tTex'), 0);
-
-        gl.enable(gl.CULL_FACE);
-        gl.cullFace(gl.BACK);
-        gl.frontFace(gl.CCW);
 
         // Draw the grid
         gl.drawElements(gl.TRIANGLES, this.indexCountTerrain, gl.UNSIGNED_INT, 0);
@@ -306,10 +307,6 @@ export class Terrain {
         gl.activeTexture(gl.TEXTURE0);
         gl.bindTexture(gl.TEXTURE_2D, texture);
         gl.uniform1i(gl.getUniformLocation(program, 'g_tTex'), 0);
-
-        gl.enable(gl.CULL_FACE);
-        gl.cullFace(gl.BACK);
-        gl.frontFace(gl.CCW);
 
         // Draw the grid
         gl.drawElements(gl.TRIANGLE_STRIP, this.indexCountSkirt, gl.UNSIGNED_INT, 0);
@@ -360,16 +357,8 @@ export class Terrain {
         gl.uniform1f(gl.getUniformLocation(program, "g_fHackBlurDepth"), app.Present.SWE.params.fHackBlurDepth);
         gl.uniform1i(gl.getUniformLocation(program, "g_iInitSetting"), app.Present.SWE.params.iInitSetting);
 
-        gl.enable(gl.CULL_FACE);
-        gl.cullFace(gl.BACK);
-        gl.frontFace(gl.CW);
-
         // Draw the grid
         gl.drawElements(gl.TRIANGLES, this.indexCountTerrain, gl.UNSIGNED_INT, 0);
-
-        gl.enable(gl.CULL_FACE);
-        gl.cullFace(gl.BACK);
-        gl.frontFace(gl.CCW);
     }
 
     renderTerrainSkirt() {
@@ -420,15 +409,8 @@ export class Terrain {
         gl.uniform1f(gl.getUniformLocation(program, "g_fHackBlurDepth"), app.Present.SWE.params.fHackBlurDepth);
         gl.uniform1i(gl.getUniformLocation(program, "g_iInitSetting"), app.Present.SWE.params.iInitSetting);
 
-        gl.enable(gl.CULL_FACE);
-        gl.cullFace(gl.BACK);
-        gl.frontFace(gl.CW);
-
         // Draw the grid
         gl.drawElements(gl.TRIANGLE_STRIP, this.indexCountSkirt, gl.UNSIGNED_INT, 0);
 
-        gl.enable(gl.CULL_FACE);
-        gl.cullFace(gl.BACK);
-        gl.frontFace(gl.CCW);
     }
 }

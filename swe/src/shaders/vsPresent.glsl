@@ -2,8 +2,7 @@
 precision highp float;
 precision highp int;
 
-in vec2 position;
-in vec2 texCoord;
+layout(location = 0) in vec2 position;
 out vec2 vTexCoord;
 
 #GLOBALS
@@ -11,5 +10,5 @@ out vec2 vTexCoord;
 void main()
 {
     gl_Position = vec4(position, 0.0, 1.0);
-    vTexCoord = texCoord;
+    vTexCoord = position * 0.5 + 0.5; // Convert from [-1, 1] to [0, 1]
 }

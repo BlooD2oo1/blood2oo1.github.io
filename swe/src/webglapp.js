@@ -76,7 +76,17 @@ class WebGLApp {
         this.webapp.appendChild(this.canvas);
         //document.body.appendChild(this.canvas);
 
-        this.gl = this.canvas.getContext("webgl2");
+        this.gl = this.canvas.getContext("webgl2", {antialias: false });
+
+        const debugInfo = this.gl.getExtension('WEBGL_debug_renderer_info');
+        if (debugInfo) {
+            const vendor = this.gl.getParameter(debugInfo.UNMASKED_VENDOR_WEBGL);
+            const renderer = this.gl.getParameter(debugInfo.UNMASKED_RENDERER_WEBGL);
+            console.log('Vendor:', vendor);
+            console.log('Renderer:', renderer);
+        } else {
+            console.warn('WEBGL_debug_renderer_info extension not supported');
+        }
 
         const ext = this.gl.getExtension("EXT_color_buffer_float");
         if (!ext) {
