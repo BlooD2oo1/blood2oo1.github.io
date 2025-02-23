@@ -137,7 +137,7 @@ float SampleDepth(vec2 xy)
     }
     else if ( g_iInitSetting == 1 )
     {
-        vec2 vUV = xy * g_fGridSizeInMeter * 0.0004 + 16.0;
+        vec2 vUV = xy * g_fGridSizeInMeter * 0.0003 + 8.0;
         vUV += vec2(noise(vUV + 2.0), noise(vUV + 1.0)) * 0.1;
         mat2 m = mat2(2.0, 1.2, -1.2, 2.0);
         fRet = noise(vUV) / 2.0; vUV = (m * vUV);
@@ -149,24 +149,24 @@ float SampleDepth(vec2 xy)
         fRet += noise(vUV) / 256.0; vUV = (m * vUV);
 
         float f = fRet;
-        fRet = sin(fRet*2.7*7.0)*0.3;
-        fRet = ( 1.0-exp(-abs(fRet)/0.2))*0.2 * sign(fRet);
-        fRet += f*0.5;
+        fRet = sin(fRet*2.7*4.0)*0.3;
+        //fRet = ( 1.0-exp(-abs(fRet)/0.2))*0.2 * sign(fRet);
+        fRet += f*2.0;
 
         {
             vec2 p = vec2( 1.0, 0.44);
             p = p*p*(3.0-2.0*p);
 	        p = p*p*(3.0-2.0*p);
 	        p = p*p*(3.0-2.0*p);
-            fRet += voronoise(xy*0.035, p.x, p.y) * 0.05;
+            fRet += voronoise(xy*0.035, p.x, p.y) * 0.1;
         }
 
         {
-            vec2 p = vec2( 1.0, 0.43);
+            vec2 p = vec2( 1.0, 0.45);
             p = p*p*(3.0-2.0*p);
 	        p = p*p*(3.0-2.0*p);
 	        p = p*p*(3.0-2.0*p);
-            fRet += voronoise(xy*0.12, p.x, p.y) * 0.03;
+            fRet += voronoise(xy*0.12, p.x, p.y) * 0.02;
         }
 
         fRet += 0.0;
@@ -174,7 +174,7 @@ float SampleDepth(vec2 xy)
         float fNoise = fRet;
     
 
-        fRet = fNoise * 0.017;
+        fRet = fNoise * 0.015;
 
         
     }
@@ -280,7 +280,13 @@ float random(vec2 st) {
     return fract(sin(dot(st.xy, vec2(12.9898, 78.233))) * 43758.5453123);
 }
 
-vec2 PCFShadow(sampler2D shadowMap, vec4 shadowCoord, float fRadMul, vec2 vTexCoord)
+float BasicShadow(sampler2D shadowMap, vec3 shadowCoord)
+{
+	float shadowDepth = texture(shadowMap, shadowCoord.xy).r;
+	return shadowCoord.z > shadowDepth + 0.004 ? 0.0 : 1.0;
+}
+
+vec2 PCFShadow(sampler2D shadowMap, vec3 shadowCoord, float fRadMul, vec2 vTexCoord)
 {
     vec2 fShadow_fDist = vec2(0.0);
     float texelSize = 1.0 / float(textureSize(shadowMap, 0).x);

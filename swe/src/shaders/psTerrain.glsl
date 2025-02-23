@@ -56,7 +56,7 @@ void main()
 
     vec3 vDiffuse = mix(vCLand, vCWater, fWater );
 
-    vec2 fShadow_fDist = PCFShadow(g_tShadowMap, shadowCoord, mix( 1.0, 2.0, fWater ), vTexCoord );
+    vec2 fShadow_fDist = PCFShadow(g_tShadowMap, shadowCoord.xyz, mix( 1.0, 2.0, fWater ), vTexCoord );
 
 
     float fSSS = ( 1.0 - fOcc ) * fWater;
@@ -70,7 +70,7 @@ void main()
     vCAmbientUp += fSSS * g_vCWaterSSS * fSSSShadowW;
     vCAmbientDown += fSSS * g_vCWaterSSS * fSSSShadowW;
     
-    vec3 vColor = Shade(g_vLightDir, g_vCLight*fShadow_fDist.x, vCAmbientUp, vCAmbientDown, vNormal, vDiffuse, mix( 0.9, mix( 0.3, 0.7, fFoam ), fWater ), mix(0.04, 0.05, fWater), g_vViewDir);
+    vec3 vColor = Shade(g_vLightDir, g_vCLight*fShadow_fDist.x, vCAmbientUp, vCAmbientDown, vNormal, vDiffuse, mix( 0.9, mix( 0.4, 0.8, fFoam ), fWater ), mix(0.04, 0.05, fWater), g_vViewDir);
 
     outColor0.rgb = vColor;
     outColor0.a = 1.0;

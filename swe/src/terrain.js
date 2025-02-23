@@ -187,7 +187,8 @@ export class Terrain {
 
             //limit the rotation:
             if (this.fCamRotX < 0) this.fCamRotX = 0;
-            if (this.fCamRotX > Math.PI / 3) this.fCamRotX = Math.PI / 3;
+            //if (this.fCamRotX > Math.PI / 3) this.fCamRotX = Math.PI / 3;
+            if (this.fCamRotX > Math.PI / 2) this.fCamRotX = Math.PI / 2;
             if (this.fCamRotZ > 2 * Math.PI) this.fCamRotZ -= 2 * Math.PI;
             if (this.fCamRotZ < 0) this.fCamRotZ += 2 * Math.PI;
         }
@@ -478,9 +479,14 @@ export class Terrain {
         gl.bindTexture(gl.TEXTURE_2D, textureMisc);
         gl.uniform1i(gl.getUniformLocation(program, 'g_tTex'), 0);
 
+        gl.activeTexture(gl.TEXTURE2);
+        gl.bindTexture(gl.TEXTURE_2D, this.shadowMap);
+        gl.uniform1i(gl.getUniformLocation(program, 'g_tShadowMap'), 2);
+
         // Set the MVP matrix
         gl.uniformMatrix4fv(gl.getUniformLocation(program, 'g_matVP'), false, this.mvpMatrix);
         gl.uniformMatrix4fv(gl.getUniformLocation(program, 'g_matVPInv'), false, this.mvpMatrixInv);
+        gl.uniformMatrix4fv(gl.getUniformLocation(program, 'g_matVPShadow'), false, this.shadowMapMatrix);
 
         // Draw the cube
         gl.drawElements(gl.TRIANGLES, this.indexCountCube, gl.UNSIGNED_SHORT, 0);

@@ -45,7 +45,7 @@ void main()
 
     vec3 vDiffuse = mix(vCLand, vCWater, fWater);
 
-    vec2 fShadow_fDist = PCFShadow(g_tShadowMap, shadowCoord, mix(1.0, 2.0, fWater), vTexCoord);
+    vec2 fShadow_fDist = PCFShadow(g_tShadowMap, shadowCoord.xyz, mix(1.0, 2.0, fWater), vTexCoord);
 
     vec3 vColor = Shade(g_vLightDir, g_vCLight * fShadow_fDist.x, g_vCAmbientUp * fOcc, g_vCAmbientDown * fOcc, vNormal, vDiffuse, mix(0.9, 0.3, fWater), mix(0.04, 0.1, fWater), g_vViewDir);
 
