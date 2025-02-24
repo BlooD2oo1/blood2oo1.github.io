@@ -54,6 +54,8 @@ void main()
 
     vCWater = mix( vCWater, vCFoam, fFoam );
 
+    vCWater = vec3( abs( vTexC.xy ), vCWater.b );
+
     vec3 vDiffuse = mix(vCLand, vCWater, fWater );
 
     vec2 fShadow_fDist = PCFShadow(g_tShadowMap, shadowCoord.xyz, mix( 1.0, 2.0, fWater ), vTexCoord );

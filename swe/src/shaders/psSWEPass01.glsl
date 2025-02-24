@@ -46,7 +46,7 @@ void main()
 
         // Compute MacCormack correction
         vec2 velocityAdvected = 0.5 * (velocity + velocityForward);
-
+        
         // Clamp to avoid overshoots
         /*vec2 minVel = min(velocityPrev, velocityForward);
         vec2 maxVel = max(velocityPrev, velocityForward);
@@ -56,7 +56,8 @@ void main()
             velocityAdvected = velocityPrev; // Fallback to semi-Lagrangian
         }*/
 
-        outColor.xy = velocityAdvected;
+        //outColor.xy = velocityAdvected;
+        outColor.xy = textureLod(g_tTex, vTexCoord - ( velocityAdvected * dt ) / g_vRTRes, 0.0).xy;
     }
 
 	outColor.zw = vTexC.zw;
@@ -80,7 +81,7 @@ void main()
         float fDirLen = length(vDir);
         float fW = max(0.0, (fRad - fDirLen)/fRad );
         fW = 0.5 - 0.5 * cos(fW*PI2);
-        outColor.z += fW * 0.000008 * g_fElapsedTimeInSec;
+        outColor.z += fW * 0.000006 * g_fElapsedTimeInSec;
     }
 
     {
@@ -89,6 +90,6 @@ void main()
         float fDirLen = length(vDir);
         float fW = max(0.0, (fRad - fDirLen)/fRad );
         fW = 0.5 - 0.5 * cos(fW*PI2);
-        outColor.z -= fW * 0.000008 * g_fElapsedTimeInSec;
+        outColor.z -= fW * 0.000006 * g_fElapsedTimeInSec;
     }
 }

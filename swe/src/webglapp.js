@@ -159,8 +159,9 @@ class WebGLApp {
         this.uiContainer.appendChild(this.button2);
 
         // Create sliders with labels
-        this.createSlider('VelAdvect', 'VelAdvect', -1.0, 1.0, 1.0);
-        this.createSlider('slider2', 'Slider 2', 0.0, 1.0, 1.0);
+        this.createSlider('SubStepCount', 'SubStepCount', 0, 100, 20);
+        this.createSlider('TimeScale', 'TimeScale', 0.01, 3.0, 1.0);
+        this.createSlider('VelAdvect', 'VelAdvect', -1.0, 1.0, 1.0);        
 
         // Create FPS display
         this.fpsDisplay = document.createElement('div');
@@ -218,9 +219,14 @@ class WebGLApp {
         return this.VelAdvect.value;
     }
 
-    getSlider2() {
-        return this.slider2.value;
+    getSliderTimeScale() {
+        return this.TimeScale.value;
     }
+
+    getSliderSubStepCount() {
+        return this.SubStepCount.value;
+    }
+
     getWidth() {
         return this.canvas.width;
     }

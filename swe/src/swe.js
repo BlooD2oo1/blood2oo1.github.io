@@ -188,14 +188,18 @@ export class SWE {
 
 
         this.params.fAdvectSpeed = app.getSliderVelAdvect();
+        this.params.fElapsedTimeInSec = app.getSliderTimeScale();
+
 
         const gl = this.gl;
         // Bind the current framebuffer and set the viewport        
         gl.viewport(0, 0, this.width, this.height);
         gl.disable(gl.DEPTH_TEST);
 
-        for (let i = 0; i < 20; i++) {
+        for (let i = 0; i < app.getSliderSubStepCount(); i++) {
+
             this.m_iFrameCount++;
+
             // Pass 01
             {
                 const program = this.program_SWEPass01;
