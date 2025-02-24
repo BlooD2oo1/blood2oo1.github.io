@@ -160,7 +160,8 @@ class WebGLApp {
 
         // Create sliders with labels
         this.createSlider('SubStepCount', 'SubStepCount', 0, 100, 20);
-        this.createSlider('TimeScale', 'TimeScale', 0.01, 3.0, 1.0);
+        this.createSlider('TimeScale', 'TimeScale', 0.01, 50.0, 1.0);
+        this.createSlider('GridScale', 'GridScale', 0.01, 50.0, 5.0);
         this.createSlider('VelAdvect', 'VelAdvect', -1.0, 1.0, 1.0);        
 
         // Create FPS display
@@ -221,6 +222,10 @@ class WebGLApp {
 
     getSliderTimeScale() {
         return this.TimeScale.value;
+    }
+
+    getSliderGridScale() {
+        return this.GridScale.value;
     }
 
     getSliderSubStepCount() {

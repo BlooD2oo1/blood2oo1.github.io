@@ -36,7 +36,8 @@ void main()
 
     // 2.1.4. Boundary Conditions
 
-    const float EPS = 0.00001;
+    //const float EPS = 0.00001;
+	float EPS = g_fGridSizeInMeter/10000.0;
     if (((vTexC.z <= EPS * g_fGridSizeInMeter) && (vTexC.w > zR)) ||
         ((vTexR.z <= EPS * g_fGridSizeInMeter) && (vTexR.w > zC)))
     {
@@ -55,7 +56,7 @@ void main()
     {
         float alpha = 0.5;
         vTexC.xy /= l;
-        l = min(l, g_fGridSizeInMeter / (g_fElapsedTimeInSec)*alpha);
+        l = min(l, alpha * g_fGridSizeInMeter / g_fElapsedTimeInSec);
         vTexC.xy *= l;
     }
 

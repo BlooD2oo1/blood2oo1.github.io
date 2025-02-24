@@ -27,7 +27,7 @@ void main()
         vec2 v4 = textureLod(g_tTex, vTexCoord - ( v3 * dt ) / g_vRTRes, 0.0 ).xy;
         vec2 v = (1.0 * v1 + 2.0 * v2 + 2.0 * v3 + 1.0 * v4) / 6.0;
     
-        outColor.xy = textureLod(g_tTex, vTexCoord - ( v * dt ) / g_vRTRes, 0.0).xy;
+        outColor = textureLod(g_tTex, vTexCoord - ( v * dt ) / g_vRTRes, 0.0);
     }*/
 
     {
@@ -56,11 +56,14 @@ void main()
             velocityAdvected = velocityPrev; // Fallback to semi-Lagrangian
         }*/
 
-        //outColor.xy = velocityAdvected;
-        outColor.xy = textureLod(g_tTex, vTexCoord - ( velocityAdvected * dt ) / g_vRTRes, 0.0).xy;
+        
+        outColor = textureLod(g_tTex, vTexCoord - velocityAdvected * dt / g_vRTRes, 0.0);
+
     }
 
-	outColor.zw = vTexC.zw;
+    //outColor.xy = vTexC.xy;
+    outColor.z = vTexC.z;
+	outColor.w = vTexC.w;
 
     //outColor.x += noise( vTexCoord.xy*1.5 + vec2(float(g_iSWEFrameCount)*0.001))*0.1 / g_vRTRes.x;
     //outColor.y += noise( vTexCoord.xy*1.5 + vec2(float(g_iSWEFrameCount+10)*0.001))*0.1 / g_vRTRes.y;

@@ -189,6 +189,7 @@ export class SWE {
 
         this.params.fAdvectSpeed = app.getSliderVelAdvect();
         this.params.fElapsedTimeInSec = app.getSliderTimeScale();
+        this.params.fGridSizeInMeter = app.getSliderGridScale();
 
 
         const gl = this.gl;

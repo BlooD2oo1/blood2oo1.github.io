@@ -46,7 +46,7 @@ void main()
 	fFoam += smoothstep(0.005, 0.0002, vTexC.z);//part
 	fFoam = clamp(fFoam, 0.0, 1.0);
     float fNormalBoostOnWater = mix(1.0, 0.6, fWater);
-    vec3 vNormal = normalize( vec3( -vTexDtC.xy, g_fGridSizeInMeter* fNormalBoostOnWater) );
+    vec3 vNormal = normalize( vec3( -vTexDtC.xy, fNormalBoostOnWater) );
     
     vec3 vCWater = mix( g_vCWaterShallow, g_vCWaterDeep, smoothstep( 0.0, 0.03, vTexC.z ) );
 	vec3 vCFoam = vec3(0.9);
