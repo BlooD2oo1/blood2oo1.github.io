@@ -42,7 +42,7 @@ void main()
     fOcc = pow( fOcc*0.8+0.2, 0.5 );
     
     float fWater = smoothstep( 0.0, 0.005, vTexC.z );
-    float fFoam = ( length(vTexDtC.xy) * length(vTexC.xy) ) * 5.0 / clamp(0.001, 1.0, vTexC.z * 1000.0);
+    float fFoam = ( length(vTexDtC.xy) * length(vTexC.xy) ) * 7.0 / clamp(0.001, 1.0, vTexC.z * 100.0);
 	fFoam += smoothstep(0.005, 0.0002, vTexC.z);//part
 	fFoam = clamp(fFoam, 0.0, 1.0);
     float fNormalBoostOnWater = mix(1.0, 0.6, fWater);

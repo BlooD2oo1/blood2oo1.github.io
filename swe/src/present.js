@@ -194,10 +194,6 @@ export class Present {
         const mousePosition = app.getMousePosition();
         gl.uniform2f(gl.getUniformLocation(this.program_Present, "uMousePosition"), mousePosition.x, mousePosition.y);
 
-        // fSlider1, fSlider2:
-        gl.uniform1f(gl.getUniformLocation(this.program_Present, "fSlider1"), app.getSlider1());
-        gl.uniform1f(gl.getUniformLocation(this.program_Present, "fSlider2"), app.getSlider2());
-
         // Create vec2 shader input for SWE width height:
         gl.uniform2f(gl.getUniformLocation(this.program_Present, "g_vRTRes"), app.getWidth(), app.getHeight());
 

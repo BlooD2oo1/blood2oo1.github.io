@@ -13,7 +13,7 @@ export class SWE {
 
         this.params = {
             fGridSizeInMeter: 5.0,
-            fElapsedTimeInSec: 0.5,
+            fElapsedTimeInSec: 1.0,
             fAdvectSpeed: -1.0,
             fG: 9.8,
             fHackBlurDepth: 1.0,
@@ -132,6 +132,9 @@ export class SWE {
 
     renderInit() {
         const gl = this.gl;
+
+        this.m_iFrameCount = 0;
+
         // Bind the current framebuffer and set the viewport
         gl.viewport(0, 0, this.width, this.height);
         gl.disable(gl.DEPTH_TEST);
@@ -182,35 +185,45 @@ export class SWE {
     }
 
     render() {
+
+
+        this.params.fAdvectSpeed = app.getSliderVelAdvect();
+
         const gl = this.gl;
         // Bind the current framebuffer and set the viewport        
         gl.viewport(0, 0, this.width, this.height);
         gl.disable(gl.DEPTH_TEST);
 
         for (let i = 0; i < 20; i++) {
+            this.m_iFrameCount++;
             // Pass 01
             {
+                const program = this.program_SWEPass01;
+
                 gl.bindFramebuffer(gl.FRAMEBUFFER, this.currentFramebuffer);
-                gl.useProgram(this.program_SWEPass01);
+                gl.useProgram(program);
 
                 gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, this.screenIbo);
                 gl.bindBuffer(gl.ARRAY_BUFFER, this.screenVbo);
-                const positionLocation = gl.getAttribLocation(this.program_SWEPass01, "position");
+                const positionLocation = gl.getAttribLocation(program, "position");
                 gl.enableVertexAttribArray(positionLocation);
                 gl.vertexAttribPointer(positionLocation, 2, gl.FLOAT, false, 0, 0);        
 
                 gl.activeTexture(gl.TEXTURE0);
                 gl.bindTexture(gl.TEXTURE_2D, this.otherTexture);
-                gl.uniform1i(gl.getUniformLocation(this.program_SWEPass01, "g_tTex"), 0);
-                gl.uniform2f(gl.getUniformLocation(this.program_SWEPass01, "g_vRTRes"), this.getWidth(), this.getHeight());
+                gl.uniform1i(gl.getUniformLocation(program, "g_tTex"), 0);
+                gl.uniform2f(gl.getUniformLocation(program, "g_vRTRes"), this.getWidth(), this.getHeight());
 
                 // Pass parameters to the fragment shader
-                gl.uniform1f(gl.getUniformLocation(this.program_SWEPass01, "g_fGridSizeInMeter"), this.params.fGridSizeInMeter);
-                gl.uniform1f(gl.getUniformLocation(this.program_SWEPass01, "g_fElapsedTimeInSec"), this.params.fElapsedTimeInSec);
-                gl.uniform1f(gl.getUniformLocation(this.program_SWEPass01, "g_fAdvectSpeed"), this.params.fAdvectSpeed);
-                gl.uniform1f(gl.getUniformLocation(this.program_SWEPass01, "g_fG"), this.params.fG);
-                gl.uniform1f(gl.getUniformLocation(this.program_SWEPass01, "g_fHackBlurDepth"), this.params.fHackBlurDepth);
-                gl.uniform1i(gl.getUniformLocation(this.program_SWEPass01, "g_iInitSetting"), this.params.iInitSetting);
+                gl.uniform1f(gl.getUniformLocation(program, "g_fGridSizeInMeter"), this.params.fGridSizeInMeter);
+                gl.uniform1f(gl.getUniformLocation(program, "g_fElapsedTimeInSec"), this.params.fElapsedTimeInSec);
+                gl.uniform1f(gl.getUniformLocation(program, "g_fAdvectSpeed"), this.params.fAdvectSpeed);
+                gl.uniform1f(gl.getUniformLocation(program, "g_fG"), this.params.fG);
+                gl.uniform1f(gl.getUniformLocation(program, "g_fHackBlurDepth"), this.params.fHackBlurDepth);
+                gl.uniform1i(gl.getUniformLocation(program, "g_iInitSetting"), this.params.iInitSetting);
+
+                gl.uniform1f(gl.getUniformLocation(program, "g_fRndSeed"), Math.random());
+                gl.uniform1i(gl.getUniformLocation(program, "g_iSWEFrameCount"), this.m_iFrameCount);
 
                 // Pass mouse position to the fragment shader
                 const mousePosition = app.getMousePosition();
@@ -254,8 +267,8 @@ export class SWE {
                     y: (intersection[1] + 0.5)
                 };
 
-                gl.uniform2f(gl.getUniformLocation(this.program_SWEPass01, "uClickPosition"), clickPosition.x, clickPosition.y);
-                gl.uniform2i(gl.getUniformLocation(this.program_SWEPass01, "uMouseButtons"), app.getMouseButtonLeft(), app.getMouseButtonRight());
+                gl.uniform2f(gl.getUniformLocation(program, "uClickPosition"), clickPosition.x, clickPosition.y);
+                gl.uniform2i(gl.getUniformLocation(program, "uMouseButtons"), app.getMouseButtonLeft(), app.getMouseButtonRight());
 
                 gl.drawElements(gl.TRIANGLES, 6, gl.UNSIGNED_SHORT, 0);
 
@@ -266,27 +279,30 @@ export class SWE {
 
             // Pass 02
             {
+
+                const program = this.program_SWEPass02;
+
                 gl.bindFramebuffer(gl.FRAMEBUFFER, this.currentFramebuffer);
-                gl.useProgram(this.program_SWEPass02);
+                gl.useProgram(program);
 
                 gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, this.screenIbo);
                 gl.bindBuffer(gl.ARRAY_BUFFER, this.screenVbo);
-                const positionLocation = gl.getAttribLocation(this.program_SWEPass02, "position");
+                const positionLocation = gl.getAttribLocation(program, "position");
                 gl.enableVertexAttribArray(positionLocation);
                 gl.vertexAttribPointer(positionLocation, 2, gl.FLOAT, false, 0, 0);        
 
                 gl.activeTexture(gl.TEXTURE0);
                 gl.bindTexture(gl.TEXTURE_2D, this.otherTexture);
-                gl.uniform1i(gl.getUniformLocation(this.program_SWEPass02, "g_tTex"), 0);
-                gl.uniform2f(gl.getUniformLocation(this.program_SWEPass02, "g_vRTRes"), this.getWidth(), this.getHeight());
+                gl.uniform1i(gl.getUniformLocation(program, "g_tTex"), 0);
+                gl.uniform2f(gl.getUniformLocation(program, "g_vRTRes"), this.getWidth(), this.getHeight());
 
                 // Pass parameters to the fragment shader
-                gl.uniform1f(gl.getUniformLocation(this.program_SWEPass02, "g_fGridSizeInMeter"), this.params.fGridSizeInMeter);
-                gl.uniform1f(gl.getUniformLocation(this.program_SWEPass02, "g_fElapsedTimeInSec"), this.params.fElapsedTimeInSec);
-                gl.uniform1f(gl.getUniformLocation(this.program_SWEPass02, "g_fAdvectSpeed"), this.params.fAdvectSpeed);
-                gl.uniform1f(gl.getUniformLocation(this.program_SWEPass02, "g_fG"), this.params.fG);
-                gl.uniform1f(gl.getUniformLocation(this.program_SWEPass02, "g_fHackBlurDepth"), this.params.fHackBlurDepth);
-                gl.uniform1i(gl.getUniformLocation(this.program_SWEPass02, "g_iInitSetting"), this.params.iInitSetting);
+                gl.uniform1f(gl.getUniformLocation(program, "g_fGridSizeInMeter"), this.params.fGridSizeInMeter);
+                gl.uniform1f(gl.getUniformLocation(program, "g_fElapsedTimeInSec"), this.params.fElapsedTimeInSec);
+                gl.uniform1f(gl.getUniformLocation(program, "g_fAdvectSpeed"), this.params.fAdvectSpeed);
+                gl.uniform1f(gl.getUniformLocation(program, "g_fG"), this.params.fG);
+                gl.uniform1f(gl.getUniformLocation(program, "g_fHackBlurDepth"), this.params.fHackBlurDepth);
+                gl.uniform1i(gl.getUniformLocation(program, "g_iInitSetting"), this.params.iInitSetting);
 
                 gl.drawElements(gl.TRIANGLES, 6, gl.UNSIGNED_SHORT, 0);
             }
@@ -296,27 +312,30 @@ export class SWE {
 
             // Pass 03
             {
+
+                const program = this.program_SWEPass03;
+
                 gl.bindFramebuffer(gl.FRAMEBUFFER, this.currentFramebuffer);
-                gl.useProgram(this.program_SWEPass03);
+                gl.useProgram(program);
 
                 gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, this.screenIbo);
                 gl.bindBuffer(gl.ARRAY_BUFFER, this.screenVbo);
-                const positionLocation = gl.getAttribLocation(this.program_SWEPass03, "position");
+                const positionLocation = gl.getAttribLocation(program, "position");
                 gl.enableVertexAttribArray(positionLocation);
                 gl.vertexAttribPointer(positionLocation, 2, gl.FLOAT, false, 0, 0);        
 
                 gl.activeTexture(gl.TEXTURE0);
                 gl.bindTexture(gl.TEXTURE_2D, this.otherTexture);
-                gl.uniform1i(gl.getUniformLocation(this.program_SWEPass03, "g_tTex"), 0);
-                gl.uniform2f(gl.getUniformLocation(this.program_SWEPass03, "g_vRTRes"), this.getWidth(), this.getHeight());
+                gl.uniform1i(gl.getUniformLocation(program, "g_tTex"), 0);
+                gl.uniform2f(gl.getUniformLocation(program, "g_vRTRes"), this.getWidth(), this.getHeight());
 
                 // Pass parameters to the fragment shader
-                gl.uniform1f(gl.getUniformLocation(this.program_SWEPass03, "g_fGridSizeInMeter"), this.params.fGridSizeInMeter);
-                gl.uniform1f(gl.getUniformLocation(this.program_SWEPass03, "g_fElapsedTimeInSec"), this.params.fElapsedTimeInSec);
-                gl.uniform1f(gl.getUniformLocation(this.program_SWEPass03, "g_fAdvectSpeed"), this.params.fAdvectSpeed);
-                gl.uniform1f(gl.getUniformLocation(this.program_SWEPass03, "g_fG"), this.params.fG);
-                gl.uniform1f(gl.getUniformLocation(this.program_SWEPass03, "g_fHackBlurDepth"), this.params.fHackBlurDepth);
-                gl.uniform1i(gl.getUniformLocation(this.program_SWEPass03, "g_iInitSetting"), this.params.iInitSetting);
+                gl.uniform1f(gl.getUniformLocation(program, "g_fGridSizeInMeter"), this.params.fGridSizeInMeter);
+                gl.uniform1f(gl.getUniformLocation(program, "g_fElapsedTimeInSec"), this.params.fElapsedTimeInSec);
+                gl.uniform1f(gl.getUniformLocation(program, "g_fAdvectSpeed"), this.params.fAdvectSpeed);
+                gl.uniform1f(gl.getUniformLocation(program, "g_fG"), this.params.fG);
+                gl.uniform1f(gl.getUniformLocation(program, "g_fHackBlurDepth"), this.params.fHackBlurDepth);
+                gl.uniform1i(gl.getUniformLocation(program, "g_iInitSetting"), this.params.iInitSetting);
 
                 gl.drawElements(gl.TRIANGLES, 6, gl.UNSIGNED_SHORT, 0);
             }
@@ -327,26 +346,29 @@ export class SWE {
 
         // Proc 01
         {
+
+            const program = this.program_SWEProc01;
+
             gl.bindFramebuffer(gl.FRAMEBUFFER, this.rtFramebufferNorm);
-            gl.useProgram(this.program_SWEProc01);
+            gl.useProgram(program);
 
             gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, this.screenIbo);
             gl.bindBuffer(gl.ARRAY_BUFFER, this.screenVbo);
-            const positionLocation = gl.getAttribLocation(this.program_SWEProc01, "position");
+            const positionLocation = gl.getAttribLocation(program, "position");
             gl.enableVertexAttribArray(positionLocation);
             gl.vertexAttribPointer(positionLocation, 2, gl.FLOAT, false, 0, 0);        
 
             gl.activeTexture(gl.TEXTURE0);
             gl.bindTexture(gl.TEXTURE_2D, this.otherTexture);
-            gl.uniform1i(gl.getUniformLocation(this.program_SWEProc01, "g_tTex"), 0);
-            gl.uniform2f(gl.getUniformLocation(this.program_SWEProc01, "g_vRTRes"), this.getWidth(), this.getHeight());
+            gl.uniform1i(gl.getUniformLocation(program, "g_tTex"), 0);
+            gl.uniform2f(gl.getUniformLocation(program, "g_vRTRes"), this.getWidth(), this.getHeight());
 
             // Pass parameters to the fragment shader
-            gl.uniform1f(gl.getUniformLocation(this.program_SWEProc01, "g_fGridSizeInMeter"), this.params.fGridSizeInMeter);
-            gl.uniform1f(gl.getUniformLocation(this.program_SWEProc01, "g_fElapsedTimeInSec"), this.params.fElapsedTimeInSec);
-            gl.uniform1f(gl.getUniformLocation(this.program_SWEProc01, "g_fAdvectSpeed"), this.params.fAdvectSpeed);
-            gl.uniform1f(gl.getUniformLocation(this.program_SWEProc01, "g_fG"), this.params.fG);
-            gl.uniform1f(gl.getUniformLocation(this.program_SWEProc01, "g_fHackBlurDepth"), this.params.fHackBlurDepth);
+            gl.uniform1f(gl.getUniformLocation(program, "g_fGridSizeInMeter"), this.params.fGridSizeInMeter);
+            gl.uniform1f(gl.getUniformLocation(program, "g_fElapsedTimeInSec"), this.params.fElapsedTimeInSec);
+            gl.uniform1f(gl.getUniformLocation(program, "g_fAdvectSpeed"), this.params.fAdvectSpeed);
+            gl.uniform1f(gl.getUniformLocation(program, "g_fG"), this.params.fG);
+            gl.uniform1f(gl.getUniformLocation(program, "g_fHackBlurDepth"), this.params.fHackBlurDepth);
             gl.uniform1i(gl.getUniformLocation(this.program_SWEProc01, "g_iInitSetting"), this.params.iInitSetting);
 
             gl.drawElements(gl.TRIANGLES, 6, gl.UNSIGNED_SHORT, 0);

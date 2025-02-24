@@ -41,7 +41,7 @@ export class Terrain {
         this.mvpMatrix = mat4.create();
         this.shadowMapMatrix = mat4.create();
         this.fCamRotX = Math.PI / 4;
-        this.fCamRotZ = Math.PI / 6;
+        this.fCamRotZ = (Math.PI*5) / 6;
 
         this.createShadowMap();
     }

@@ -118,6 +118,8 @@ class WebGLApp {
 
         this.lastFrameTime = performance.now();
         this.frameCount = 0;
+
+        this.m_fTimeSec = 0.0;
     }
 
     isMobileDevice() {
@@ -157,7 +159,7 @@ class WebGLApp {
         this.uiContainer.appendChild(this.button2);
 
         // Create sliders with labels
-        this.createSlider('slider1', 'Slider 1', 0.0, 1.0, 1.0);
+        this.createSlider('VelAdvect', 'VelAdvect', -1.0, 1.0, 1.0);
         this.createSlider('slider2', 'Slider 2', 0.0, 1.0, 1.0);
 
         // Create FPS display
@@ -212,8 +214,8 @@ class WebGLApp {
         this[id] = slider;
     }
 
-    getSlider1() {
-        return this.slider1.value;
+    getSliderVelAdvect() {
+        return this.VelAdvect.value;
     }
 
     getSlider2() {
@@ -239,6 +241,10 @@ class WebGLApp {
     }
     getMouseButtonRight() {
         return this.mouseButtonRight;
+    }
+
+    getTimeSec() { 
+        return this.m_fTimeSec;
     }
 
     async init() {
@@ -327,6 +333,7 @@ class WebGLApp {
     render() {
         const now = performance.now();
         const deltaTime = now - this.lastFrameTime;
+        this.m_fTimeSec += deltaTime / 1000.0;
         this.frameCount++;
 
         if (deltaTime >= 1000) {

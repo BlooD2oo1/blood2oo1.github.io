@@ -7,8 +7,6 @@ out vec4 outColor;
 uniform sampler2D g_tTex;
 uniform vec2 g_vRTRes;
 uniform vec2 uMousePosition;
-uniform float fSlider1;
-uniform float fSlider2;
 
 void main()
 {

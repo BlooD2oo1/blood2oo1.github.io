@@ -15,6 +15,11 @@ uniform float g_fAdvectSpeed;
 uniform float g_fG;
 uniform float g_fHackBlurDepth;
 uniform int g_iInitSetting;
+uniform int g_iSWEFrameCount;
+
+uniform float g_fRndSeed;
+uniform float g_fTimeSec;
+
 
 const float PI05 = 1.5707963267948966192313216916398;
 const float PI = 3.1415926535897932384626433832795;
@@ -137,7 +142,7 @@ float SampleDepth(vec2 xy)
     }
     else if ( g_iInitSetting == 1 )
     {
-        vec2 vUV = xy * g_fGridSizeInMeter * 0.0003 + 8.0;
+        vec2 vUV = xy * g_fGridSizeInMeter * 0.0006 + 8.0;
         vUV += vec2(noise(vUV + 2.0), noise(vUV + 1.0)) * 0.1;
         mat2 m = mat2(2.0, 1.2, -1.2, 2.0);
         fRet = noise(vUV) / 2.0; vUV = (m * vUV);
@@ -148,11 +153,10 @@ float SampleDepth(vec2 xy)
         fRet += noise(vUV) / 128.0; vUV = (m * vUV);
         fRet += noise(vUV) / 256.0; vUV = (m * vUV);
 
-        float f = fRet;
-        fRet = sin(fRet*2.7*4.0)*0.3;
-        //fRet = ( 1.0-exp(-abs(fRet)/0.2))*0.2 * sign(fRet);
-        fRet += f*2.0;
-
+        fRet *= 4.0;
+        //fRet = sin(fRet*2.7*4.0)*0.3;
+        
+        fRet = ( 1.0-exp(-abs(fRet)/0.9))*0.9 * sign(fRet);
         {
             vec2 p = vec2( 1.0, 0.44);
             p = p*p*(3.0-2.0*p);
@@ -160,7 +164,7 @@ float SampleDepth(vec2 xy)
 	        p = p*p*(3.0-2.0*p);
             fRet += voronoise(xy*0.035, p.x, p.y) * 0.1;
         }
-
+        
         {
             vec2 p = vec2( 1.0, 0.45);
             p = p*p*(3.0-2.0*p);
@@ -305,4 +309,102 @@ vec2 PCFShadow(sampler2D shadowMap, vec3 shadowCoord, float fRadMul, vec2 vTexCo
     fShadow_fDist.x /= 16.0;
     fShadow_fDist.y /= 16.0;
     return fShadow_fDist;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/* discontinuous pseudorandom uniformly distributed in [-0.5, +0.5]^3 */
+vec3 random3(vec3 c) {
+	float j = 4096.0*sin(dot(c,vec3(17.0, 59.4, 15.0)));
+	vec3 r;
+	r.z = fract(512.0*j);
+	j *= .125;
+	r.x = fract(512.0*j);
+	j *= .125;
+	r.y = fract(512.0*j);
+	return r-0.5;
+}
+
+/* skew constants for 3d simplex functions */
+const float F3 =  0.3333333;
+const float G3 =  0.1666667;
+
+/* 3d simplex noise */
+float simplex3d(vec3 p) {
+	 /* 1. find current tetrahedron T and it's four vertices */
+	 /* s, s+i1, s+i2, s+1.0 - absolute skewed (integer) coordinates of T vertices */
+	 /* x, x1, x2, x3 - unskewed coordinates of p relative to each of T vertices*/
+	 
+	 /* calculate s and x */
+	 vec3 s = floor(p + dot(p, vec3(F3)));
+	 vec3 x = p - s + dot(s, vec3(G3));
+	 
+	 /* calculate i1 and i2 */
+	 vec3 e = step(vec3(0.0), x - x.yzx);
+	 vec3 i1 = e*(1.0 - e.zxy);
+	 vec3 i2 = 1.0 - e.zxy*(1.0 - e);
+	 	
+	 /* x1, x2, x3 */
+	 vec3 x1 = x - i1 + G3;
+	 vec3 x2 = x - i2 + 2.0*G3;
+	 vec3 x3 = x - 1.0 + 3.0*G3;
+	 
+	 /* 2. find four surflets and store them in d */
+	 vec4 w, d;
+	 
+	 /* calculate surflet weights */
+	 w.x = dot(x, x);
+	 w.y = dot(x1, x1);
+	 w.z = dot(x2, x2);
+	 w.w = dot(x3, x3);
+	 
+	 /* w fades from 0.6 at the center of the surflet to 0.0 at the margin */
+	 w = max(0.6 - w, 0.0);
+	 
+	 /* calculate surflet components */
+	 d.x = dot(random3(s), x);
+	 d.y = dot(random3(s + i1), x1);
+	 d.z = dot(random3(s + i2), x2);
+	 d.w = dot(random3(s + 1.0), x3);
+	 
+	 /* multiply d by w^4 */
+	 w *= w;
+	 w *= w;
+	 d *= w;
+	 
+	 /* 3. return the sum of the four surflets */
+	 return dot(d, vec4(52.0));
+}
+
+/* const matrices for 3d rotation */
+const mat3 rot1 = mat3(-0.37, 0.36, 0.85,-0.14,-0.93, 0.34,0.92, 0.01,0.4);
+const mat3 rot2 = mat3(-0.55,-0.39, 0.74, 0.33,-0.91,-0.24,0.77, 0.12,0.63);
+const mat3 rot3 = mat3(-0.71, 0.52,-0.47,-0.08,-0.72,-0.68,-0.7,-0.45,0.56);
+
+/* directional artifacts can be reduced by rotating each octave */
+float simplex3d_fractal(vec3 m) {
+    return   0.5333333*simplex3d(m*rot1)
+			+0.2666667*simplex3d(2.0*m*rot2)
+			+0.1333333*simplex3d(4.0*m*rot3)
+			+0.0666667*simplex3d(8.0*m);
 }
