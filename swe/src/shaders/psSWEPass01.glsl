@@ -30,7 +30,7 @@ void main()
         outColor = textureLod(g_tTex, vTexCoord - ( v * dt ) / g_vRTRes, 0.0);
     }*/
 
-    {
+    /*{
         vec2 velocity = vTexC.xy;
         // Compute backward position (semi-Lagrangian)
         vec2 prevPos = vTexCoord - velocity * dt / g_vRTRes;
@@ -45,20 +45,27 @@ void main()
         vec2 velocityForward = vTexForward.xy;
 
         // Compute MacCormack correction
-        vec2 velocityAdvected = 0.5 * (velocity + velocityForward);
+        vec2 velocityAdvected = (velocity + velocityForward) * 0.5;
         
         // Clamp to avoid overshoots
-        /*vec2 minVel = min(velocityPrev, velocityForward);
-        vec2 maxVel = max(velocityPrev, velocityForward);
-
-        if (any(lessThan(velocityAdvected, minVel)) || any(greaterThan(velocityAdvected, maxVel)))
-        {
-            velocityAdvected = velocityPrev; // Fallback to semi-Lagrangian
-        }*/
+        // vec2 minVel = min(velocityPrev, velocityForward);
+        // vec2 maxVel = max(velocityPrev, velocityForward);
+        // 
+        // if (any(lessThan(velocityAdvected, minVel)) || any(greaterThan(velocityAdvected, maxVel)))
+        // {
+        //     velocityAdvected = velocityPrev; // Fallback to semi-Lagrangian
+        // }
 
         
         outColor = textureLod(g_tTex, vTexCoord - velocityAdvected * dt / g_vRTRes, 0.0);
 
+    }*/
+
+    {
+        vec2 v0 = vTexC.xy * dt / g_vRTRes;
+		vec2 vk1 = textureLod(g_tTex, vTexCoord + v0, 0.0).xy * dt / g_vRTRes;
+        vec2 vk0 = ( v0 + vk1 ) * 0.5;
+		outColor = textureLod(g_tTex, vTexCoord + vk0, 0.0);
     }
 
     //outColor.xy = vTexC.xy;
@@ -70,7 +77,7 @@ void main()
 
     if ( uMouseButtons.x!=0)
     {
-        float fRad = 0.09;
+        float fRad = 0.04;
         vec2 vDir = vTexCoord - uClickPosition;
         float fDirLen = length(vDir);
         float fW = max(0.0, (fRad - fDirLen)/fRad );

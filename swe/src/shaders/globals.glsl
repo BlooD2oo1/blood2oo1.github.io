@@ -20,6 +20,8 @@ uniform int g_iSWEFrameCount;
 uniform float g_fRndSeed;
 uniform float g_fTimeSec;
 
+#define EPS 0.00001
+
 
 const float PI05 = 1.5707963267948966192313216916398;
 const float PI = 3.1415926535897932384626433832795;
@@ -126,7 +128,7 @@ float SampleDepth(vec2 xy)
         float fNoise = fRet;
     
 
-        fRet = fNoise * 0.017;
+        fRet = fNoise * 0.02;
 
         //fRet = clamp(fRet, 0.0, 0.001);
         //fRet = ( 1.0-exp(-abs(fRet)/0.001))*0.001;// * sign(fRet);
@@ -177,7 +179,7 @@ float SampleDepth(vec2 xy)
 
         fRet += 0.0;
 
-        fRet *= 0.015;
+        fRet *= 0.005;
 
     }
     return fRet * 5.0;

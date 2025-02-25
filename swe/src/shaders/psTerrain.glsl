@@ -41,9 +41,10 @@ void main()
     float fOcc = 1.0 - clamp(length(dC - dR) + length(dC - dB), 0.0, 1.0);
     fOcc = pow( fOcc*0.8+0.2, 0.5 );
     
-    float fWater = smoothstep( 0.0, 0.005, vTexC.z );
+    float fWaterMin = 0.0004;
+    float fWater = smoothstep( 0.0, fWaterMin, vTexC.z );
     float fFoam = ( length(vTexDtC.xy) * length(vTexC.xy) ) * 7.0 / clamp(0.001, 1.0, vTexC.z * 100.0);
-	fFoam += smoothstep(0.005, 0.0002, vTexC.z);//part
+	fFoam += smoothstep(0.005, 0.0, vTexC.z);//part
 	fFoam = clamp(fFoam, 0.0, 1.0);
     float fNormalBoostOnWater = mix(1.0, 0.6, fWater);
     vec3 vNormal = normalize( vec3( -vTexDtC.xy, fNormalBoostOnWater) );
@@ -53,13 +54,10 @@ void main()
     vec3 vCLand = mix(g_vCLand01, g_vCLand02, clamp(vTexC.w * 10.1, 0.0, 1.0));
 
     vCWater = mix( vCWater, vCFoam, fFoam );
-
-    vCWater = vec3( abs( vTexC.xy ), vCWater.b );
-
+	
     vec3 vDiffuse = mix(vCLand, vCWater, fWater );
 
     vec2 fShadow_fDist = PCFShadow(g_tShadowMap, shadowCoord.xyz, mix( 1.0, 2.0, fWater ), vTexCoord );
-
 
     float fSSS = ( 1.0 - fOcc ) * fWater;
     //float fSSS = ( 1.0-(vNormal.z*0.5+0.5) ) * fWater;
@@ -67,7 +65,7 @@ void main()
 
     vec3 vCAmbientUp = g_vCAmbientUp * fOcc;
     vec3 vCAmbientDown = g_vCAmbientDown * fOcc;
-
+    
     float fSSSShadowW = 1.0-clamp( fShadow_fDist.y, 0.0, 0.03 )/0.03;
     vCAmbientUp += fSSS * g_vCWaterSSS * fSSSShadowW;
     vCAmbientDown += fSSS * g_vCWaterSSS * fSSSShadowW;
@@ -78,5 +76,6 @@ void main()
     outColor0.a = 1.0;
 	outColor1 = vec4(vNormal, vScreenCoord.z);
     
-    //outColor.rgb = vec3(1.0-clamp( fShadow_fDist.y, 0.0, 0.05 )/0.05);
+    //outColor0.rgb = vec3(1.0-clamp( fShadow_fDist.y, 0.0, 0.05 )/0.05);
+    //outColor0.rgb = mix( outColor0.rgb, vec3( length( vTexC.xy ) ), fWater );
 }
