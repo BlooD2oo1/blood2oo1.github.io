@@ -37,6 +37,7 @@ void main()
     vec3 vCWater = mix(g_vCWaterShallow, g_vCWaterDeep, smoothstep(0.0, 0.03, vTexC.z));
     float fWaterDepth = (vTexC.z + vTexC.w) - fZPos;
     vCWater = mix(vCWater, g_vCWaterDeep * 0.8, clamp(fWaterDepth / 0.01, 0.0, 1.0));
+    vCWater = mix( vCWater, g_vCWaterMud, clamp( vTexC2.x*1000.0, 0.0, 1.0 ) );
     vec3 vCFoam = vec3(1.0);
     vec3 vCLand = mix(g_vCLandRock, g_vCLandSand, clamp( vTexC2.x*1000.0, 0.0, 1.0 ) );
     //float fLandDepth = vTexC.w - fZPos;

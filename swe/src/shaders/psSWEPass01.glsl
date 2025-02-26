@@ -67,11 +67,18 @@ void main()
 		vec2 vk1 = textureLod(g_tTex1, vTexCoord + v0, 0.0).xy * dt / g_vRTRes;
         vec2 vk0 = ( v0 + vk1 ) * 0.5;
 		outColor0 = textureLod(g_tTex1, vTexCoord + vk0, 0.0);
+        outColor1 = textureLod(g_tTex2, vTexCoord + vk0, 0.0);
     }
 
-    //outColor0.xy = vTexC.xy;
+    //outColor0.x = vTexC.x;
+    //outColor0.y = vTexC.y;
     outColor0.z = vTexC.z;
 	outColor0.w = vTexC.w;
+
+    outColor1.x = vTexC2.x;
+    //outColor1.y = vTexC2.y;
+    outColor1.z = vTexC2.z;
+	outColor1.w = vTexC2.w;
 
     //outColor0.x += noise( vTexCoord.xy*1.5 + vec2(float(g_iSWEFrameCount)*0.001))*0.001 / g_vRTRes.x;
     //outColor0.y += noise( vTexCoord.xy*1.5 + vec2(float(g_iSWEFrameCount+10)*0.001))*0.001 / g_vRTRes.y;
