@@ -77,12 +77,12 @@ void main()
 
     if ( uMouseButtons.x!=0)
     {
-        float fRad = 0.04;
+        float fRad = 0.06;
         vec2 vDir = vTexCoord - uClickPosition;
         float fDirLen = length(vDir);
         float fW = max(0.0, (fRad - fDirLen)/fRad );
         fW = 0.5 - 0.5 * cos(fW*PI2);
-        outColor.z += fW * 0.00003 * g_fElapsedTimeInSec;
+        outColor.z += fW * 0.00009 * g_fElapsedTimeInSec;
     }
 
     {

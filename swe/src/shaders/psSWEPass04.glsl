@@ -25,25 +25,16 @@ void main()
     //if (vTexC.y == 0.0) vTex.xyz = vTexC.xyz;
     //vTex.zw = vTexC.zw;
 
-    float fVel_x_L = vTexL.x;
-    float fVel_x_R = vTexC.x;
-    float fVel_y_T = vTexT.y;
-    float fVel_y_B = vTexC.y;
+    float fxL = vTexL.x;
+    float fxR = vTexC.x;
+    float fyT = vTexT.y;
+    float fyB = vTexC.y;
 
-    // szerintem az elso naiv megoldas latvanyosabb ha eros a velocity advection ( nem annyira alakulnak ki a zavar V-alakok )
-#if 1
-    //basic:
-    float hL = ( vTexL.z + vTexC.z ) * 0.5;
-    float hR = ( vTexR.z + vTexC.z ) * 0.5;
-    float hT = ( vTexT.z + vTexC.z ) * 0.5;
-    float hB = ( vTexB.z + vTexC.z ) * 0.5;
-#else
     // We also found that it yields a more stable simulation:
     float hL = (vTexL.x >= 0.0) ? vTexL.z : vTexC.z;
     float hR = (vTexC.x <= 0.0) ? vTexR.z : vTexC.z;
     float hT = (vTexT.y >= 0.0) ? vTexT.z : vTexC.z;
     float hB = (vTexC.y <= 0.0) ? vTexB.z : vTexC.z;
-#endif
 
     {
         // 2.1.5. Stability Enhancements
@@ -58,7 +49,7 @@ void main()
         hB -= hAdj;
     }
 
-    float dH = -((hR * fVel_x_R - hL * fVel_x_L) / g_fGridSizeInMeter + (hB * fVel_y_B - hT * fVel_y_T) / g_fGridSizeInMeter);
+    float dH = -((hR * fxR - hL * fxL) / g_fGridSizeInMeter + (hB * fyB - hT * fyT) / g_fGridSizeInMeter);
 
     vTexC.z += dH * (g_fElapsedTimeInSec);
 

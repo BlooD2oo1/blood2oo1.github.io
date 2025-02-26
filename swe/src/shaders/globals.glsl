@@ -36,9 +36,9 @@ const vec3 g_vCWaterShallow = vec3(0.3, 0.8, 0.8) * 0.4;
 const vec3 g_vCWaterDeep = vec3(0.3, 0.6, 0.8) * 0.7 * 0.4;
 const vec3 g_vCLand01 = vec3(0.6, 0.5, 0.3) * 0.6;
 const vec3 g_vCLand02 = vec3(0.6, 0.6, 0.5) * 0.6;
-const vec3 g_vCLight = vec3(1.0, 0.8, 0.5) * 7.0;
-const vec3 g_vCAmbientUp = vec3(0.3, 0.5, 0.7) * 0.15;
-const vec3 g_vCAmbientDown = (g_vCLand01 + g_vCLand02) * 0.5 * 0.01;
+const vec3 g_vCLight = vec3(1.0, 0.8, 0.5) * 10.0;
+const vec3 g_vCAmbientUp = vec3(0.3, 0.5, 0.7) * 0.2;
+const vec3 g_vCAmbientDown = (g_vCLand01 + g_vCLand02) * 0.5 * 0.02;
 
 vec2 hash(vec2 p) // replace this by something better
 {
@@ -155,7 +155,7 @@ float SampleDepth(vec2 xy)
         fRet += noise(vUV) / 128.0; vUV = (m * vUV);
         fRet += noise(vUV) / 256.0; vUV = (m * vUV);
 
-        fRet *= 2.0;
+        fRet *= 8.0;
         //fRet = sin(fRet*2.7*4.0)*0.3;
         
         fRet = ( 1.0-exp(-abs(fRet)/0.9))*0.9 * sign(fRet);
@@ -175,7 +175,7 @@ float SampleDepth(vec2 xy)
             fRet += voronoise(xy*0.12, p.x, p.y) * 0.02;
         }
 
-        fRet += (xy.x-0.5)*0.002;
+        fRet += (xy.x-0.5)*0.001;
 
         fRet += 0.0;
 

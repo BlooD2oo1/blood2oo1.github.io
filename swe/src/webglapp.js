@@ -1,5 +1,6 @@
 import { Present } from './present.js';
 
+
 async function loadShaderFile(url) {
     console.log(url, "\nloading...\n");
     try {
@@ -16,20 +17,27 @@ async function loadShaderFile(url) {
     }
 }
 
+let globalsCache = null;
 export async function createShaderProgram(gl, vsPath, fsPath) {
-    const [vsSource, fsSource, globals] = await Promise.all([
+    const [vsSource, fsSource] = await Promise.all([
         loadShaderFile(vsPath),
-        loadShaderFile(fsPath),
-        loadShaderFile('src/shaders/globals.glsl')
+        loadShaderFile(fsPath)
     ]);
 
-    if (!vsSource || !fsSource || !globals) {
+    if (!vsSource || !fsSource ) {
         return null;
     }
 
+    if (!globalsCache) {
+        globalsCache = await loadShaderFile('src/shaders/globals.glsl');
+        if (!globalsCache) {
+            return null;
+        }
+    }
+
     // Replace #GLOBALS with the content of globals
-    const vsSourceWithGlobals = vsSource.replace('#GLOBALS', globals);
-    const fsSourceWithGlobals = fsSource.replace('#GLOBALS', globals);
+    const vsSourceWithGlobals = vsSource.replace('#GLOBALS', globalsCache);
+    const fsSourceWithGlobals = fsSource.replace('#GLOBALS', globalsCache);
 
     const vs = gl.createShader(gl.VERTEX_SHADER);
     gl.shaderSource(vs, vsSourceWithGlobals);
