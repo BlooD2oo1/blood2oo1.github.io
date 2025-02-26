@@ -13,11 +13,11 @@ void main()
 {
     ivec2 tc = ivec2(vTexCoord * g_vRTRes);
 
-    vec4 vTexC = texelFetch(g_tTex, tc, 0);
-    vec4 vTexL = ( tc.x > 0 ) ?                    texelFetchOffset(g_tTex,tc, 0, ivec2(-1,0)) : vTexC*vec4(0.0,0.0,1.0,1.0);
-    vec4 vTexR = (tc.x < int(g_vRTRes.x) - 1) ? texelFetchOffset(g_tTex, tc, 0, ivec2(1, 0)) : vTexC * vec4(0.0, 0.0, 1.0, 1.0);
-    vec4 vTexT = ( tc.y > 0 ) ?                    texelFetchOffset(g_tTex,tc, 0, ivec2(0,-1)) : vTexC*vec4(0.0,0.0,1.0,1.0);
-    vec4 vTexB = (tc.y < int(g_vRTRes.y) - 1) ? texelFetchOffset(g_tTex, tc, 0, ivec2(0, 1)) : vTexC * vec4(0.0, 0.0, 1.0, 1.0);
+    vec4 vTexC = texelFetch(g_tTex1, tc, 0);
+    vec4 vTexL = ( tc.x > 0 ) ?                    texelFetchOffset(g_tTex1,tc, 0, ivec2(-1,0)) : vTexC*vec4(0.0,0.0,1.0,1.0);
+    vec4 vTexR = (tc.x < int(g_vRTRes.x) - 1) ? texelFetchOffset(g_tTex1, tc, 0, ivec2(1, 0)) : vTexC * vec4(0.0, 0.0, 1.0, 1.0);
+    vec4 vTexT = ( tc.y > 0 ) ?                    texelFetchOffset(g_tTex1,tc, 0, ivec2(0,-1)) : vTexC*vec4(0.0,0.0,1.0,1.0);
+    vec4 vTexB = (tc.y < int(g_vRTRes.y) - 1) ? texelFetchOffset(g_tTex1, tc, 0, ivec2(0, 1)) : vTexC * vec4(0.0, 0.0, 1.0, 1.0);
 
 
     ////////////////////////////////////////////////////////////////

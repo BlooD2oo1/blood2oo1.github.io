@@ -21,9 +21,10 @@ void main()
     shadowCoord.xyz /= shadowCoord.w;
     shadowCoord.xyz = shadowCoord.xyz * 0.5 + 0.5;
 
-    ivec2 viTexRes = textureSize(g_tTex, 0);
+    ivec2 viTexRes = textureSize(g_tTex1, 0);
     vec2 vTexRes = vec2(viTexRes);
-    vec4 vTexC = texture(g_tTex, vTexCoord);
+    vec4 vTexC = texture(g_tTex1, vTexCoord);
+    vec4 vTexC2 = texture(g_tTex2, vTexCoord);
 
     float fOcc = 1.0;
 
@@ -37,9 +38,8 @@ void main()
     float fWaterDepth = (vTexC.z + vTexC.w) - fZPos;
     vCWater = mix(vCWater, g_vCWaterDeep * 0.8, clamp(fWaterDepth / 0.01, 0.0, 1.0));
     vec3 vCFoam = vec3(1.0);
-    vec3 vCLand = mix(g_vCLand01, g_vCLand02, clamp(vTexC.w * 10.1, 0.0, 1.0));
-    float fLandDepth = vTexC.w - fZPos;
-    vCLand = mix(vCLand, g_vCLand02 * 0.9, clamp(fLandDepth / 0.2, 0.0, 1.0) * sin(fLandDepth / 0.006));
+    vec3 vCLand = mix(g_vCLandRock, g_vCLandSand, clamp( vTexC2.x*1000.0, 0.0, 1.0 ) );
+    //float fLandDepth = vTexC.w - fZPos;
 
     vCWater = mix(vCWater, vCFoam, fFoam);
 

@@ -77,41 +77,77 @@ export class SWE {
         gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, this.screenIbo);
         gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, quadIndices, gl.STATIC_DRAW);
 
-        // Create the first framebuffer and texture
-        [this.currentTexture, this.currentFramebuffer] = this.createTextureAndFramebuffer(gl, this.width, this.height );
+        // tex1: x: velocity x+1/2, y: velocity y+1/2 z: water depth, w: terrain height ( rock + sand )
+        // tex2: x: sand depth, y: dissolved sand, z: -, w: -
 
-        // Create the second framebuffer and texture
-        [this.otherTexture, this.otherFramebuffer] = this.createTextureAndFramebuffer(gl, this.width, this.height);
-
-        // Create the second framebuffer and texture
-        [this.rtTextureNorm, this.rtFramebufferNorm] = this.createTextureAndFramebuffer(gl, this.width, this.height);
-
-        this.renderInit();
-    }
-
-    createTextureAndFramebuffer(gl, width, height) {
-        const framebuffer = gl.createFramebuffer();
-        gl.bindFramebuffer(gl.FRAMEBUFFER, framebuffer);
-
-        const texture = gl.createTexture();
-        gl.bindTexture(gl.TEXTURE_2D, texture);
-        gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA32F, width, height, 0, gl.RGBA, gl.FLOAT, null);
+        this.m_pTex1 = gl.createTexture();
+        gl.bindTexture(gl.TEXTURE_2D, this.m_pTex1);
+        gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA32F, this.width, this.height, 0, gl.RGBA, gl.FLOAT, null);
         gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
         gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
 
-        gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_2D, texture, 0);
+        this.m_pTex1Temp = gl.createTexture();
+        gl.bindTexture(gl.TEXTURE_2D, this.m_pTex1Temp);
+        gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA32F, this.width, this.height, 0, gl.RGBA, gl.FLOAT, null);
+        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
+        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
 
-        const status = gl.checkFramebufferStatus(gl.FRAMEBUFFER);
-        if (status !== gl.FRAMEBUFFER_COMPLETE) {
-            console.error('Framebuffer is not complete:', status.toString(16));
-        }
+        this.m_pTex2 = gl.createTexture();
+        gl.bindTexture(gl.TEXTURE_2D, this.m_pTex2);
+        gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA32F, this.width, this.height, 0, gl.RGBA, gl.FLOAT, null);
+        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
+        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
 
-        gl.clearColor(0.0, 0.0, 0.0, 0.0);
-        gl.clear(gl.COLOR_BUFFER_BIT);
+        this.m_pTex2Temp = gl.createTexture();
+        gl.bindTexture(gl.TEXTURE_2D, this.m_pTex2Temp);
+        gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA32F, this.width, this.height, 0, gl.RGBA, gl.FLOAT, null);
+        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
+        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
 
-        gl.bindFramebuffer(gl.FRAMEBUFFER, null);
+        this.m_pTexNorm = gl.createTexture();
+        gl.bindTexture(gl.TEXTURE_2D, this.m_pTexNorm);
+        gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA32F, this.width, this.height, 0, gl.RGBA, gl.FLOAT, null);
+        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
+        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
 
-        return [texture, framebuffer];
+        this.m_pTex1FB = gl.createFramebuffer();
+        gl.bindFramebuffer(gl.FRAMEBUFFER, this.m_pTex1FB);
+        gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_2D, this.m_pTex1, 0);
+        gl.drawBuffers([gl.COLOR_ATTACHMENT0]);
+
+        this.m_pTex1FBTemp = gl.createFramebuffer();
+        gl.bindFramebuffer(gl.FRAMEBUFFER, this.m_pTex1FBTemp);
+        gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_2D, this.m_pTex1Temp, 0);
+        gl.drawBuffers([gl.COLOR_ATTACHMENT0]);
+
+        /*this.m_pTex2FB = gl.createFramebuffer();
+        gl.bindFramebuffer(gl.FRAMEBUFFER, this.m_pTex2FB);
+        gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_2D, this.m_pTex2, 0);
+        gl.drawBuffers([gl.COLOR_ATTACHMENT0]);
+
+        this.m_pTex2FBTemp = gl.createFramebuffer();
+        gl.bindFramebuffer(gl.FRAMEBUFFER, this.m_pTex2FBTemp);
+        gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_2D, this.m_pTex2Temp, 0);
+        gl.drawBuffers([gl.COLOR_ATTACHMENT0]);*/
+
+        this.m_pTexFBNorm = gl.createFramebuffer();
+        gl.bindFramebuffer(gl.FRAMEBUFFER, this.m_pTexFBNorm);
+        gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_2D, this.m_pTexNorm, 0);
+        gl.drawBuffers([gl.COLOR_ATTACHMENT0]);
+
+        this.m_pTex12FB = gl.createFramebuffer();
+        gl.bindFramebuffer(gl.FRAMEBUFFER, this.m_pTex12FB);
+        gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_2D, this.m_pTex1, 0);
+        gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT1, gl.TEXTURE_2D, this.m_pTex2, 0);
+        gl.drawBuffers([gl.COLOR_ATTACHMENT0, gl.COLOR_ATTACHMENT1]);
+
+        this.m_pTex12FBTemp = gl.createFramebuffer();
+        gl.bindFramebuffer(gl.FRAMEBUFFER, this.m_pTex12FBTemp);
+        gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_2D, this.m_pTex1Temp, 0);
+        gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT1, gl.TEXTURE_2D, this.m_pTex2Temp, 0);
+        gl.drawBuffers([gl.COLOR_ATTACHMENT0, gl.COLOR_ATTACHMENT1]);
+
+        this.renderInit();
     }
 
     getWidth() {
@@ -122,12 +158,16 @@ export class SWE {
         return this.height;
     }
 
-    getSWETex() {
-        return this.otherTexture;
+    getSWETex1() {
+        return this.m_pTex1Temp;
+    }
+
+    getSWETex2() {
+        return this.m_pTex2Temp;
     }
 
     getNormalTex() {
-        return this.rtTextureNorm;
+        return this.m_pTexNorm;
     }
 
     renderInit() {
@@ -138,7 +178,8 @@ export class SWE {
         // Bind the current framebuffer and set the viewport
         gl.viewport(0, 0, this.width, this.height);
         gl.disable(gl.DEPTH_TEST);
-        gl.bindFramebuffer(gl.FRAMEBUFFER, this.otherFramebuffer);
+
+        gl.bindFramebuffer(gl.FRAMEBUFFER, this.m_pTex12FBTemp);
         // Render to the framebuffer
         gl.useProgram(this.program_SWEPassInit);
 
@@ -205,18 +246,23 @@ export class SWE {
             {
                 const program = this.program_SWEPass01;
 
-                gl.bindFramebuffer(gl.FRAMEBUFFER, this.currentFramebuffer);
+                gl.bindFramebuffer(gl.FRAMEBUFFER, this.m_pTex12FB);
+
                 gl.useProgram(program);
 
                 gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, this.screenIbo);
                 gl.bindBuffer(gl.ARRAY_BUFFER, this.screenVbo);
                 const positionLocation = gl.getAttribLocation(program, "position");
                 gl.enableVertexAttribArray(positionLocation);
-                gl.vertexAttribPointer(positionLocation, 2, gl.FLOAT, false, 0, 0);        
+                gl.vertexAttribPointer(positionLocation, 2, gl.FLOAT, false, 0, 0);
 
                 gl.activeTexture(gl.TEXTURE0);
-                gl.bindTexture(gl.TEXTURE_2D, this.otherTexture);
-                gl.uniform1i(gl.getUniformLocation(program, "g_tTex"), 0);
+                gl.bindTexture(gl.TEXTURE_2D, this.m_pTex1Temp);
+                gl.uniform1i(gl.getUniformLocation(program, "g_tTex1"), 0);
+                gl.activeTexture(gl.TEXTURE1);
+                gl.bindTexture(gl.TEXTURE_2D, this.m_pTex2Temp);
+                gl.uniform1i(gl.getUniformLocation(program, "g_tTex2"), 1);
+
                 gl.uniform2f(gl.getUniformLocation(program, "g_vRTRes"), this.getWidth(), this.getHeight());
 
                 // Pass parameters to the fragment shader
@@ -277,17 +323,19 @@ export class SWE {
 
                 gl.drawElements(gl.TRIANGLES, 6, gl.UNSIGNED_SHORT, 0);
 
+                [this.m_pTex1, this.m_pTex1Temp] = [this.m_pTex1Temp, this.m_pTex1];
+                [this.m_pTex2, this.m_pTex2Temp] = [this.m_pTex2Temp, this.m_pTex2];
+                [this.m_pTex1FB, this.m_pTex1FBTemp] = [this.m_pTex1FBTemp, this.m_pTex1FB];
+                [this.m_pTex2FB, this.m_pTex2FBTemp] = [this.m_pTex2FBTemp, this.m_pTex2FB];
+                [this.m_pTex12FB, this.m_pTex12FBTemp] = [this.m_pTex12FBTemp, this.m_pTex12FB];
             }
-
-            [this.currentFramebuffer, this.otherFramebuffer] =[this.otherFramebuffer, this.currentFramebuffer];
-            [this.currentTexture, this.otherTexture] = [this.otherTexture, this.currentTexture];
 
             // Pass 02
             {
-
                 const program = this.program_SWEPass02;
 
-                gl.bindFramebuffer(gl.FRAMEBUFFER, this.currentFramebuffer);
+                gl.bindFramebuffer(gl.FRAMEBUFFER, this.m_pTex1FB);
+
                 gl.useProgram(program);
 
                 gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, this.screenIbo);
@@ -297,8 +345,9 @@ export class SWE {
                 gl.vertexAttribPointer(positionLocation, 2, gl.FLOAT, false, 0, 0);        
 
                 gl.activeTexture(gl.TEXTURE0);
-                gl.bindTexture(gl.TEXTURE_2D, this.otherTexture);
-                gl.uniform1i(gl.getUniformLocation(program, "g_tTex"), 0);
+                gl.bindTexture(gl.TEXTURE_2D, this.m_pTex1Temp);
+                gl.uniform1i(gl.getUniformLocation(program, "g_tTex1"), 0);
+
                 gl.uniform2f(gl.getUniformLocation(program, "g_vRTRes"), this.getWidth(), this.getHeight());
 
                 // Pass parameters to the fragment shader
@@ -310,17 +359,21 @@ export class SWE {
                 gl.uniform1i(gl.getUniformLocation(program, "g_iInitSetting"), this.params.iInitSetting);
 
                 gl.drawElements(gl.TRIANGLES, 6, gl.UNSIGNED_SHORT, 0);
-            }
 
-            [this.currentFramebuffer, this.otherFramebuffer] = [this.otherFramebuffer, this.currentFramebuffer];
-            [this.currentTexture, this.otherTexture] = [this.otherTexture, this.currentTexture];
+                [this.m_pTex1, this.m_pTex1Temp] = [this.m_pTex1Temp, this.m_pTex1];
+                [this.m_pTex2, this.m_pTex2Temp] = [this.m_pTex2Temp, this.m_pTex2];
+                [this.m_pTex1FB, this.m_pTex1FBTemp] = [this.m_pTex1FBTemp, this.m_pTex1FB];
+                [this.m_pTex2FB, this.m_pTex2FBTemp] = [this.m_pTex2FBTemp, this.m_pTex2FB];
+                [this.m_pTex12FB, this.m_pTex12FBTemp] = [this.m_pTex12FBTemp, this.m_pTex12FB];
+            }
 
             // Pass 03
             {
 
                 const program = this.program_SWEPass03;
 
-                gl.bindFramebuffer(gl.FRAMEBUFFER, this.currentFramebuffer);
+                gl.bindFramebuffer(gl.FRAMEBUFFER, this.m_pTex1FB);
+
                 gl.useProgram(program);
 
                 gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, this.screenIbo);
@@ -330,8 +383,9 @@ export class SWE {
                 gl.vertexAttribPointer(positionLocation, 2, gl.FLOAT, false, 0, 0);        
 
                 gl.activeTexture(gl.TEXTURE0);
-                gl.bindTexture(gl.TEXTURE_2D, this.otherTexture);
-                gl.uniform1i(gl.getUniformLocation(program, "g_tTex"), 0);
+                gl.bindTexture(gl.TEXTURE_2D, this.m_pTex1Temp);
+                gl.uniform1i(gl.getUniformLocation(program, "g_tTex1"), 0);
+
                 gl.uniform2f(gl.getUniformLocation(program, "g_vRTRes"), this.getWidth(), this.getHeight());
 
                 // Pass parameters to the fragment shader
@@ -343,10 +397,13 @@ export class SWE {
                 gl.uniform1i(gl.getUniformLocation(program, "g_iInitSetting"), this.params.iInitSetting);
 
                 gl.drawElements(gl.TRIANGLES, 6, gl.UNSIGNED_SHORT, 0);
-            }
 
-            [this.currentFramebuffer, this.otherFramebuffer] = [this.otherFramebuffer, this.currentFramebuffer];
-            [this.currentTexture, this.otherTexture] = [this.otherTexture, this.currentTexture];
+                [this.m_pTex1, this.m_pTex1Temp] = [this.m_pTex1Temp, this.m_pTex1];
+                [this.m_pTex2, this.m_pTex2Temp] = [this.m_pTex2Temp, this.m_pTex2];
+                [this.m_pTex1FB, this.m_pTex1FBTemp] = [this.m_pTex1FBTemp, this.m_pTex1FB];
+                [this.m_pTex2FB, this.m_pTex2FBTemp] = [this.m_pTex2FBTemp, this.m_pTex2FB];
+                [this.m_pTex12FB, this.m_pTex12FBTemp] = [this.m_pTex12FBTemp, this.m_pTex12FB];
+            }
         }
 
         // Proc 01
@@ -354,7 +411,8 @@ export class SWE {
 
             const program = this.program_SWEProc01;
 
-            gl.bindFramebuffer(gl.FRAMEBUFFER, this.rtFramebufferNorm);
+            gl.bindFramebuffer(gl.FRAMEBUFFER, this.m_pTexFBNorm);
+
             gl.useProgram(program);
 
             gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, this.screenIbo);
@@ -364,8 +422,9 @@ export class SWE {
             gl.vertexAttribPointer(positionLocation, 2, gl.FLOAT, false, 0, 0);        
 
             gl.activeTexture(gl.TEXTURE0);
-            gl.bindTexture(gl.TEXTURE_2D, this.otherTexture);
-            gl.uniform1i(gl.getUniformLocation(program, "g_tTex"), 0);
+            gl.bindTexture(gl.TEXTURE_2D, this.m_pTex1Temp);
+            gl.uniform1i(gl.getUniformLocation(program, "g_tTex1"), 0);
+
             gl.uniform2f(gl.getUniformLocation(program, "g_vRTRes"), this.getWidth(), this.getHeight());
 
             // Pass parameters to the fragment shader

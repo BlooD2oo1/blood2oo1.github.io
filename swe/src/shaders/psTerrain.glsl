@@ -19,15 +19,17 @@ void main()
     shadowCoord.xyz /= shadowCoord.w;
     shadowCoord.xyz = shadowCoord.xyz * 0.5 + 0.5;
 
-    ivec2 viTexRes = textureSize(g_tTex, 0);
+    ivec2 viTexRes = textureSize(g_tTex1, 0);
 	vec2 vTexRes = vec2(viTexRes);
-    vec4 vTexC = texture(g_tTex, vTexCoord);
+    vec4 vTexC = texture(g_tTex1, vTexCoord);
+    vec4 vTexC2 = texture(g_tTex2, vTexCoord);
+
     vec4 vTexDtC = texture(g_tTexNorm, vTexCoord + vec2(0.5) / vTexRes);
     vec4 vTexDtR = texture(g_tTexNorm, vTexCoord + vec2(0.5) / vTexRes + vec2(1.0 / vTexRes.x, 0.0));
     vec4 vTexDtB = texture(g_tTexNorm, vTexCoord + vec2(0.5) / vTexRes + vec2(0.0, 1.0 / vTexRes.y));
 
     //ivec2 tc = ivec2(vTexCoord * vec2(vTexSize));
-    //vec4 vTexC = texelFetch(g_tTex, tc, 0);	
+    //vec4 vTexC = texelFetch(g_tTex1, tc, 0);	
     //ivec2 tcDt = ivec2(vTexCoord * (vec2(vTexSize)+vec2(0.5)));
     //vec4 vTexDtC = texelFetch(g_tTexNorm, tcDt, 0);
     //vec4 vTexDtR = (tc.x < vTexSize.x - 1) ? texelFetchOffset(g_tTexNorm, tcDt, 0, ivec2(1, 0)) : vTexC * vec4(0.0, 0.0, 1.0, 1.0);
@@ -51,7 +53,7 @@ void main()
     
     vec3 vCWater = mix( g_vCWaterShallow, g_vCWaterDeep, smoothstep( 0.0, 0.03, vTexC.z ) );
 	vec3 vCFoam = vec3(0.9);
-    vec3 vCLand = mix(g_vCLand01, g_vCLand02, clamp(vTexC.w * 10.1, 0.0, 1.0));
+    vec3 vCLand = mix(g_vCLandRock, g_vCLandSand, clamp( vTexC2.x*1000.0, 0.0, 1.0 ) );
 
     vCWater = mix( vCWater, vCFoam, fFoam );
 	
@@ -77,5 +79,6 @@ void main()
 	outColor1 = vec4(vNormal, vScreenCoord.z);
     
     //outColor0.rgb = vec3(1.0-clamp( fShadow_fDist.y, 0.0, 0.05 )/0.05);
-    //outColor0.rgb = mix( outColor0.rgb, vec3( length( vTexC.xy ) ), fWater );
+    //outColor0.rgb = mix( outColor0.rgb, vec3( length( vTexC.xy )*20.0 ), fWater );
+    //outColor0.rgb = mix( outColor0.rgb, vec3( abs( vTexC.xy )*20.0, 0.1 ), fWater );
 }

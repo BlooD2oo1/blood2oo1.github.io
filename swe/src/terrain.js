@@ -317,11 +317,9 @@ export class Terrain {
 
         gl.uniformMatrix4fv(gl.getUniformLocation(program, 'g_matVPShadow'), false, this.shadowMapMatrix);
 
-        // Bind the SWE texture
-        const texture = app.Present.SWE.getSWETex();
         gl.activeTexture(gl.TEXTURE0);
-        gl.bindTexture(gl.TEXTURE_2D, texture);
-        gl.uniform1i(gl.getUniformLocation(program, 'g_tTex'), 0);
+        gl.bindTexture(gl.TEXTURE_2D, app.Present.SWE.getSWETex1());
+        gl.uniform1i(gl.getUniformLocation(program, 'g_tTex1'), 0);
 
         // Draw the grid
         gl.drawElements(gl.TRIANGLES, this.indexCountTerrain, gl.UNSIGNED_INT, 0);
@@ -347,11 +345,9 @@ export class Terrain {
 
         gl.uniformMatrix4fv(gl.getUniformLocation(program, 'g_matVPShadow'), false, this.shadowMapMatrix);
 
-        // Bind the SWE texture
-        const texture = app.Present.SWE.getSWETex();
         gl.activeTexture(gl.TEXTURE0);
-        gl.bindTexture(gl.TEXTURE_2D, texture);
-        gl.uniform1i(gl.getUniformLocation(program, 'g_tTex'), 0);
+        gl.bindTexture(gl.TEXTURE_2D, app.Present.SWE.getSWETex1());
+        gl.uniform1i(gl.getUniformLocation(program, 'g_tTex1'), 0);
 
         // Draw the grid
         gl.drawElements(gl.TRIANGLE_STRIP, this.indexCountSkirt, gl.UNSIGNED_INT, 0);
@@ -378,21 +374,21 @@ export class Terrain {
         gl.uniform3f(gl.getUniformLocation(program, "g_vViewDir"), this.viewDir[0], this.viewDir[1], this.viewDir[2]);
         gl.uniform3f(gl.getUniformLocation(program, "g_vLightDir"), this.vLightDir[0], this.vLightDir[1], this.vLightDir[2]);
 
-        // Bind the SWE texture
-        const texture = app.Present.SWE.getSWETex();
         gl.activeTexture(gl.TEXTURE0);
-        gl.bindTexture(gl.TEXTURE_2D, texture);
-        gl.uniform1i(gl.getUniformLocation(program, 'g_tTex'), 0);
+        gl.bindTexture(gl.TEXTURE_2D, app.Present.SWE.getSWETex1());
+        gl.uniform1i(gl.getUniformLocation(program, 'g_tTex1'), 0);
 
-        // Bind the SWETex texture
-        const texture2 = app.Present.SWE.getNormalTex();
         gl.activeTexture(gl.TEXTURE1);
-        gl.bindTexture(gl.TEXTURE_2D, texture2);
-        gl.uniform1i(gl.getUniformLocation(program, 'g_tTexNorm'), 1);
+        gl.bindTexture(gl.TEXTURE_2D, app.Present.SWE.getSWETex2());
+        gl.uniform1i(gl.getUniformLocation(program, 'g_tTex2'), 1);
 
         gl.activeTexture(gl.TEXTURE2);
+        gl.bindTexture(gl.TEXTURE_2D, app.Present.SWE.getNormalTex());
+        gl.uniform1i(gl.getUniformLocation(program, 'g_tTexNorm'), 2);
+
+        gl.activeTexture(gl.TEXTURE3);
         gl.bindTexture(gl.TEXTURE_2D, this.shadowMap);
-        gl.uniform1i(gl.getUniformLocation(program, 'g_tShadowMap'), 2);
+        gl.uniform1i(gl.getUniformLocation(program, 'g_tShadowMap'), 3);
 
         // Pass parameters to the fragment shader
         gl.uniform1f(gl.getUniformLocation(program, "g_fGridSizeInMeter"), app.Present.SWE.params.fGridSizeInMeter);
@@ -430,21 +426,21 @@ export class Terrain {
         gl.uniform3f(gl.getUniformLocation(program, "g_vViewDir"), this.viewDir[0], this.viewDir[1], this.viewDir[2]);
         gl.uniform3f(gl.getUniformLocation(program, "g_vLightDir"), this.vLightDir[0], this.vLightDir[1], this.vLightDir[2]);
 
-        // Bind the SWE texture
-        const texture = app.Present.SWE.getSWETex();
         gl.activeTexture(gl.TEXTURE0);
-        gl.bindTexture(gl.TEXTURE_2D, texture);
-        gl.uniform1i(gl.getUniformLocation(program, 'g_tTex'), 0);
+        gl.bindTexture(gl.TEXTURE_2D, app.Present.SWE.getSWETex1());
+        gl.uniform1i(gl.getUniformLocation(program, 'g_tTex1'), 0);
 
-        // Bind the SWETex texture
-        const texture2 = app.Present.SWE.getNormalTex();
         gl.activeTexture(gl.TEXTURE1);
-        gl.bindTexture(gl.TEXTURE_2D, texture2);
-        gl.uniform1i(gl.getUniformLocation(program, 'g_tTexNorm'), 1);
+        gl.bindTexture(gl.TEXTURE_2D, app.Present.SWE.getSWETex2());
+        gl.uniform1i(gl.getUniformLocation(program, 'g_tTex2'), 1);
 
         gl.activeTexture(gl.TEXTURE2);
+        gl.bindTexture(gl.TEXTURE_2D, app.Present.SWE.getNormalTex());
+        gl.uniform1i(gl.getUniformLocation(program, 'g_tTexNorm'), 2);
+
+        gl.activeTexture(gl.TEXTURE3);
         gl.bindTexture(gl.TEXTURE_2D, this.shadowMap);
-        gl.uniform1i(gl.getUniformLocation(program, 'g_tShadowMap'), 2);
+        gl.uniform1i(gl.getUniformLocation(program, 'g_tShadowMap'), 3);
 
         // Pass parameters to the fragment shader
         gl.uniform1f(gl.getUniformLocation(program, "g_fGridSizeInMeter"), app.Present.SWE.params.fGridSizeInMeter);
@@ -477,11 +473,11 @@ export class Terrain {
         const textureMisc = app.Present.textureMisc;
         gl.activeTexture(gl.TEXTURE0);
         gl.bindTexture(gl.TEXTURE_2D, textureMisc);
-        gl.uniform1i(gl.getUniformLocation(program, 'g_tTex'), 0);
+        gl.uniform1i(gl.getUniformLocation(program, 'g_tTex1'), 0);
 
-        gl.activeTexture(gl.TEXTURE2);
+        gl.activeTexture(gl.TEXTURE1);
         gl.bindTexture(gl.TEXTURE_2D, this.shadowMap);
-        gl.uniform1i(gl.getUniformLocation(program, 'g_tShadowMap'), 2);
+        gl.uniform1i(gl.getUniformLocation(program, 'g_tShadowMap'), 1);
 
         // Set the MVP matrix
         gl.uniformMatrix4fv(gl.getUniformLocation(program, 'g_matVP'), false, this.mvpMatrix);

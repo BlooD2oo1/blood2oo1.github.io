@@ -186,7 +186,7 @@ export class Present {
 
         gl.activeTexture(gl.TEXTURE0);
         gl.bindTexture(gl.TEXTURE_2D, this.textureScene);
-        gl.uniform1i(gl.getUniformLocation(this.program_Present, "g_tTex"), 0);
+        gl.uniform1i(gl.getUniformLocation(this.program_Present, "g_tTex1"), 0);
         gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
         gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
 

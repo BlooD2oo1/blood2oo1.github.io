@@ -1,4 +1,5 @@
-uniform sampler2D g_tTex;
+uniform sampler2D g_tTex1;
+uniform sampler2D g_tTex2;
 uniform sampler2D g_tTexNorm;
 uniform sampler2D g_tShadowMap;
 
@@ -34,11 +35,11 @@ const float LN2 = 0.69314718055994530941723212145817658;
 
 const vec3 g_vCWaterShallow = vec3(0.3, 0.8, 0.8) * 0.4;
 const vec3 g_vCWaterDeep = vec3(0.3, 0.6, 0.8) * 0.7 * 0.4;
-const vec3 g_vCLand01 = vec3(0.6, 0.5, 0.3) * 0.6;
-const vec3 g_vCLand02 = vec3(0.6, 0.6, 0.5) * 0.6;
-const vec3 g_vCLight = vec3(1.0, 0.8, 0.5) * 10.0;
+const vec3 g_vCLandRock = vec3(0.65, 0.7, 0.75) * 0.3;
+const vec3 g_vCLandSand = vec3(0.8, 0.8, 0.5) * 0.9;
+const vec3 g_vCLight = vec3(1.0, 0.8, 0.5) * 9.0;
 const vec3 g_vCAmbientUp = vec3(0.3, 0.5, 0.7) * 0.2;
-const vec3 g_vCAmbientDown = (g_vCLand01 + g_vCLand02) * 0.5 * 0.02;
+const vec3 g_vCAmbientDown = (g_vCLandRock + g_vCLandSand) * 0.5 * 0.02;
 
 vec2 hash(vec2 p) // replace this by something better
 {

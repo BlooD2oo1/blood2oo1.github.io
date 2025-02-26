@@ -46,10 +46,10 @@ bool ClipLineWithBox(vec3 boxExtent, vec3 start, vec3 end, out vec3 clippedStart
 
 void main()
 {
-    ivec2 viTexRes = textureSize(g_tTex, 0);
+    ivec2 viTexRes = textureSize(g_tTex1, 0);
     vec2 vTexRes = vec2(viTexRes);
 	vec3 vScreenCoord = screencoord.xyz/ screencoord.w;
-	vec4 vTexMisc = texelFetch(g_tTex, ivec2((vScreenCoord.xy*0.5+0.5) * vTexRes), 0);
+	vec4 vTexMisc = texelFetch(g_tTex1, ivec2((vScreenCoord.xy*0.5+0.5) * vTexRes), 0);
 	vec3 vNormal = vTexMisc.rgb;
 	float fDepth = vTexMisc.a;
 

@@ -28,13 +28,6 @@ export async function createShaderProgram(gl, vsPath, fsPath) {
         return null;
     }
 
-    if (!globalsCache) {
-        globalsCache = await loadShaderFile('src/shaders/globals.glsl');
-        if (!globalsCache) {
-            return null;
-        }
-    }
-
     // Replace #GLOBALS with the content of globals
     const vsSourceWithGlobals = vsSource.replace('#GLOBALS', globalsCache);
     const fsSourceWithGlobals = fsSource.replace('#GLOBALS', globalsCache);
@@ -267,6 +260,9 @@ class WebGLApp {
     }
 
     async init() {
+
+        globalsCache = await loadShaderFile('src/shaders/globals.glsl');
+
         await this.Present.init();
 
         console.log("All resources loaded, starting render loop.");

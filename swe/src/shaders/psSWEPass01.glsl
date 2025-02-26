@@ -3,31 +3,31 @@ precision highp float;
 precision highp int;
 
 in vec2 vTexCoord;
-out vec4 outColor;
+layout(location = 0) out vec4 outColor0;
+layout(location = 1) out vec4 outColor1;
 
 #GLOBALS
 
 uniform vec2 uClickPosition;
 uniform ivec2 uMouseButtons;
 
-
-
 // Velocity Advection
 
 void main()
 {
     ivec2 tc = ivec2(vTexCoord*g_vRTRes);
-    vec4 vTexC = texelFetch(g_tTex, tc, 0);
+    vec4 vTexC = texelFetch(g_tTex1, tc, 0);
+    vec4 vTexC2 = texelFetch(g_tTex2, tc, 0);
 
     float dt = g_fAdvectSpeed * g_fElapsedTimeInSec / g_fGridSizeInMeter;
     /*{
         vec2 v1 = vTexC.xy;
-        vec2 v2 = textureLod(g_tTex, vTexCoord - ( 0.5 * v1 * dt ) / g_vRTRes, 0.0 ).xy;
-        vec2 v3 = textureLod(g_tTex, vTexCoord - ( 0.5 * v2 * dt ) / g_vRTRes, 0.0 ).xy;
-        vec2 v4 = textureLod(g_tTex, vTexCoord - ( v3 * dt ) / g_vRTRes, 0.0 ).xy;
+        vec2 v2 = textureLod(g_tTex1, vTexCoord - ( 0.5 * v1 * dt ) / g_vRTRes, 0.0 ).xy;
+        vec2 v3 = textureLod(g_tTex1, vTexCoord - ( 0.5 * v2 * dt ) / g_vRTRes, 0.0 ).xy;
+        vec2 v4 = textureLod(g_tTex1, vTexCoord - ( v3 * dt ) / g_vRTRes, 0.0 ).xy;
         vec2 v = (1.0 * v1 + 2.0 * v2 + 2.0 * v3 + 1.0 * v4) / 6.0;
     
-        outColor = textureLod(g_tTex, vTexCoord - ( v * dt ) / g_vRTRes, 0.0);
+        outColor0 = textureLod(g_tTex1, vTexCoord - ( v * dt ) / g_vRTRes, 0.0);
     }*/
 
     /*{
@@ -36,12 +36,12 @@ void main()
         vec2 prevPos = vTexCoord - velocity * dt / g_vRTRes;
 
         // Sample velocity at backward position
-        vec4 vTexPrev = textureLod(g_tTex, prevPos, 0.0);
+        vec4 vTexPrev = textureLod(g_tTex1, prevPos, 0.0);
         vec2 velocityPrev = vTexPrev.xy;
 
         // Predict forward position (MacCormack)
         vec2 forwardPos = prevPos + velocityPrev * dt / g_vRTRes;
-        vec4 vTexForward = textureLod(g_tTex, forwardPos, 0.0);
+        vec4 vTexForward = textureLod(g_tTex1, forwardPos, 0.0);
         vec2 velocityForward = vTexForward.xy;
 
         // Compute MacCormack correction
@@ -57,23 +57,24 @@ void main()
         // }
 
         
-        outColor = textureLod(g_tTex, vTexCoord - velocityAdvected * dt / g_vRTRes, 0.0);
+        outColor0 = textureLod(g_tTex1, vTexCoord - velocityAdvected * dt / g_vRTRes, 0.0);
 
     }*/
 
     {
+        //MacCormack
         vec2 v0 = vTexC.xy * dt / g_vRTRes;
-		vec2 vk1 = textureLod(g_tTex, vTexCoord + v0, 0.0).xy * dt / g_vRTRes;
+		vec2 vk1 = textureLod(g_tTex1, vTexCoord + v0, 0.0).xy * dt / g_vRTRes;
         vec2 vk0 = ( v0 + vk1 ) * 0.5;
-		outColor = textureLod(g_tTex, vTexCoord + vk0, 0.0);
+		outColor0 = textureLod(g_tTex1, vTexCoord + vk0, 0.0);
     }
 
-    //outColor.xy = vTexC.xy;
-    outColor.z = vTexC.z;
-	outColor.w = vTexC.w;
+    //outColor0.xy = vTexC.xy;
+    outColor0.z = vTexC.z;
+	outColor0.w = vTexC.w;
 
-    //outColor.x += noise( vTexCoord.xy*1.5 + vec2(float(g_iSWEFrameCount)*0.001))*0.1 / g_vRTRes.x;
-    //outColor.y += noise( vTexCoord.xy*1.5 + vec2(float(g_iSWEFrameCount+10)*0.001))*0.1 / g_vRTRes.y;
+    //outColor0.x += noise( vTexCoord.xy*1.5 + vec2(float(g_iSWEFrameCount)*0.001))*0.001 / g_vRTRes.x;
+    //outColor0.y += noise( vTexCoord.xy*1.5 + vec2(float(g_iSWEFrameCount+10)*0.001))*0.001 / g_vRTRes.y;
 
     if ( uMouseButtons.x!=0)
     {
@@ -82,7 +83,7 @@ void main()
         float fDirLen = length(vDir);
         float fW = max(0.0, (fRad - fDirLen)/fRad );
         fW = 0.5 - 0.5 * cos(fW*PI2);
-        outColor.z += fW * 0.00009 * g_fElapsedTimeInSec;
+        outColor0.z += fW * 0.00009 * g_fElapsedTimeInSec;
     }
 
     {
@@ -91,7 +92,7 @@ void main()
         float fDirLen = length(vDir);
         float fW = max(0.0, (fRad - fDirLen)/fRad );
         fW = 0.5 - 0.5 * cos(fW*PI2);
-        outColor.z += fW * 0.000006 * g_fElapsedTimeInSec;
+        outColor0.z += fW * 0.000006 * g_fElapsedTimeInSec;
     }
 
     {
@@ -100,6 +101,8 @@ void main()
         float fDirLen = length(vDir);
         float fW = max(0.0, (fRad - fDirLen)/fRad );
         fW = 0.5 - 0.5 * cos(fW*PI2);
-        outColor.z -= fW * 0.000006 * g_fElapsedTimeInSec;
+        outColor0.z -= fW * 0.000006 * g_fElapsedTimeInSec;
     }
+
+    outColor1 = vTexC2;
 }
