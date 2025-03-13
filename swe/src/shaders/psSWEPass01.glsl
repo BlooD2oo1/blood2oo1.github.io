@@ -28,8 +28,20 @@ uniform ivec2 uMouseButtons;
 void main()
 {
 	ivec2 tc = ivec2(vTexCoord * g_vRTRes);
+
 	vec4 vTex1C = texelFetch(g_tTex1, tc, 0);
+	vec4 vTex1L = (tc.x > 0) ? texelFetchOffset(g_tTex1, tc, 0, ivec2(-1, 0)) : vTex1C * vec4(0.0, 0.0, 1.0, 1.0);
+	vec4 vTex1R = (tc.x < int(g_vRTRes.x) - 1) ? texelFetchOffset(g_tTex1, tc, 0, ivec2(1, 0)) : vTex1C * vec4(0.0, 0.0, 1.0, 1.0);
+	vec4 vTex1T = (tc.y > 0) ? texelFetchOffset(g_tTex1, tc, 0, ivec2(0, -1)) : vTex1C * vec4(0.0, 0.0, 1.0, 1.0);
+	vec4 vTex1B = (tc.y < int(g_vRTRes.y) - 1) ? texelFetchOffset(g_tTex1, tc, 0, ivec2(0, 1)) : vTex1C * vec4(0.0, 0.0, 1.0, 1.0);
+
 	vec4 vTex2C = texelFetch(g_tTex2, tc, 0);
+	vec4 vTex2L = (tc.x > 0) ? texelFetchOffset(g_tTex2, tc, 0, ivec2(-1, 0)) : vTex2C * vec4(1.0, 1.0, 1.0, 1.0);
+	vec4 vTex2R = (tc.x < int(g_vRTRes.x) - 1) ? texelFetchOffset(g_tTex2, tc, 0, ivec2(1, 0)) : vTex2C * vec4(1.0, 1.0, 1.0, 1.0);
+	vec4 vTex2T = (tc.y > 0) ? texelFetchOffset(g_tTex2, tc, 0, ivec2(0, -1)) : vTex2C * vec4(1.0, 1.0, 1.0, 1.0);
+	vec4 vTex2B = (tc.y < int(g_vRTRes.y) - 1) ? texelFetchOffset(g_tTex2, tc, 0, ivec2(0, 1)) : vTex2C * vec4(1.0, 1.0, 1.0, 1.0);
+
+	////////////////////////////////////////////////////////////////
 
 	float dt = g_fAdvectSpeed * g_fElapsedTimeInSec / g_fGridSizeInMeter;
 	/*{
@@ -84,8 +96,31 @@ void main()
 
 	//outColor0.x = vTexC.x;
 	//outColor0.y = vTexC.y;
-	outColor0.z = vTex1C.z;
+	outColor0.z = vTex1C.z; // viztomeget nem advectalunk mert tomegmegmaradas szerintem bukik
 	outColor0.w = vTex1C.w;
+
+	/*{
+		// simple blur of vTex2C:
+		//vTex2C.y = (vTex2L.y + vTex2R.y + vTex2T.y + vTex2B.y + 54.0 * vTex2C.y) / (4.0+54.0);
+
+		float hC = vTex1C.z + vTex2C.x + vTex2C.y;
+		float hL = vTex1L.z + vTex2L.x + vTex2L.y;
+		float hR = vTex1R.z + vTex2R.x + vTex2R.y;
+		float hT = vTex1T.z + vTex2T.x + vTex2T.y;
+		float hB = vTex1B.z + vTex2B.x + vTex2B.y;
+
+		float fSlope_x_L = (hL - hC) * g_fGridSizeInMeter;
+		float fSlope_x_R = (hR - hC) * g_fGridSizeInMeter;
+		float fSlope_y_T = (hT - hC) * g_fGridSizeInMeter;
+		float fSlope_y_B = (hB - hC) * g_fGridSizeInMeter;
+
+		float fMinSlope = 0.1;
+		fSlope_x_L = max(0.0, (abs(fSlope_x_L) - fMinSlope)) * sign(fSlope_x_L);
+		fSlope_x_R = max(0.0, (abs(fSlope_x_R) - fMinSlope)) * sign(fSlope_x_R);
+		fSlope_y_T = max(0.0, (abs(fSlope_y_T) - fMinSlope)) * sign(fSlope_y_T);
+		fSlope_y_B = max(0.0, (abs(fSlope_y_B) - fMinSlope)) * sign(fSlope_y_B);
+
+	}*/
 
 	outColor1.x = vTex2C.x;
 	outColor1.y = vTex2C.y;
