@@ -23,8 +23,8 @@ void main()
 
     ivec2 viTexRes = textureSize(g_tTex1, 0);
     vec2 vTexRes = vec2(viTexRes);
-    vec4 vTexC = texture(g_tTex1, vTexCoord);
-    vec4 vTexC2 = texture(g_tTex2, vTexCoord);
+    vec4 vTex1C = texture(g_tTex1, vTexCoord);
+    vec4 vTex2C = texture(g_tTex2, vTexCoord);
 
     float fOcc = 1.0;
 

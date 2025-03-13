@@ -77,9 +77,6 @@ export class SWE {
         gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, this.screenIbo);
         gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, quadIndices, gl.STATIC_DRAW);
 
-        // tex1: x: velocity x+1/2, y: velocity y+1/2 z: water depth, w: terrain height ( rock + sand )
-        // tex2: x: sand depth, y: dissolved sand, z: -, w: -
-
         this.m_pTex1 = gl.createTexture();
         gl.bindTexture(gl.TEXTURE_2D, this.m_pTex1);
         gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA32F, this.width, this.height, 0, gl.RGBA, gl.FLOAT, null);
@@ -276,50 +273,52 @@ export class SWE {
                 gl.uniform1f(gl.getUniformLocation(program, "g_fRndSeed"), Math.random());
                 gl.uniform1i(gl.getUniformLocation(program, "g_iSWEFrameCount"), this.m_iFrameCount);
 
-                // Pass mouse position to the fragment shader
-                const mousePosition = app.getMousePosition();
-                const matMVP = app.Present.Terrain.mvpMatrix;
+                {
+                    // Pass mouse position to the fragment shader
+                    const mousePosition = app.getMousePosition();
+                    const matMVP = app.Present.Terrain.mvpMatrix;
 
-                // Convert mouse position to NDC
-                const ndcX = (mousePosition.x / app.getWidth()) * 2 - 1;
-                const ndcY = ((mousePosition.y / app.getHeight()) * 2 - 1); // Flip Y coordinate
+                    // Convert mouse position to NDC
+                    const ndcX = (mousePosition.x / app.getWidth()) * 2 - 1;
+                    const ndcY = ((mousePosition.y / app.getHeight()) * 2 - 1); // Flip Y coordinate
 
-                // Create NDC ray
-                const rayStartNDC = vec4.fromValues(ndcX, ndcY, -1, 1);
-                const rayEndNDC = vec4.fromValues(ndcX, ndcY, 1, 1);
+                    // Create NDC ray
+                    const rayStartNDC = vec4.fromValues(ndcX, ndcY, -1, 1);
+                    const rayEndNDC = vec4.fromValues(ndcX, ndcY, 1, 1);
 
-                // Inverse MVP matrix
-                const invMVP = mat4.create();
-                mat4.invert(invMVP, matMVP);
+                    // Inverse MVP matrix
+                    const invMVP = mat4.create();
+                    mat4.invert(invMVP, matMVP);
 
-                // Transform NDC ray to world coordinates
-                const rayStartWorld = vec4.create();
-                const rayEndWorld = vec4.create();
-                vec4.transformMat4(rayStartWorld, rayStartNDC, invMVP);
-                vec4.transformMat4(rayEndWorld, rayEndNDC, invMVP);
+                    // Transform NDC ray to world coordinates
+                    const rayStartWorld = vec4.create();
+                    const rayEndWorld = vec4.create();
+                    vec4.transformMat4(rayStartWorld, rayStartNDC, invMVP);
+                    vec4.transformMat4(rayEndWorld, rayEndNDC, invMVP);
 
-                // Convert homogeneous coordinates to 3D coordinates
-                vec3.scale(rayStartWorld, rayStartWorld, 1 / rayStartWorld[3]);
-                vec3.scale(rayEndWorld, rayEndWorld, 1 / rayEndWorld[3]);
+                    // Convert homogeneous coordinates to 3D coordinates
+                    vec3.scale(rayStartWorld, rayStartWorld, 1 / rayStartWorld[3]);
+                    vec3.scale(rayEndWorld, rayEndWorld, 1 / rayEndWorld[3]);
 
-                // Calculate ray direction
-                const rayDirWorld = vec3.create();
-                vec3.subtract(rayDirWorld, rayEndWorld, rayStartWorld);
-                vec3.normalize(rayDirWorld, rayDirWorld);
+                    // Calculate ray direction
+                    const rayDirWorld = vec3.create();
+                    vec3.subtract(rayDirWorld, rayEndWorld, rayStartWorld);
+                    vec3.normalize(rayDirWorld, rayDirWorld);
 
-                // Calculate intersection with XY plane (z = 0)
-                const t = -rayStartWorld[2] / rayDirWorld[2];
-                const intersection = vec3.create();
-                vec3.scaleAndAdd(intersection, rayStartWorld, rayDirWorld, t);
+                    // Calculate intersection with XY plane (z = 0)
+                    const t = -rayStartWorld[2] / rayDirWorld[2];
+                    const intersection = vec3.create();
+                    vec3.scaleAndAdd(intersection, rayStartWorld, rayDirWorld, t);
 
-                // Convert world coordinates to texture UV coordinates
-                const clickPosition = {
-                    x: (intersection[0] + 0.5),
-                    y: (intersection[1] + 0.5)
-                };
+                    // Convert world coordinates to texture UV coordinates
+                    const clickPosition = {
+                        x: (intersection[0] + 0.5),
+                        y: (intersection[1] + 0.5)
+                    };
 
-                gl.uniform2f(gl.getUniformLocation(program, "uClickPosition"), clickPosition.x, clickPosition.y);
-                gl.uniform2i(gl.getUniformLocation(program, "uMouseButtons"), app.getMouseButtonLeft(), app.getMouseButtonRight());
+                    gl.uniform2f(gl.getUniformLocation(program, "uClickPosition"), clickPosition.x, clickPosition.y);
+                    gl.uniform2i(gl.getUniformLocation(program, "uMouseButtons"), app.getMouseButtonLeft(), app.getMouseButtonRight());
+                }
 
                 gl.drawElements(gl.TRIANGLES, 6, gl.UNSIGNED_SHORT, 0);
 
@@ -334,7 +333,7 @@ export class SWE {
             {
                 const program = this.program_SWEPass02;
 
-                gl.bindFramebuffer(gl.FRAMEBUFFER, this.m_pTex1FB);
+                gl.bindFramebuffer(gl.FRAMEBUFFER, this.m_pTex12FB);
 
                 gl.useProgram(program);
 
@@ -347,6 +346,9 @@ export class SWE {
                 gl.activeTexture(gl.TEXTURE0);
                 gl.bindTexture(gl.TEXTURE_2D, this.m_pTex1Temp);
                 gl.uniform1i(gl.getUniformLocation(program, "g_tTex1"), 0);
+                gl.activeTexture(gl.TEXTURE1);
+                gl.bindTexture(gl.TEXTURE_2D, this.m_pTex2Temp);
+                gl.uniform1i(gl.getUniformLocation(program, "g_tTex2"), 1);
 
                 gl.uniform2f(gl.getUniformLocation(program, "g_vRTRes"), this.getWidth(), this.getHeight());
 
@@ -372,7 +374,7 @@ export class SWE {
 
                 const program = this.program_SWEPass03;
 
-                gl.bindFramebuffer(gl.FRAMEBUFFER, this.m_pTex1FB);
+                gl.bindFramebuffer(gl.FRAMEBUFFER, this.m_pTex12FB);
 
                 gl.useProgram(program);
 
@@ -385,6 +387,9 @@ export class SWE {
                 gl.activeTexture(gl.TEXTURE0);
                 gl.bindTexture(gl.TEXTURE_2D, this.m_pTex1Temp);
                 gl.uniform1i(gl.getUniformLocation(program, "g_tTex1"), 0);
+                gl.activeTexture(gl.TEXTURE1);
+                gl.bindTexture(gl.TEXTURE_2D, this.m_pTex2Temp);
+                gl.uniform1i(gl.getUniformLocation(program, "g_tTex2"), 1);
 
                 gl.uniform2f(gl.getUniformLocation(program, "g_vRTRes"), this.getWidth(), this.getHeight());
 
@@ -424,6 +429,9 @@ export class SWE {
             gl.activeTexture(gl.TEXTURE0);
             gl.bindTexture(gl.TEXTURE_2D, this.m_pTex1Temp);
             gl.uniform1i(gl.getUniformLocation(program, "g_tTex1"), 0);
+            gl.activeTexture(gl.TEXTURE1);
+            gl.bindTexture(gl.TEXTURE_2D, this.m_pTex2Temp);
+            gl.uniform1i(gl.getUniformLocation(program, "g_tTex2"), 1);
 
             gl.uniform2f(gl.getUniformLocation(program, "g_vRTRes"), this.getWidth(), this.getHeight());
 

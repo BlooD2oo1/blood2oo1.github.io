@@ -37,9 +37,9 @@ const vec3 g_vCWaterShallow = vec3(0.3, 0.8, 0.8) * 0.4;
 const vec3 g_vCWaterDeep = vec3(0.3, 0.6, 0.8) * 0.7 * 0.4;
 const vec3 g_vCWaterMud = vec3(0.5, 0.4, 0.3) * 0.4;
 const vec3 g_vCLandRock = vec3(0.65, 0.7, 0.75) * 0.3;
-const vec3 g_vCLandSand = vec3(0.8, 0.8, 0.5) * 0.9;
-const vec3 g_vCLight = vec3(1.0, 0.8, 0.5) * 9.0;
-const vec3 g_vCAmbientUp = vec3(0.3, 0.5, 0.7) * 0.2;
+const vec3 g_vCLandSand = vec3(0.8, 0.7, 0.6) * 0.7;
+const vec3 g_vCLight = vec3(1.0, 0.8, 0.5) * 8.0;
+const vec3 g_vCAmbientUp = vec3(0.3, 0.5, 0.7) * 0.15;
 const vec3 g_vCAmbientDown = (g_vCLandRock + g_vCLandSand) * 0.5 * 0.02;
 
 vec2 hash(vec2 p) // replace this by something better

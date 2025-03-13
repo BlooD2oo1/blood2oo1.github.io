@@ -20,9 +20,9 @@ void main()
     vec2 vTexRes = vec2(viTexRes);
     vTexCoord = position.xy + vec2(0.5) / vTexRes;
     ivec2 tc = ivec2(vTexCoord * vTexRes);
-    vec4 vTexC = texelFetch(g_tTex1, tc, 0);
-    float fZ1 = (vTexC.w + vTexC.z);
-    float fZC = vTexC.w;
+    vec4 vTex1C = texelFetch(g_tTex1, tc, 0);
+    vec4 vTex2C = texelFetch(g_tTex2, tc, 0);
+    float fZ1 = vTex1C.z + vTex2C.x + vTex2C.y;
     float fZ0 = -0.1;
     float fW = position.z;
     fZPos = mix( fZ0, fZ1, fW);

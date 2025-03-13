@@ -3,96 +3,115 @@ precision highp float;
 precision highp int;
 
 in vec2 vTexCoord;
-out vec4 outColor;
+layout(location = 0) out vec4 outColor0;
+layout(location = 1) out vec4 outColor1;
 
 #GLOBALS
+
+//	tex1:
+//		x: velocity x+1/2
+//		y: velocity y+1/2
+//		z: water depth
+//		w: dissolved sand
+//	tex2:
+//		x: rock depth
+//		y: sand depth
+//		z: -
+//		w: -
 
 // Height Integration
 
 void main()
 {
-    ivec2 tc = ivec2(vTexCoord * g_vRTRes);
+	ivec2 tc = ivec2(vTexCoord * g_vRTRes);
 
-    vec4 vTexC = texelFetch(g_tTex1, tc, 0);
-    vec4 vTexL = (tc.x > 0) ? texelFetchOffset(g_tTex1, tc, 0, ivec2(-1, 0)) : vTexC * vec4(0.0, 0.0, 1.0, 1.0);
-    vec4 vTexR = (tc.x < int(g_vRTRes.x) - 1) ? texelFetchOffset(g_tTex1, tc, 0, ivec2(1, 0)) : vTexC * vec4(0.0, 0.0, 1.0, 1.0);
-    vec4 vTexT = (tc.y > 0) ? texelFetchOffset(g_tTex1, tc, 0, ivec2(0, -1)) : vTexC * vec4(0.0, 0.0, 1.0, 1.0);
-    vec4 vTexB = (tc.y < int(g_vRTRes.y) - 1) ? texelFetchOffset(g_tTex1, tc, 0, ivec2(0, 1)) : vTexC * vec4(0.0, 0.0, 1.0, 1.0);
+	vec4 vTex1C = texelFetch(g_tTex1, tc, 0);
+	vec4 vTex1L = (tc.x > 0)					? texelFetchOffset(g_tTex1, tc, 0, ivec2(-1, 0))	: vTex1C * vec4(0.0, 0.0, 1.0, 1.0);
+	vec4 vTex1R = (tc.x < int(g_vRTRes.x) - 1)	? texelFetchOffset(g_tTex1, tc, 0, ivec2(1, 0))		: vTex1C * vec4(0.0, 0.0, 1.0, 1.0);
+	vec4 vTex1T = (tc.y > 0)					? texelFetchOffset(g_tTex1, tc, 0, ivec2(0, -1))	: vTex1C * vec4(0.0, 0.0, 1.0, 1.0);
+	vec4 vTex1B = (tc.y < int(g_vRTRes.y) - 1)	? texelFetchOffset(g_tTex1, tc, 0, ivec2(0, 1))		: vTex1C * vec4(0.0, 0.0, 1.0, 1.0);
 
-    //vec2 vOffset = vTexC.xy / g_vRTRes.xy * g_fAdvectSpeed * g_fElapsedTimeInSec / g_fGridSizeInMeter;
-    //vec4 vTex = textureLod(g_tTex1, vTexCoord + vOffset, 0.0);
-    //if (vTexC.x == 0.0) vTex.xyz = vTexC.xyz;
-    //if (vTexC.y == 0.0) vTex.xyz = vTexC.xyz;
-    //vTex.zw = vTexC.zw;
+	vec4 vTex2C = texelFetch(g_tTex2, tc, 0);
+	vec4 vTex2L = (tc.x > 0)					? texelFetchOffset(g_tTex2, tc, 0, ivec2(-1, 0))	: vTex2C * vec4(1.0, 1.0, 1.0, 1.0);
+	vec4 vTex2R = (tc.x < int(g_vRTRes.x) - 1)	? texelFetchOffset(g_tTex2, tc, 0, ivec2(1, 0))		: vTex2C * vec4(1.0, 1.0, 1.0, 1.0);
+	vec4 vTex2T = (tc.y > 0)					? texelFetchOffset(g_tTex2, tc, 0, ivec2(0, -1))	: vTex2C * vec4(1.0, 1.0, 1.0, 1.0);
+	vec4 vTex2B = (tc.y < int(g_vRTRes.y) - 1)	? texelFetchOffset(g_tTex2, tc, 0, ivec2(0, 1))		: vTex2C * vec4(1.0, 1.0, 1.0, 1.0);
 
-    float fVel_x_L = vTexL.x;
-    float fVel_x_R = vTexC.x;
-    float fVel_y_T = vTexT.y;
-    float fVel_y_B = vTexC.y;
+	////////////////////////////////////////////////////////////////
 
-    // szerintem az elso naiv megoldas latvanyosabb ha eros a velocity advection ( nem annyira alakulnak ki a zavaro V-alakok ), de nem annyira stabil, rezonal neha
+	float fVel_x_L = vTex1L.x;
+	float fVel_x_R = vTex1C.x;
+	float fVel_y_T = vTex1T.y;
+	float fVel_y_B = vTex1C.y;
+
+	// szerintem az elso naiv megoldas latvanyosabb ha eros a velocity advection ( nem annyira alakulnak ki a zavaro V-alakok ), de nem annyira stabil, rezonal neha
 #if 1
-    //basic:
-    float hL = ( vTexL.z + vTexC.z ) * 0.5;
-    float hR = ( vTexR.z + vTexC.z ) * 0.5;
-    float hT = ( vTexT.z + vTexC.z ) * 0.5;
-    float hB = ( vTexB.z + vTexC.z ) * 0.5;
+	//basic:
+	float hL = (vTex1L.z + vTex1C.z) * 0.5;
+	float hR = (vTex1R.z + vTex1C.z) * 0.5;
+	float hT = (vTex1T.z + vTex1C.z) * 0.5;
+	float hB = (vTex1B.z + vTex1C.z) * 0.5;
 #else
-    // We also found that it yields a more stable simulation:
-    float hL = (vTexL.x >= 0.0) ? vTexL.z : vTexC.z;
-    float hR = (vTexC.x <= 0.0) ? vTexR.z : vTexC.z;
-    float hT = (vTexT.y >= 0.0) ? vTexT.z : vTexC.z;
-    float hB = (vTexC.y <= 0.0) ? vTexB.z : vTexC.z;
+	// We also found that it yields a more stable simulation:
+	float hL = (vTex1L.x >= 0.0) ? vTex1L.z : vTex1C.z;
+	float hR = (vTex1C.x <= 0.0) ? vTex1R.z : vTex1C.z;
+	float hT = (vTex1T.y >= 0.0) ? vTex1T.z : vTex1C.z;
+	float hB = (vTex1C.y <= 0.0) ? vTex1B.z : vTex1C.z;
 #endif
 
-    {
-        // 2.1.5. Stability Enhancements
-        float beta = 2.0;
-        float hAvgMax = beta * g_fGridSizeInMeter / ( g_fG * g_fElapsedTimeInSec );
-        float hAdj = max( 0.0, (hR+hL+hB+hT)/4.0 - hAvgMax );
-        //float hAdj = max( 0.0, (vTexL.z+vTexR.z+vTexT.z+vTexB.z)/4.0 - hAvgMax );
+	{
+		// 2.1.5. Stability Enhancements
+		float beta = 2.0;
+		float hAvgMax = beta * g_fGridSizeInMeter / (g_fG * g_fElapsedTimeInSec);
+		float hAdj = max(0.0, (hR + hL + hB + hT) / 4.0 - hAvgMax);
+		//float hAdj = max( 0.0, (vTexL.z+vTexR.z+vTexT.z+vTexB.z)/4.0 - hAvgMax );
 
-        hL -= hAdj;
-        hR -= hAdj;
-        hT -= hAdj;
-        hB -= hAdj;
-    }
+		hL -= hAdj;
+		hR -= hAdj;
+		hT -= hAdj;
+		hB -= hAdj;
+	}
 
-    float dH = -((hR * fVel_x_R - hL * fVel_x_L) / g_fGridSizeInMeter + (hB * fVel_y_B - hT * fVel_y_T) / g_fGridSizeInMeter);
+	float dH = -((hR * fVel_x_R - hL * fVel_x_L) / g_fGridSizeInMeter + (hB * fVel_y_B - hT * fVel_y_T) / g_fGridSizeInMeter);
 
-    vTexC.z += dH * (g_fElapsedTimeInSec);
+	vTex1C.z += dH * (g_fElapsedTimeInSec);
 
-    // 2.2. Overshooting Reduction
-    {
-        float hC = vTexC.z+vTexC.w;
-        float hL = vTexL.z+vTexL.w;
-        float hR = vTexR.z+vTexR.w;
-        float hT = vTexT.z+vTexT.w;
-        float hB = vTexB.z+vTexB.w;
-        float lamdaedge = 2.0*g_fGridSizeInMeter;
-        float alphaedge = 0.5;
-        if ( ( ( hC - hL ) > lamdaedge ) && ( hC > hR ) )
-        {
-            vTexC.z += alphaedge * ( max( 0.0, (vTexC.z+vTexR.z)/2.0 ) - vTexC.z );
-        }
-        if ( ( ( hC - hR ) > lamdaedge ) && ( hC > hL ) )
-        {
-            vTexC.z += alphaedge * ( max( 0.0, (vTexC.z+vTexL.z)/2.0 ) - vTexC.z );
-        }
-        if ( ( ( hC - hT ) > lamdaedge ) && ( hC > hB ) )
-        {
-            vTexC.z += alphaedge * ( max( 0.0, (vTexC.z+vTexB.z)/2.0 ) - vTexC.z );
-        }
-        if ( ( ( hC - hB ) > lamdaedge ) && ( hC > hT ) )
-        {
-            vTexC.z += alphaedge * ( max( 0.0, (vTexC.z+vTexT.z)/2.0 ) - vTexC.z );
-        }
-    }
+	// 2.2. Overshooting Reduction
+	{
+		float hC = vTex1C.z + vTex2C.x + vTex2C.y;
+		float hL = vTex1L.z + vTex2L.x + vTex2L.y;
+		float hR = vTex1R.z + vTex2R.x + vTex2R.y;
+		float hT = vTex1T.z + vTex2T.x + vTex2T.y;
+		float hB = vTex1B.z + vTex2B.x + vTex2B.y;
 
-    if ( vTexC.z <= 0.0 )
-    {
-        vTexC.z = 0.0;
-    }
 
-    outColor = vTexC;
+
+		float lamdaedge = 2.0 * g_fGridSizeInMeter;
+		float alphaedge = 0.5;
+		if (((hC - hL) > lamdaedge) && (hC > hR))
+		{
+			vTex1C.z += alphaedge * (max(0.0, (vTex1C.z + vTex1R.z) * 0.5) - vTex1C.z);
+		}
+		if (((hC - hR) > lamdaedge) && (hC > hL))
+		{
+			vTex1C.z += alphaedge * (max(0.0, (vTex1C.z + vTex1L.z) * 0.5) - vTex1C.z);
+		}
+		if (((hC - hT) > lamdaedge) && (hC > hB))
+		{
+			vTex1C.z += alphaedge * (max(0.0, (vTex1C.z + vTex1B.z) * 0.5) - vTex1C.z);
+		}
+		if (((hC - hB) > lamdaedge) && (hC > hT))
+		{
+			vTex1C.z += alphaedge * (max(0.0, (vTex1C.z + vTex1T.z) * 0.5) - vTex1C.z);
+		}
+	}
+
+	if (vTex1C.z <= 0.0)
+	{
+		vTex1C.z = 0.0;
+		vTex1C.w = 0.0;
+	}
+
+	outColor0 = vTex1C;
+	outColor1 = vTex2C;
 }

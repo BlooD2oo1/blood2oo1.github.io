@@ -319,7 +319,10 @@ export class Terrain {
 
         gl.activeTexture(gl.TEXTURE0);
         gl.bindTexture(gl.TEXTURE_2D, app.Present.SWE.getSWETex1());
-        gl.uniform1i(gl.getUniformLocation(program, 'g_tTex1'), 0);
+        gl.uniform1i(gl.getUniformLocation(program, "g_tTex1"), 0);
+        gl.activeTexture(gl.TEXTURE1);
+        gl.bindTexture(gl.TEXTURE_2D, app.Present.SWE.getSWETex2());
+        gl.uniform1i(gl.getUniformLocation(program, "g_tTex2"), 1);
 
         // Draw the grid
         gl.drawElements(gl.TRIANGLES, this.indexCountTerrain, gl.UNSIGNED_INT, 0);
@@ -347,7 +350,10 @@ export class Terrain {
 
         gl.activeTexture(gl.TEXTURE0);
         gl.bindTexture(gl.TEXTURE_2D, app.Present.SWE.getSWETex1());
-        gl.uniform1i(gl.getUniformLocation(program, 'g_tTex1'), 0);
+        gl.uniform1i(gl.getUniformLocation(program, "g_tTex1"), 0);
+        gl.activeTexture(gl.TEXTURE1);
+        gl.bindTexture(gl.TEXTURE_2D, app.Present.SWE.getSWETex2());
+        gl.uniform1i(gl.getUniformLocation(program, "g_tTex2"), 1);
 
         // Draw the grid
         gl.drawElements(gl.TRIANGLE_STRIP, this.indexCountSkirt, gl.UNSIGNED_INT, 0);
