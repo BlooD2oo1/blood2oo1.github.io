@@ -127,11 +127,6 @@ export class SWE {
         gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_2D, this.m_pTex2Temp, 0);
         gl.drawBuffers([gl.COLOR_ATTACHMENT0]);*/
 
-        this.m_pTexFBNorm = gl.createFramebuffer();
-        gl.bindFramebuffer(gl.FRAMEBUFFER, this.m_pTexFBNorm);
-        gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_2D, this.m_pTexNorm, 0);
-        gl.drawBuffers([gl.COLOR_ATTACHMENT0]);
-
         this.m_pTex12FB = gl.createFramebuffer();
         gl.bindFramebuffer(gl.FRAMEBUFFER, this.m_pTex12FB);
         gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_2D, this.m_pTex1, 0);
@@ -143,6 +138,11 @@ export class SWE {
         gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_2D, this.m_pTex1Temp, 0);
         gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT1, gl.TEXTURE_2D, this.m_pTex2Temp, 0);
         gl.drawBuffers([gl.COLOR_ATTACHMENT0, gl.COLOR_ATTACHMENT1]);
+
+        this.m_pTexFBNorm = gl.createFramebuffer();
+        gl.bindFramebuffer(gl.FRAMEBUFFER, this.m_pTexFBNorm);
+        gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_2D, this.m_pTexNorm, 0);
+        gl.drawBuffers([gl.COLOR_ATTACHMENT0]);
 
         this.renderInit();
     }

@@ -28,18 +28,18 @@ void main()
 
     float fOcc = 1.0;
 
-    float fWater = clamp((fZPos - vTexC.w) / 0.005, 0.0, 1.0);
+    float fWater = clamp((fZPos - (vTex2C.x+vTex2C.y)) / 0.005, 0.0, 1.0);
     float fFoam = 0.0;
-    fFoam += smoothstep(0.0010, 0.0002, vTexC.z);
+    fFoam += smoothstep(0.0010, 0.0002, vTex1C.z);
     fFoam = clamp(fFoam, 0.0, 1.0);
     vec3 vNormal = vec3(vNormalXY, 0);
 
-    vec3 vCWater = mix(g_vCWaterShallow, g_vCWaterDeep, smoothstep(0.0, 0.03, vTexC.z));
-    float fWaterDepth = (vTexC.z + vTexC.w) - fZPos;
+    vec3 vCWater = mix(g_vCWaterShallow, g_vCWaterDeep, smoothstep(0.0, 0.03, vTex1C.z));
+    float fWaterDepth = (vTex1C.z + vTex2C.x+ vTex2C.y) - fZPos;
     vCWater = mix(vCWater, g_vCWaterDeep * 0.8, clamp(fWaterDepth / 0.01, 0.0, 1.0));
-    vCWater = mix( vCWater, g_vCWaterMud, clamp( vTexC2.x*1000.0, 0.0, 1.0 ) );
+    //vCWater = mix( vCWater, g_vCWaterMud, clamp( vTexC2.y*1000.0, 0.0, 1.0 ) );
     vec3 vCFoam = vec3(1.0);
-    vec3 vCLand = mix(g_vCLandRock, g_vCLandSand, clamp( vTexC2.x*1000.0, 0.0, 1.0 ) );
+    vec3 vCLand = mix(g_vCLandRock, g_vCLandSand, clamp( vTex2C.y*1000.0, 0.0, 1.0 ) );
     //float fLandDepth = vTexC.w - fZPos;
 
     vCWater = mix(vCWater, vCFoam, fFoam);
