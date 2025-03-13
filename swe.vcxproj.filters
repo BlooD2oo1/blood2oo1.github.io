@@ -1,0 +1,84 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="src">
+      <UniqueIdentifier>{cef6321e-2dad-4384-9b77-708470349c54}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src\shaders">
+      <UniqueIdentifier>{c56f3518-6385-48e6-b32e-304adc5cda63}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="swe\src\present.js">
+      <Filter>src</Filter>
+    </None>
+    <None Include="swe\src\swe.js">
+      <Filter>src</Filter>
+    </None>
+    <None Include="swe\src\terrain.js">
+      <Filter>src</Filter>
+    </None>
+    <None Include="swe\src\webglapp.js">
+      <Filter>src</Filter>
+    </None>
+    <None Include="swe\src\shaders\globals.glsl">
+      <Filter>src\shaders</Filter>
+    </None>
+    <None Include="swe\src\shaders\psFogCube.glsl">
+      <Filter>src\shaders</Filter>
+    </None>
+    <None Include="swe\src\shaders\psPresent.glsl">
+      <Filter>src\shaders</Filter>
+    </None>
+    <None Include="swe\src\shaders\psSWEInit.glsl">
+      <Filter>src\shaders</Filter>
+    </None>
+    <None Include="swe\src\shaders\psSWEPass01.glsl">
+      <Filter>src\shaders</Filter>
+    </None>
+    <None Include="swe\src\shaders\psSWEPass02.glsl">
+      <Filter>src\shaders</Filter>
+    </None>
+    <None Include="swe\src\shaders\psSWEPass03.glsl">
+      <Filter>src\shaders</Filter>
+    </None>
+    <None Include="swe\src\shaders\psSWEProc01.glsl">
+      <Filter>src\shaders</Filter>
+    </None>
+    <None Include="swe\src\shaders\psTerrain.glsl">
+      <Filter>src\shaders</Filter>
+    </None>
+    <None Include="swe\src\shaders\psTerrainShadow.glsl">
+      <Filter>src\shaders</Filter>
+    </None>
+    <None Include="swe\src\shaders\psTerrainSkirt.glsl">
+      <Filter>src\shaders</Filter>
+    </None>
+    <None Include="swe\src\shaders\psTerrainSkirtShadow.glsl">
+      <Filter>src\shaders</Filter>
+    </None>
+    <None Include="swe\src\shaders\vsFogCube.glsl">
+      <Filter>src\shaders</Filter>
+    </None>
+    <None Include="swe\src\shaders\vsPresent.glsl">
+      <Filter>src\shaders</Filter>
+    </None>
+    <None Include="swe\src\shaders\vsSWE.glsl">
+      <Filter>src\shaders</Filter>
+    </None>
+    <None Include="swe\src\shaders\vsTerrain.glsl">
+      <Filter>src\shaders</Filter>
+    </None>
+    <None Include="swe\src\shaders\vsTerrainShadow.glsl">
+      <Filter>src\shaders</Filter>
+    </None>
+    <None Include="swe\src\shaders\vsTerrainSkirt.glsl">
+      <Filter>src\shaders</Filter>
+    </None>
+    <None Include="swe\src\shaders\vsTerrainSkirtShadow.glsl">
+      <Filter>src\shaders</Filter>
+    </None>
+    <None Include="swe\index.html" />
+    <None Include="swe\styles.css" />
+  </ItemGroup>
+</Project>
