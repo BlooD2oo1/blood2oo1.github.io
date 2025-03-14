@@ -39,7 +39,7 @@ void main()
     float fWaterMin = 0.0004;
     float fWater = smoothstep( 0.0, fWaterMin, vTex1C.z );
     float fFoam = ( length(vTexDtC.xy) * length(vTex1C.xy) ) * 7.0 / clamp(0.001, 1.0, vTex1C.z * 100.0);
-	fFoam += smoothstep(0.005, 0.0, vTex1C.z);//part
+	fFoam += smoothstep(0.003, 0.0, vTex1C.z);//part
 	fFoam = clamp(fFoam, 0.0, 1.0);
     float fNormalBoostOnWater = mix(1.0, 0.6, fWater);
     vec3 vNormal = normalize( vec3( -vTexDtC.xy, fNormalBoostOnWater) );

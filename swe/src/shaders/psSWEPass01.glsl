@@ -99,29 +99,78 @@ void main()
 	outColor0.z = vTex1C.z; // viztomeget nem advectalunk mert tomegmegmaradas szerintem bukik
 	outColor0.w = vTex1C.w;
 
-	/*{
+#if 0
+	{
 		// simple blur of vTex2C:
 		//vTex2C.y = (vTex2L.y + vTex2R.y + vTex2T.y + vTex2B.y + 54.0 * vTex2C.y) / (4.0+54.0);
 
-		float hC = vTex1C.z + vTex2C.x + vTex2C.y;
-		float hL = vTex1L.z + vTex2L.x + vTex2L.y;
-		float hR = vTex1R.z + vTex2R.x + vTex2R.y;
-		float hT = vTex1T.z + vTex2T.x + vTex2T.y;
-		float hB = vTex1B.z + vTex2B.x + vTex2B.y;
+		float hC = vTex2C.x + vTex2C.y;
+		float hL = vTex2L.x + vTex2L.y;
+		float hR = vTex2R.x + vTex2R.y;
+		float hT = vTex2T.x + vTex2T.y;
+		float hB = vTex2B.x + vTex2B.y;
 
-		float fSlope_x_L = (hL - hC) * g_fGridSizeInMeter;
-		float fSlope_x_R = (hR - hC) * g_fGridSizeInMeter;
-		float fSlope_y_T = (hT - hC) * g_fGridSizeInMeter;
-		float fSlope_y_B = (hB - hC) * g_fGridSizeInMeter;
+		float fFlowSpeed = 0.2;
+		float fAdd_x_L = (hL - hC) * fFlowSpeed;
+		float fAdd_x_R = (hR - hC) * fFlowSpeed;
+		float fAdd_y_T = (hT - hC) * fFlowSpeed;
+		float fAdd_y_B = (hB - hC) * fFlowSpeed;
 
-		float fMinSlope = 0.1;
-		fSlope_x_L = max(0.0, (abs(fSlope_x_L) - fMinSlope)) * sign(fSlope_x_L);
-		fSlope_x_R = max(0.0, (abs(fSlope_x_R) - fMinSlope)) * sign(fSlope_x_R);
-		fSlope_y_T = max(0.0, (abs(fSlope_y_T) - fMinSlope)) * sign(fSlope_y_T);
-		fSlope_y_B = max(0.0, (abs(fSlope_y_B) - fMinSlope)) * sign(fSlope_y_B);
+		fAdd_x_L = min( fAdd_x_L, vTex2L.y );
+		fAdd_x_R = min( fAdd_x_R, vTex2R.y );
+		fAdd_y_T = min( fAdd_y_T, vTex2T.y );
+		fAdd_y_B = min( fAdd_y_B, vTex2B.y );
 
-	}*/
+		float fMinSlope = 0.00005;
+		fAdd_x_L = max(0.0, (abs(fAdd_x_L) - fMinSlope)) * sign(fAdd_x_L);
+		fAdd_x_R = max(0.0, (abs(fAdd_x_R) - fMinSlope)) * sign(fAdd_x_R);
+		fAdd_y_T = max(0.0, (abs(fAdd_y_T) - fMinSlope)) * sign(fAdd_y_T);
+		fAdd_y_B = max(0.0, (abs(fAdd_y_B) - fMinSlope)) * sign(fAdd_y_B);
 
+		float fAdd = fAdd_x_L + fAdd_x_R + fAdd_y_T + fAdd_y_B;
+
+		vTex2C.y += fAdd;
+
+		vTex2C.y = max( 0.0, vTex2C.y );
+	}
+#else
+	{
+		// sand flow
+
+		float hC = vTex2C.x + vTex2C.y;
+		float hL = vTex2L.x + vTex2L.y;
+		float hR = vTex2R.x + vTex2R.y;
+		float hT = vTex2T.x + vTex2T.y;
+		float hB = vTex2B.x + vTex2B.y;
+
+		float fFlowSpeed = 0.2;
+		float fAdd_x_L = (hL - hC) * fFlowSpeed;
+		float fAdd_x_R = (hR - hC) * fFlowSpeed;
+		float fAdd_y_T = (hT - hC) * fFlowSpeed;
+		float fAdd_y_B = (hB - hC) * fFlowSpeed;
+
+		fAdd_x_L = min( fAdd_x_L, vTex2L.y );
+		fAdd_x_R = min( fAdd_x_R, vTex2R.y );
+		fAdd_y_T = min( fAdd_y_T, vTex2T.y );
+		fAdd_y_B = min( fAdd_y_B, vTex2B.y );
+
+		vec2 vAddDir = vec2( fAdd_x_L + fAdd_x_R, fAdd_y_T + fAdd_y_B );
+		float fAddLen = length( vAddDir );
+
+		//fAddLen = min( fAddLen, ( vTex2L.y + vTex2R.y + vTex2T.y + vTex2B.y ) );
+
+		if ( fAddLen > 0.0 )
+		{
+			float fMinSlope = 0.000005;
+			float fAdd = max( 0.0, fAddLen - fMinSlope );
+
+			vAddDir = vAddDir/fAddLen * fAdd;
+
+			vTex2C.y += vAddDir.x + vAddDir.y;
+		}
+		vTex2C.y = max( 0.0, vTex2C.y );
+	}
+#endif
 	outColor1.x = vTex2C.x;
 	outColor1.y = vTex2C.y;
 	outColor1.z = vTex2C.z;
@@ -134,10 +183,10 @@ void main()
 		float fDirLen = length(vDir);
 		float fW = max(0.0, (fRad - fDirLen) / fRad);
 		fW = 0.5 - 0.5 * cos(fW * PI2);
-		outColor0.z += fW * 0.00009 * g_fElapsedTimeInSec;
+		outColor1.y += fW * 0.00009 * g_fElapsedTimeInSec;
 	}
 
-	{
+	/*{
 		float fRad = 0.09;
 		vec2 vDir = vTexCoord - vec2(0.85, 0.7);
 		float fDirLen = length(vDir);
@@ -153,5 +202,5 @@ void main()
 		float fW = max(0.0, (fRad - fDirLen) / fRad);
 		fW = 0.5 - 0.5 * cos(fW * PI2);
 		outColor0.z -= fW * 0.000006 * g_fElapsedTimeInSec;
-	}
+	}*/
 }
