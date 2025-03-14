@@ -84,8 +84,6 @@ void main()
 		float hT = vTex1T.z + vTex2T.x + vTex2T.y;
 		float hB = vTex1B.z + vTex2B.x + vTex2B.y;
 
-
-
 		float lamdaedge = 2.0 * g_fGridSizeInMeter;
 		float alphaedge = 0.5;
 		if (((hC - hL) > lamdaedge) && (hC > hR))
@@ -106,10 +104,40 @@ void main()
 		}
 	}
 
-	if (vTex1C.z <= 0.0)
+	if (vTex1C.z < 0.0)
 	{
 		vTex1C.z = 0.0;
 		vTex1C.w = 0.0;
+	}
+
+	//if ( vTex1C.z > 0.0 )
+	{
+		float hL = (vTex2L.y + vTex2C.y) * 0.5;
+		float hR = (vTex2R.y + vTex2C.y) * 0.5;
+		float hT = (vTex2T.y + vTex2C.y) * 0.5;
+		float hB = (vTex2B.y + vTex2C.y) * 0.5;
+
+		{
+			// 2.1.5. Stability Enhancements
+			float beta = 2.0;
+			float hAvgMax = beta * g_fGridSizeInMeter / (g_fG * g_fElapsedTimeInSec);
+			float hAdj = max(0.0, (hR + hL + hB + hT) / 4.0 - hAvgMax);
+			//float hAdj = max( 0.0, (vTexL.z+vTexR.z+vTexT.z+vTexB.z)/4.0 - hAvgMax );
+
+			hL -= hAdj;
+			hR -= hAdj;
+			hT -= hAdj;
+			hB -= hAdj;
+		}
+
+		float dH = -((hR * fVel_x_R - hL * fVel_x_L) / g_fGridSizeInMeter + (hB * fVel_y_B - hT * fVel_y_T) / g_fGridSizeInMeter);
+
+		vTex2C.y += dH * (g_fElapsedTimeInSec)*0.005;
+
+		if ( vTex2C.y < 0.0 )
+		{
+			vTex2C.y = 0.0;
+		}
 	}
 
 	outColor0 = vTex1C;

@@ -91,11 +91,22 @@ void main()
 	}*/
 
 	// 2.1.5. Stability Enhancements
-	if (vTex1C.z <= 0.0)
+	if (vTex1C.z < 0.0)
 	{
 		vTex1C.z = 0.0;
 		vTex1C.w = 0.0;
 	}
+
+	/*if ( vTex1C.z > EPS*2.0 )
+	{
+		//sand:
+		float fVelLen = -( length( vTex1C.xy ) - 0.1 ) * 0.0001;
+		fVelLen = clamp( fVelLen, -0.000001, 0.000001 );
+		float fAddSand = fVelLen;
+		vTex2C.y += fAddSand;
+
+		vTex2C.y = max( 0.0, vTex2C.y );
+	}*/
 
 	outColor0 = vTex1C;
 	outColor1 = vTex2C;

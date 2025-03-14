@@ -26,8 +26,9 @@ void main()
 
 	ivec2 tc = ivec2(vTexCoord * g_vRTRes);
 
-	float fRockDepth = SampleDepth(vec2(tc));
-	float fSandDepth = max(0.0, SampleDepth(vec2(tc + ivec2(2048, 2048))) * 0.2-0.007)*1.2;
+	float fRockDepth = SampleDepth(vec2(tc))*0.4-0.1;
+	float fSandDepth = max(0.0, SampleDepth(vec2(tc + ivec2(2048, 2048))) * 0.2-0.007)*1.0;
+	fSandDepth = 0.1;
 	float fSolidDepth = fRockDepth + fSandDepth;
 
 	outColor0.z = max(0.0, -fSolidDepth + 0.0);

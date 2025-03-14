@@ -143,7 +143,7 @@ void main()
 		float hT = vTex2T.x + vTex2T.y;
 		float hB = vTex2B.x + vTex2B.y;
 
-		float fFlowSpeed = 0.2;
+		float fFlowSpeed = 0.1;
 		float fAdd_x_L = (hL - hC) * fFlowSpeed;
 		float fAdd_x_R = (hR - hC) * fFlowSpeed;
 		float fAdd_y_T = (hT - hC) * fFlowSpeed;
@@ -161,7 +161,7 @@ void main()
 
 		if ( fAddLen > 0.0 )
 		{
-			float fMinSlope = 0.000005;
+			float fMinSlope = 0.00001;
 			float fAdd = max( 0.0, fAddLen - fMinSlope );
 
 			vAddDir = vAddDir/fAddLen * fAdd;
@@ -186,21 +186,21 @@ void main()
 		outColor1.y += fW * 0.00009 * g_fElapsedTimeInSec;
 	}
 
-	/*{
-		float fRad = 0.09;
-		vec2 vDir = vTexCoord - vec2(0.85, 0.7);
+	{
+		float fRad = 0.2;
+		vec2 vDir = vTexCoord - vec2(0.85, 0.85);
 		float fDirLen = length(vDir);
 		float fW = max(0.0, (fRad - fDirLen) / fRad);
 		fW = 0.5 - 0.5 * cos(fW * PI2);
-		outColor0.z += fW * 0.000006 * g_fElapsedTimeInSec;
+		outColor0.z += fW * 0.00000004 * g_fElapsedTimeInSec;
 	}
 
 	{
-		float fRad = 0.09;
-		vec2 vDir = vTexCoord - vec2(0.15, 0.3);
+		float fRad = 0.2;
+		vec2 vDir = vTexCoord - vec2(0.15, 0.15);
 		float fDirLen = length(vDir);
 		float fW = max(0.0, (fRad - fDirLen) / fRad);
 		fW = 0.5 - 0.5 * cos(fW * PI2);
-		outColor0.z -= fW * 0.000006 * g_fElapsedTimeInSec;
-	}*/
+		outColor0.z -= fW * 0.0000004 * g_fElapsedTimeInSec;
+	}
 }
