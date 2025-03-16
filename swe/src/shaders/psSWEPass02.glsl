@@ -26,16 +26,16 @@ void main()
 	ivec2 tc = ivec2(vTexCoord * g_vRTRes);
 
 	vec4 vTex1C = texelFetch(g_tTex1, tc, 0);
-	vec4 vTex1L = (tc.x > 0)					? texelFetchOffset(g_tTex1, tc, 0, ivec2(-1, 0))	: vTex1C * vec4(0.0, 0.0, 1.0, 1.0);
-	vec4 vTex1R = (tc.x < int(g_vRTRes.x) - 1)	? texelFetchOffset(g_tTex1, tc, 0, ivec2(1, 0))		: vTex1C * vec4(0.0, 0.0, 1.0, 1.0);
-	vec4 vTex1T = (tc.y > 0)					? texelFetchOffset(g_tTex1, tc, 0, ivec2(0, -1))	: vTex1C * vec4(0.0, 0.0, 1.0, 1.0);
-	vec4 vTex1B = (tc.y < int(g_vRTRes.y) - 1)	? texelFetchOffset(g_tTex1, tc, 0, ivec2(0, 1))		: vTex1C * vec4(0.0, 0.0, 1.0, 1.0);
+	vec4 vTex1L = (tc.x > 0) ? texelFetchOffset(g_tTex1, tc, 0, ivec2(-1, 0)) : vTex1C * vec4(0.0, 0.0, 1.0, 1.0);
+	vec4 vTex1R = (tc.x < int(g_vRTRes.x) - 1) ? texelFetchOffset(g_tTex1, tc, 0, ivec2(1, 0)) : vTex1C * vec4(0.0, 0.0, 1.0, 1.0);
+	vec4 vTex1T = (tc.y > 0) ? texelFetchOffset(g_tTex1, tc, 0, ivec2(0, -1)) : vTex1C * vec4(0.0, 0.0, 1.0, 1.0);
+	vec4 vTex1B = (tc.y < int(g_vRTRes.y) - 1) ? texelFetchOffset(g_tTex1, tc, 0, ivec2(0, 1)) : vTex1C * vec4(0.0, 0.0, 1.0, 1.0);
 
 	vec4 vTex2C = texelFetch(g_tTex2, tc, 0);
-	vec4 vTex2L = (tc.x > 0)					? texelFetchOffset(g_tTex2, tc, 0, ivec2(-1, 0))	: vTex2C * vec4(1.0, 1.0, 1.0, 1.0);
-	vec4 vTex2R = (tc.x < int(g_vRTRes.x) - 1)	? texelFetchOffset(g_tTex2, tc, 0, ivec2(1, 0))		: vTex2C * vec4(1.0, 1.0, 1.0, 1.0);
-	vec4 vTex2T = (tc.y > 0)					? texelFetchOffset(g_tTex2, tc, 0, ivec2(0, -1))	: vTex2C * vec4(1.0, 1.0, 1.0, 1.0);
-	vec4 vTex2B = (tc.y < int(g_vRTRes.y) - 1)	? texelFetchOffset(g_tTex2, tc, 0, ivec2(0, 1))		: vTex2C * vec4(1.0, 1.0, 1.0, 1.0);
+	vec4 vTex2L = (tc.x > 0) ? texelFetchOffset(g_tTex2, tc, 0, ivec2(-1, 0)) : vTex2C * vec4(1.0, 1.0, 1.0, 1.0);
+	vec4 vTex2R = (tc.x < int(g_vRTRes.x) - 1) ? texelFetchOffset(g_tTex2, tc, 0, ivec2(1, 0)) : vTex2C * vec4(1.0, 1.0, 1.0, 1.0);
+	vec4 vTex2T = (tc.y > 0) ? texelFetchOffset(g_tTex2, tc, 0, ivec2(0, -1)) : vTex2C * vec4(1.0, 1.0, 1.0, 1.0);
+	vec4 vTex2B = (tc.y < int(g_vRTRes.y) - 1) ? texelFetchOffset(g_tTex2, tc, 0, ivec2(0, 1)) : vTex2C * vec4(1.0, 1.0, 1.0, 1.0);
 
 	////////////////////////////////////////////////////////////////
 
@@ -45,7 +45,7 @@ void main()
 	float fVel_y_B = vTex1C.y;
 
 	// szerintem az elso naiv megoldas latvanyosabb ha eros a velocity advection ( nem annyira alakulnak ki a zavaro V-alakok ), de nem annyira stabil, rezonal neha
-#if 1
+#if 0
 	//basic:
 	float hL = (vTex1L.z + vTex1C.z) * 0.5;
 	float hR = (vTex1R.z + vTex1C.z) * 0.5;
@@ -57,6 +57,11 @@ void main()
 	float hR = (vTex1C.x <= 0.0) ? vTex1R.z : vTex1C.z;
 	float hT = (vTex1T.y >= 0.0) ? vTex1T.z : vTex1C.z;
 	float hB = (vTex1C.y <= 0.0) ? vTex1B.z : vTex1C.z;
+
+	float sL = (vTex1L.x >= 0.0) ? vTex2L.y : vTex2C.y;
+	float sR = (vTex1C.x <= 0.0) ? vTex2R.y : vTex2C.y;
+	float sT = (vTex1T.y >= 0.0) ? vTex2T.y : vTex2C.y;
+	float sB = (vTex1C.y <= 0.0) ? vTex2B.y : vTex2C.y;
 #endif
 
 	{
@@ -74,7 +79,7 @@ void main()
 
 	float dH = -((hR * fVel_x_R - hL * fVel_x_L) / g_fGridSizeInMeter + (hB * fVel_y_B - hT * fVel_y_T) / g_fGridSizeInMeter);
 
-	vTex1C.z += dH * (g_fElapsedTimeInSec);
+	vTex1C.z += dH * g_fElapsedTimeInSec;
 
 	// 2.2. Overshooting Reduction
 	{
@@ -110,31 +115,26 @@ void main()
 		vTex1C.w = 0.0;
 	}
 
-	//if ( vTex1C.z > 0.0 )
+	if (vTex1C.z > 0.0)
 	{
-		float hL = (vTex2L.y + vTex2C.y) * 0.5;
-		float hR = (vTex2R.y + vTex2C.y) * 0.5;
-		float hT = (vTex2T.y + vTex2C.y) * 0.5;
-		float hB = (vTex2B.y + vTex2C.y) * 0.5;
-
-		{
+		/*{
 			// 2.1.5. Stability Enhancements
 			float beta = 2.0;
 			float hAvgMax = beta * g_fGridSizeInMeter / (g_fG * g_fElapsedTimeInSec);
-			float hAdj = max(0.0, (hR + hL + hB + hT) / 4.0 - hAvgMax);
+			float hAdj = max(0.0, (sR + sL + sB + sT) / 4.0 - hAvgMax);
 			//float hAdj = max( 0.0, (vTexL.z+vTexR.z+vTexT.z+vTexB.z)/4.0 - hAvgMax );
 
-			hL -= hAdj;
-			hR -= hAdj;
-			hT -= hAdj;
-			hB -= hAdj;
-		}
+			sL -= hAdj;
+			sR -= hAdj;
+			sT -= hAdj;
+			sB -= hAdj;
+		}*/
 
-		float dH = -((hR * fVel_x_R - hL * fVel_x_L) / g_fGridSizeInMeter + (hB * fVel_y_B - hT * fVel_y_T) / g_fGridSizeInMeter);
+		float dH = -((sR * fVel_x_R - sL * fVel_x_L) / g_fGridSizeInMeter + (sB * fVel_y_B - sT * fVel_y_T) / g_fGridSizeInMeter);
+		dH = clamp(dH * 0.1, -0.000005, 0.000005);
+		vTex2C.y += dH * g_fElapsedTimeInSec;
 
-		vTex2C.y += dH * (g_fElapsedTimeInSec)*0.005;
-
-		if ( vTex2C.y < 0.0 )
+		if (vTex2C.y < 0.0)
 		{
 			vTex2C.y = 0.0;
 		}

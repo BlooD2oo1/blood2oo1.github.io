@@ -44,7 +44,7 @@ void main()
     float fNormalBoostOnWater = mix(1.0, 0.6, fWater);
     vec3 vNormal = normalize( vec3( -vTexDtC.xy, fNormalBoostOnWater) );
     
-    vec3 vCWater = mix( g_vCWaterShallow, g_vCWaterDeep, smoothstep( 0.0, 0.03, vTex1C.z ) );
+    vec3 vCWater = mix( g_vCWaterShallow, g_vCWaterDeep, smoothstep( 0.0, 0.01, vTex1C.z ) );
     //vCWater = mix( vCWater, g_vCWaterMud, clamp( vTex2C.y*1000.0, 0.0, 1.0 ) );
 	vec3 vCFoam = vec3(0.9);
     vec3 vCLand = mix(g_vCLandRock, g_vCLandSand, clamp( vTex2C.y*1000.0, 0.0, 1.0 ) );

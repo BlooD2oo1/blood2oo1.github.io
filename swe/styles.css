@@ -86,9 +86,10 @@ input[type="range"]::-moz-range-thumb {
     cursor: pointer; /* Cursor style */
 }
 
-.slider-container label,
-.slider-container span {
-    font-size: 0.6rem; /* Smaller font size for labels and values */
+/* Add this to your styles.css */
+.ui-element-container {
+    font-size: 0.6rem; /* Smaller font size for all UI elements */
+    margin-bottom: 5px; /* Add some space between elements */
 }
 
 .webapp {

@@ -127,13 +127,12 @@ float SampleDepth(vec2 xy)
         }
         fRet += 0.2;
 
-		fRet += xy.x*0.0002;
-		fRet += xy.y*0.0002;
+        fRet *= 0.01;
 
-        float fNoise = fRet;
-    
+		fRet += xy.x*0.000002;
+		fRet += xy.y*0.000002;
 
-        fRet = fNoise * 0.02;
+        
 
         //fRet = clamp(fRet, 0.0, 0.001);
         //fRet = ( 1.0-exp(-abs(fRet)/0.001))*0.001;// * sign(fRet);
@@ -149,7 +148,7 @@ float SampleDepth(vec2 xy)
     }
     else if ( g_iInitSetting == 1 )
     {
-        vec2 vUV = xy * 5.0 * 0.0008 + 8.0;
+        vec2 vUV = xy * 5.0 * 0.0008 + 9.0;
         vUV += vec2(noise(vUV + 2.0), noise(vUV + 1.0)) * 0.1;
         mat2 m = mat2(2.0, 1.2, -1.2, 2.0);
         fRet = noise(vUV) / 2.0; vUV = (m * vUV);
@@ -180,7 +179,8 @@ float SampleDepth(vec2 xy)
             fRet += voronoise(xy*0.12, p.x, p.y) * 0.02;
         }
 
-        fRet += (xy.x-0.5)*0.001;
+        fRet += xy.x * 0.002;
+        fRet += xy.y * 0.002;
 
         fRet += 0.0;
 
