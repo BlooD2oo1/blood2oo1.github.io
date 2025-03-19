@@ -12,7 +12,7 @@ layout(location = 1) out vec4 outColor1;
 //		x: velocity x+1/2
 //		y: velocity y+1/2
 //		z: water depth
-//		w: dissolved sand
+//		w: velocity delta
 //	tex2:
 //		x: rock depth
 //		y: sand depth
@@ -48,7 +48,8 @@ void main()
 	vec2 vV;
 	vV.x = -g_fG / g_fGridSizeInMeter * (hR - hC);
 	vV.y = -g_fG / g_fGridSizeInMeter * (hB - hC);
-	vTex1C.xy += vV * g_fElapsedTimeInSec;
+	vV *= g_fElapsedTimeInSec;
+	vTex1C.xy += vV;
 
 	// 2.1.4. Boundary Conditions
 

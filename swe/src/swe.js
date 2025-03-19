@@ -14,7 +14,10 @@ export class SWE {
 		this.params = {
 			fGridSizeInMeter: 5.0,
 			fElapsedTimeInSec: 1.0,
-			fAdvectSpeed: -1.0,
+            fAdvectSpeed: 1.0,
+            fAdvectDissipation: 0.999,
+            fSandSlope: 0.00002,
+            fSandFlow: 0.002,
 			fG: 9.8,
 			fHackBlurDepth: 1.0,
 			iInitSetting: 0,
@@ -170,7 +173,9 @@ export class SWE {
 	renderInit() {
 		const gl = this.gl;
 
-		this.m_iFrameCount = 0;
+        this.m_iFrameCount = 0;
+
+        const program = this.program_SWEPassInit;
 
 		// Bind the current framebuffer and set the viewport
 		gl.viewport(0, 0, this.width, this.height);
@@ -178,23 +183,26 @@ export class SWE {
 
 		gl.bindFramebuffer(gl.FRAMEBUFFER, this.m_pTex12FBTemp);
 		// Render to the framebuffer
-		gl.useProgram(this.program_SWEPassInit);
+        gl.useProgram(program);
 
 		gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, this.screenIbo);
 		gl.bindBuffer(gl.ARRAY_BUFFER, this.screenVbo);
-		const positionLocation = gl.getAttribLocation(this.program_SWEPassInit, "position");
+        const positionLocation = gl.getAttribLocation(program, "position");
 		gl.enableVertexAttribArray(positionLocation);
 		gl.vertexAttribPointer(positionLocation, 2, gl.FLOAT, false, 0, 0);
 
-		gl.uniform2f(gl.getUniformLocation(this.program_SWEPassInit, "g_vRTRes"), this.getWidth(), this.getHeight());
+        gl.uniform2f(gl.getUniformLocation(program, "g_vRTRes"), this.getWidth(), this.getHeight());
 
 		// Pass parameters to the fragment shader
-		gl.uniform1f(gl.getUniformLocation(this.program_SWEPassInit, "g_fGridSizeInMeter"), this.params.fGridSizeInMeter);
-		gl.uniform1f(gl.getUniformLocation(this.program_SWEPassInit, "g_fElapsedTimeInSec"), this.params.fElapsedTimeInSec);
-		gl.uniform1f(gl.getUniformLocation(this.program_SWEPassInit, "g_fAdvectSpeed"), this.params.fAdvectSpeed);
-		gl.uniform1f(gl.getUniformLocation(this.program_SWEPassInit, "g_fG"), this.params.fG);
-		gl.uniform1f(gl.getUniformLocation(this.program_SWEPassInit, "g_fHackBlurDepth"), this.params.fHackBlurDepth);
-		gl.uniform1i(gl.getUniformLocation(this.program_SWEPassInit, "g_iInitSetting"), this.params.iInitSetting);
+		gl.uniform1f(gl.getUniformLocation(program, "g_fGridSizeInMeter"), this.params.fGridSizeInMeter);
+		gl.uniform1f(gl.getUniformLocation(program, "g_fElapsedTimeInSec"), this.params.fElapsedTimeInSec);
+        gl.uniform1f(gl.getUniformLocation(program, "g_fAdvectSpeed"), this.params.fAdvectSpeed);
+        gl.uniform1f(gl.getUniformLocation(program, "g_fAdvectDissipation"), this.params.fAdvectDissipation);
+        gl.uniform1f(gl.getUniformLocation(program, "g_fSandSlope"), this.params.fSandSlope);
+        gl.uniform1f(gl.getUniformLocation(program, "g_fSandFlow"), this.params.fSandFlow);
+		gl.uniform1f(gl.getUniformLocation(program, "g_fG"), this.params.fG);
+		gl.uniform1f(gl.getUniformLocation(program, "g_fHackBlurDepth"), this.params.fHackBlurDepth);
+        gl.uniform1i(gl.getUniformLocation(program, "g_iInitSetting"), this.params.iInitSetting);
 		console.log(this.params.iInitSetting);
 		gl.drawElements(gl.TRIANGLES, 6, gl.UNSIGNED_SHORT, 0);
 		// Unbind the framebuffer
@@ -225,7 +233,10 @@ export class SWE {
 	render() {
 
 
-		this.params.fAdvectSpeed = app.getSliderVelAdvect();
+        this.params.fAdvectSpeed = app.getSliderVelAdvect();
+        this.params.fAdvectDissipation = app.getSliderVelAdvectDissipation();
+        this.params.fSandSlope = app.getSliderSandSlope();
+        this.params.fSandFlow = app.getSliderSandFlow();
 		this.params.fElapsedTimeInSec = app.getSliderTimeScale();
 		this.params.fGridSizeInMeter = app.getSliderGridScale();
 
@@ -265,12 +276,15 @@ export class SWE {
 				// Pass parameters to the fragment shader
 				gl.uniform1f(gl.getUniformLocation(program, "g_fGridSizeInMeter"), this.params.fGridSizeInMeter);
 				gl.uniform1f(gl.getUniformLocation(program, "g_fElapsedTimeInSec"), this.params.fElapsedTimeInSec);
-				gl.uniform1f(gl.getUniformLocation(program, "g_fAdvectSpeed"), this.params.fAdvectSpeed);
+                gl.uniform1f(gl.getUniformLocation(program, "g_fAdvectSpeed"), this.params.fAdvectSpeed);
+                gl.uniform1f(gl.getUniformLocation(program, "g_fAdvectDissipation"), this.params.fAdvectDissipation);
+                gl.uniform1f(gl.getUniformLocation(program, "g_fSandSlope"), this.params.fSandSlope);
+                gl.uniform1f(gl.getUniformLocation(program, "g_fSandFlow"), this.params.fSandFlow);
 				gl.uniform1f(gl.getUniformLocation(program, "g_fG"), this.params.fG);
 				gl.uniform1f(gl.getUniformLocation(program, "g_fHackBlurDepth"), this.params.fHackBlurDepth);
 				gl.uniform1i(gl.getUniformLocation(program, "g_iInitSetting"), this.params.iInitSetting);
 
-				gl.uniform1f(gl.getUniformLocation(program, "g_fRndSeed"), Math.random());
+                gl.uniform1f(gl.getUniformLocation(program, "g_fRndSeed"), Math.random());
 				gl.uniform1i(gl.getUniformLocation(program, "g_iSWEFrameCount"), this.m_iFrameCount);
 
 				{
@@ -364,7 +378,10 @@ export class SWE {
 				// Pass parameters to the fragment shader
 				gl.uniform1f(gl.getUniformLocation(program, "g_fGridSizeInMeter"), this.params.fGridSizeInMeter);
 				gl.uniform1f(gl.getUniformLocation(program, "g_fElapsedTimeInSec"), this.params.fElapsedTimeInSec);
-				gl.uniform1f(gl.getUniformLocation(program, "g_fAdvectSpeed"), this.params.fAdvectSpeed);
+                gl.uniform1f(gl.getUniformLocation(program, "g_fAdvectSpeed"), this.params.fAdvectSpeed);
+                gl.uniform1f(gl.getUniformLocation(program, "g_fAdvectDissipation"), this.params.fAdvectDissipation);
+                gl.uniform1f(gl.getUniformLocation(program, "g_fSandSlope"), this.params.fSandSlope);
+                gl.uniform1f(gl.getUniformLocation(program, "g_fSandFlow"), this.params.fSandFlow);
 				gl.uniform1f(gl.getUniformLocation(program, "g_fG"), this.params.fG);
 				gl.uniform1f(gl.getUniformLocation(program, "g_fHackBlurDepth"), this.params.fHackBlurDepth);
 				gl.uniform1i(gl.getUniformLocation(program, "g_iInitSetting"), this.params.iInitSetting);
@@ -405,7 +422,10 @@ export class SWE {
 				// Pass parameters to the fragment shader
 				gl.uniform1f(gl.getUniformLocation(program, "g_fGridSizeInMeter"), this.params.fGridSizeInMeter);
 				gl.uniform1f(gl.getUniformLocation(program, "g_fElapsedTimeInSec"), this.params.fElapsedTimeInSec);
-				gl.uniform1f(gl.getUniformLocation(program, "g_fAdvectSpeed"), this.params.fAdvectSpeed);
+                gl.uniform1f(gl.getUniformLocation(program, "g_fAdvectSpeed"), this.params.fAdvectSpeed);
+                gl.uniform1f(gl.getUniformLocation(program, "g_fAdvectDissipation"), this.params.fAdvectDissipation);
+                gl.uniform1f(gl.getUniformLocation(program, "g_fSandSlope"), this.params.fSandSlope);
+                gl.uniform1f(gl.getUniformLocation(program, "g_fSandFlow"), this.params.fSandFlow);
 				gl.uniform1f(gl.getUniformLocation(program, "g_fG"), this.params.fG);
 				gl.uniform1f(gl.getUniformLocation(program, "g_fHackBlurDepth"), this.params.fHackBlurDepth);
 				gl.uniform1i(gl.getUniformLocation(program, "g_iInitSetting"), this.params.iInitSetting);
@@ -447,7 +467,10 @@ export class SWE {
 			// Pass parameters to the fragment shader
 			gl.uniform1f(gl.getUniformLocation(program, "g_fGridSizeInMeter"), this.params.fGridSizeInMeter);
 			gl.uniform1f(gl.getUniformLocation(program, "g_fElapsedTimeInSec"), this.params.fElapsedTimeInSec);
-			gl.uniform1f(gl.getUniformLocation(program, "g_fAdvectSpeed"), this.params.fAdvectSpeed);
+            gl.uniform1f(gl.getUniformLocation(program, "g_fAdvectSpeed"), this.params.fAdvectSpeed);
+            gl.uniform1f(gl.getUniformLocation(program, "g_fAdvectDissipation"), this.params.fAdvectDissipation);
+            gl.uniform1f(gl.getUniformLocation(program, "g_fSandSlope"), this.params.fSandSlope);
+            gl.uniform1f(gl.getUniformLocation(program, "g_fSandFlow"), this.params.fSandFlow);
 			gl.uniform1f(gl.getUniformLocation(program, "g_fG"), this.params.fG);
 			gl.uniform1f(gl.getUniformLocation(program, "g_fHackBlurDepth"), this.params.fHackBlurDepth);
 			gl.uniform1i(gl.getUniformLocation(this.program_SWEProc01, "g_iInitSetting"), this.params.iInitSetting);

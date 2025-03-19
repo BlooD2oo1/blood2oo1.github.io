@@ -41,7 +41,7 @@ void main()
     float fFoam = ( length(vTexDtC.xy) * length(vTex1C.xy) ) * 7.0 / clamp(0.001, 1.0, vTex1C.z * 100.0);
 	fFoam += smoothstep(0.003, 0.0, vTex1C.z);//part
 	fFoam = clamp(fFoam, 0.0, 1.0);
-    float fNormalBoostOnWater = mix(1.0, 0.6, fWater);
+    float fNormalBoostOnWater = 1.0;//mix(1.0, 0.6, fWater);
     vec3 vNormal = normalize( vec3( -vTexDtC.xy, fNormalBoostOnWater) );
     
     vec3 vCWater = mix( g_vCWaterShallow, g_vCWaterDeep, smoothstep( 0.0, 0.01, vTex1C.z ) );
@@ -68,6 +68,8 @@ void main()
     
     vec3 vColor = Shade(g_vLightDir, g_vCLight*fShadow_fDist.x, vCAmbientUp, vCAmbientDown, vNormal, vDiffuse, mix( 0.96, mix( 0.4, 0.8, fFoam ), fWater ), mix(0.04, 0.05, fWater), g_vViewDir);
 
+	//vColor = mix( vColor, vec3( abs( vTex1C.w )*1000.0 ), fWater );
+
     outColor0.rgb = vColor;
     outColor0.a = 1.0;
 	outColor1 = vec4(vNormal, vScreenCoord.z);
@@ -75,4 +77,6 @@ void main()
     //outColor0.rgb = vec3(1.0-clamp( fShadow_fDist.y, 0.0, 0.05 )/0.05);
     //outColor0.rgb = mix( outColor0.rgb, vec3( length( vTex1C.xy )*20.0 ), fWater );
     //outColor0.rgb = mix( outColor0.rgb, vec3( abs( vTex1C.xy )*20.0, 0.1 ), fWater );
+
+	
 }

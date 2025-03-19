@@ -400,6 +400,9 @@ export class Terrain {
         gl.uniform1f(gl.getUniformLocation(program, "g_fGridSizeInMeter"), app.Present.SWE.params.fGridSizeInMeter);
         gl.uniform1f(gl.getUniformLocation(program, "g_fElapsedTimeInSec"), app.Present.SWE.params.fElapsedTimeInSec);
         gl.uniform1f(gl.getUniformLocation(program, "g_fAdvectSpeed"), app.Present.SWE.params.fAdvectSpeed);
+        gl.uniform1f(gl.getUniformLocation(program, "g_fAdvectDissipation"), app.Present.SWE.params.fAdvectDissipation);
+        gl.uniform1f(gl.getUniformLocation(program, "g_fSandSlope"), app.Present.SWE.params.fSandSlope);
+        gl.uniform1f(gl.getUniformLocation(program, "g_fSandFlow"), app.Present.SWE.params.fSandFlow);
         gl.uniform1f(gl.getUniformLocation(program, "g_fG"), app.Present.SWE.params.fG);
         gl.uniform1f(gl.getUniformLocation(program, "g_fHackBlurDepth"), app.Present.SWE.params.fHackBlurDepth);
         gl.uniform1i(gl.getUniformLocation(program, "g_iInitSetting"), app.Present.SWE.params.iInitSetting);
@@ -452,6 +455,9 @@ export class Terrain {
         gl.uniform1f(gl.getUniformLocation(program, "g_fGridSizeInMeter"), app.Present.SWE.params.fGridSizeInMeter);
         gl.uniform1f(gl.getUniformLocation(program, "g_fElapsedTimeInSec"), app.Present.SWE.params.fElapsedTimeInSec);
         gl.uniform1f(gl.getUniformLocation(program, "g_fAdvectSpeed"), app.Present.SWE.params.fAdvectSpeed);
+        gl.uniform1f(gl.getUniformLocation(program, "g_fAdvectDissipation"), app.Present.SWE.params.fAdvectDissipation);
+        gl.uniform1f(gl.getUniformLocation(program, "g_fSandSlope"), app.Present.SWE.params.fSandSlope);
+        gl.uniform1f(gl.getUniformLocation(program, "g_fSandFlow"), app.Present.SWE.params.fSandFlow);
         gl.uniform1f(gl.getUniformLocation(program, "g_fG"), app.Present.SWE.params.fG);
         gl.uniform1f(gl.getUniformLocation(program, "g_fHackBlurDepth"), app.Present.SWE.params.fHackBlurDepth);
         gl.uniform1i(gl.getUniformLocation(program, "g_iInitSetting"), app.Present.SWE.params.iInitSetting);

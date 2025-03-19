@@ -13,13 +13,15 @@ uniform vec3 g_vViewDir;
 uniform float g_fGridSizeInMeter;
 uniform float g_fElapsedTimeInSec;
 uniform float g_fAdvectSpeed;
+uniform float g_fAdvectDissipation;
+uniform float g_fSandSlope;
+uniform float g_fSandFlow;
 uniform float g_fG;
 uniform float g_fHackBlurDepth;
 uniform int g_iInitSetting;
 uniform int g_iSWEFrameCount;
 
 uniform float g_fRndSeed;
-uniform float g_fTimeSec;
 
 #define EPS 0.00001
 
@@ -127,10 +129,10 @@ float SampleDepth(vec2 xy)
         }
         fRet += 0.2;
 
-        fRet *= 0.01;
+        fRet *= 0.001;
 
-		fRet += xy.x*0.000002;
-		fRet += xy.y*0.000002;
+		fRet += xy.x*0.000005;
+		fRet += xy.y*0.000005;
 
         
 

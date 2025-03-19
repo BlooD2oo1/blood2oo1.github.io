@@ -12,7 +12,7 @@ layout(location = 1) out vec4 outColor1;
 //		x: velocity x+1/2
 //		y: velocity y+1/2
 //		z: water depth
-//		w: dissolved sand
+//		w: velocity delta
 //	tex2:
 //		x: rock depth
 //		y: sand depth

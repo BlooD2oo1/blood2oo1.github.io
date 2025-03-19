@@ -163,7 +163,10 @@ class WebGLApp {
 		this.createSlider('SubStepCount', 'SubStepCount', 0, 100, 20, 1);
 		this.createSlider('TimeScale', 'TimeScale', 0.01, 5.0, 0.2, 0.01);
 		this.createSlider('GridScale', 'GridScale', 0.01, 5.0, 1.0, 0.01);
-		this.createSlider('VelAdvect', 'VelAdvect', -1.0, 1.0, -1.0);
+        this.createSlider('VelAdvect', 'VelAdvect', -1.0, 1.0, 1.0);
+        this.createSlider('VelAdvectDissipation', 'VelAdvectDissip.', 0.99, 1.0, 0.999, 0.00001);
+        this.createSlider('SandSlope', 'SandSlope', 0.0, 0.0002, 0.00002, 0.000001);
+        this.createSlider('SandFlow', 'SandFlow', 0.0, 0.02, 0.002, 0.0002);
 
 		// Create FPS display
 		this.fpsDisplay = document.createElement('div');
@@ -207,7 +210,7 @@ class WebGLApp {
 		this.uiContainer.appendChild(container);
 
 		slider.addEventListener('input', (event) => {
-			valueElement.innerText = parseFloat(event.target.value).toFixed(4); // Format the value to 4 decimal places
+			valueElement.innerText = parseFloat(event.target.value).toFixed(6); // Format the value to 4 decimal places
 			// Add your processing logic here
 		});
 
@@ -262,7 +265,11 @@ class WebGLApp {
 
 	getSliderVelAdvect() {
 		return this.VelAdvect.value;
-	}
+    }
+
+    getSliderVelAdvectDissipation() {
+        return this.VelAdvectDissipation.value;
+    }
 
 	getSliderTimeScale() {
 		return this.TimeScale.value;
@@ -290,7 +297,15 @@ class WebGLApp {
 
 	getSliderEmitterDrain() {
 		return this.EmitterDrain.value;
-	}
+    }
+
+    getSliderSandSlope() {
+        return this.SandSlope.value;
+    }
+
+    getSliderSandFlow() {
+        return this.SandFlow.value;
+    }
 
 	getGizmoMaterial() {
 		return this.iGizmoMaterial;

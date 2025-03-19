@@ -23,7 +23,7 @@ uniform ivec2 uMouseButtons;
 //		x: velocity x+1/2
 //		y: velocity y+1/2
 //		z: water depth
-//		w: dissolved sand
+//		w: velocity delta
 //	tex2:
 //		x: rock depth
 //		y: sand depth
@@ -51,7 +51,7 @@ void main()
 
 	////////////////////////////////////////////////////////////////
 
-	float dt = g_fAdvectSpeed * g_fElapsedTimeInSec / g_fGridSizeInMeter;
+	float dt = -g_fAdvectSpeed * g_fElapsedTimeInSec / g_fGridSizeInMeter;
 	/*{
 		vec2 v1 = vTexC.xy;
 		vec2 v2 = textureLod(g_tTex1, vTexCoord - ( 0.5 * v1 * dt ) / g_vRTRes, 0.0 ).xy;
@@ -102,10 +102,12 @@ void main()
 		outColor1 = textureLod(g_tTex2, vTexCoord + vk0, 0.0);
 	}
 
+	outColor0.xy *= g_fAdvectDissipation;
+
 	//outColor0.x = vTexC.x;
 	//outColor0.y = vTexC.y;
 	outColor0.z = vTex1C.z; // viztomeget nem advectalunk mert tomegmegmaradas szerintem bukik
-	outColor0.w = vTex1C.w;
+	outColor0.w = length( outColor0.xy - vTex1C.xy );
 
 	{
 		// sand "blur"
@@ -134,7 +136,7 @@ void main()
 
 		if ( fAddLen > 0.0 )
 		{
-			float fMinSlope = 0.00002;
+			float fMinSlope = g_fSandSlope;
 			float fAdd = max( 0.0, fAddLen - fMinSlope );
 
 			vAddDir = vAddDir/fAddLen * fAdd;
@@ -173,21 +175,27 @@ void main()
 
 	}
 
+	float fTimeSec = float( g_iSWEFrameCount ) * g_fElapsedTimeInSec;
+
 	{
+		float fSinTime = (sin( fTimeSec * 0.001 )*0.5+0.5);
+		fSinTime = fSinTime*0.9+0.1;
 		float fRad = 0.02;
 		vec2 vDir = vTexCoord - vec2(0.85, 0.85);
 		float fDirLen = length(vDir);
 		float fW = max(0.0, (fRad - fDirLen) / fRad);
 		fW = 0.5 - 0.5 * cos(fW * PI2);
-		outColor0.z += fW * g_fEmitter_Source * g_fElapsedTimeInSec;
+		outColor0.z += fW * fSinTime * g_fEmitter_Source * g_fElapsedTimeInSec;
 	}
 
 	{
+		float fSinTime = (sin( fTimeSec * 0.001 + PI05 )*0.5+0.5);
+		fSinTime = fSinTime*0.9+0.1;
 		float fRad = 0.08;
 		vec2 vDir = vTexCoord - vec2(0.15, 0.15);
 		float fDirLen = length(vDir);
 		float fW = max(0.0, (fRad - fDirLen) / fRad);
 		fW = 0.5 - 0.5 * cos(fW * PI2);
-		outColor0.z -= fW * g_fEmitter_Drain * g_fElapsedTimeInSec;
+		outColor0.z -= fW * fSinTime * g_fEmitter_Drain * g_fElapsedTimeInSec;
 	}
 }
