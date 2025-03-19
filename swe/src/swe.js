@@ -20,7 +20,7 @@ export class SWE {
             fSandFlow: 0.002,
 			fG: 9.8,
 			fHackBlurDepth: 1.0,
-			iInitSetting: 0,
+			iInitSetting: 2,
 		};
 	}
 

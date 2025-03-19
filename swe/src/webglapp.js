@@ -159,6 +159,11 @@ class WebGLApp {
 			this.Present.SWE.renderInit();
 		});
 
+		this.createButton('button2', 'TerrainPreset03', () => {
+			this.Present.SWE.params.iInitSetting = 2;
+			this.Present.SWE.renderInit();
+		});
+
 		// Create sliders with labels
 		this.createSlider('SubStepCount', 'SubStepCount', 0, 100, 20, 1);
 		this.createSlider('TimeScale', 'TimeScale', 0.01, 5.0, 0.2, 0.01);

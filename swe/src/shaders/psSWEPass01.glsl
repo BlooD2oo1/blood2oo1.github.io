@@ -181,7 +181,7 @@ void main()
 		float fSinTime = (sin( fTimeSec * 0.001 )*0.5+0.5);
 		fSinTime = fSinTime*0.9+0.1;
 		float fRad = 0.02;
-		vec2 vDir = vTexCoord - vec2(0.85, 0.85);
+		vec2 vDir = vTexCoord - vec2(0.5, 0.5);
 		float fDirLen = length(vDir);
 		float fW = max(0.0, (fRad - fDirLen) / fRad);
 		fW = 0.5 - 0.5 * cos(fW * PI2);
@@ -198,4 +198,5 @@ void main()
 		fW = 0.5 - 0.5 * cos(fW * PI2);
 		outColor0.z -= fW * fSinTime * g_fEmitter_Drain * g_fElapsedTimeInSec;
 	}
+
 }

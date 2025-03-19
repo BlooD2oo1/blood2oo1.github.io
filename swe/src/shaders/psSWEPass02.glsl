@@ -116,6 +116,7 @@ void main()
 		vTex1C.w = 0.0;
 	}
 
+#if 1
 	if (vTex1C.z > 0.0)
 	{
 		/*{
@@ -158,6 +159,7 @@ void main()
 			vTex2C.y = 0.0;
 		}
 	}
+#endif
 
 	outColor0 = vTex1C;
 	outColor1 = vTex2C;

@@ -134,7 +134,7 @@ float SampleDepth(vec2 xy)
 		fRet += xy.x*0.000005;
 		fRet += xy.y*0.000005;
 
-        
+        fRet *= 5.0;
 
         //fRet = clamp(fRet, 0.0, 0.001);
         //fRet = ( 1.0-exp(-abs(fRet)/0.001))*0.001;// * sign(fRet);
@@ -186,10 +186,18 @@ float SampleDepth(vec2 xy)
 
         fRet += 0.0;
 
-        fRet *= 0.005;
+        fRet *= 0.005 * 5.0;
 
     }
-    return fRet * 5.0;
+    else if (g_iInitSetting == 2 )
+    {
+        vec2 vLQ = xy - vec2(1024.0 / 2.0);
+        float fLQ = max( abs( vLQ.x ), abs( vLQ.y ) );
+        //fRet = 0.00002 * length( vLQ );
+		fRet += 0.001 * max( 0.0, fLQ-450.0 );
+    }
+
+    return fRet;
 }
 
 vec3 Shade(vec3 vLightDir, vec3 vLightColor, vec3 vAmbientColorUp, vec3 vAmbientColorDown, vec3 vNormal, vec3 vDiffuse, float fRoughness, float fReflectance, vec3 vViewDir)
