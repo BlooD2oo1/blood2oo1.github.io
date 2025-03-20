@@ -12,7 +12,7 @@ layout(location = 1) out vec4 outColor1;
 //		x: velocity x+1/2
 //		y: velocity y+1/2
 //		z: water depth
-//		w: velocity delta
+//		w: -
 //	tex2:
 //		x: rock depth
 //		y: sand depth
@@ -95,7 +95,6 @@ void main()
 	if (vTex1C.z < 0.0)
 	{
 		vTex1C.z = 0.0;
-		vTex1C.w = 0.0;
 	}
 
 	/*if ( vTex1C.z > EPS*2.0 )

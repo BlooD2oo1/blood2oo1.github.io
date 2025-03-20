@@ -12,7 +12,7 @@ layout(location = 1) out vec4 outColor1;
 //		x: velocity x+1/2
 //		y: velocity y+1/2
 //		z: water depth
-//		w: velocity delta
+//		w: -
 //	tex2:
 //		x: rock depth
 //		y: sand depth
@@ -29,7 +29,7 @@ void main()
 	float fRockDepth = SampleDepth(vec2(tc))*0.4-0.01;
 	fRockDepth = clamp(fRockDepth, -0.1, 0.2);
 	//float fSandDepth = max(0.0, SampleDepth(vec2(tc + ivec2(2048, 2048))) * 0.2-0.007)*1.0;
-	float fSandDepth = 0.015*0.0;
+	float fSandDepth = 0.015;
 	float fSolidDepth = fRockDepth + fSandDepth;
 
 	outColor0.z = max(0.0, -fSolidDepth + 0.0)*0.0;

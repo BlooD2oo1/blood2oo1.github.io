@@ -11,7 +11,7 @@ out vec4 outColor;
 //		x: velocity x+1/2
 //		y: velocity y+1/2
 //		z: water depth
-//		w: velocity delta
+//		w: -
 //	tex2:
 //		x: rock depth
 //		y: sand depth

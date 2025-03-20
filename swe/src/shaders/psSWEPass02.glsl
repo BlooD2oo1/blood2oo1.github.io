@@ -12,7 +12,7 @@ layout(location = 1) out vec4 outColor1;
 //		x: velocity x+1/2
 //		y: velocity y+1/2
 //		z: water depth
-//		w: velocity delta
+//		w: -
 //	tex2:
 //		x: rock depth
 //		y: sand depth
@@ -113,10 +113,9 @@ void main()
 	if (vTex1C.z < 0.0)
 	{
 		vTex1C.z = 0.0;
-		vTex1C.w = 0.0;
 	}
 
-#if 1
+#if 0
 	if (vTex1C.z > 0.0)
 	{
 		/*{
@@ -132,7 +131,7 @@ void main()
 			sB -= hAdj;
 		}*/
 
-		float hC = vTex1C.z + vTex2C.x + vTex2C.y;
+		/*float hC = vTex1C.z + vTex2C.x + vTex2C.y;
 		float hL = vTex1L.z + vTex2L.x + vTex2L.y;
 		float hR = vTex1R.z + vTex2R.x + vTex2R.y;
 		float hT = vTex1T.z + vTex2T.x + vTex2T.y;
@@ -143,7 +142,7 @@ void main()
 		vec2 vV;
 		vV.x = -g_fG / g_fGridSizeInMeter * (hR - hC);
 		vV.y = -g_fG / g_fGridSizeInMeter * (hB - hC);
-		vV *= g_fElapsedTimeInSec;
+		vV *= g_fElapsedTimeInSec;*/
 
 		float dH = -((sR * fVel_x_R - sL * fVel_x_L) / g_fGridSizeInMeter + (sB * fVel_y_B - sT * fVel_y_T) / g_fGridSizeInMeter);
 		dH = dH * g_fSandFlow;
@@ -160,6 +159,23 @@ void main()
 		}
 	}
 #endif
+	//if (vTex1C.z > 0.0)
+	{
+		vec2 vVel = vec2(fVel_x_R + fVel_x_L, fVel_y_T + fVel_y_B) * 0.5;
+		float fVel = length(vVel);
+		float fSandToDilute = min(vTex2C.y, fVel*fVel * 0.000001 );
+		float fSandToSettle = vTex1C.w * 0.000001;
+
+		float fTransfer = fSandToDilute - fSandToSettle;
+
+		vTex1C.w += fTransfer;
+		vTex2C.y -= fTransfer;
+
+		vTex1C.w = max(0.0, vTex1C.w);
+		vTex2C.y = max(0.0, vTex2C.y);
+	}
+
+
 
 	outColor0 = vTex1C;
 	outColor1 = vTex2C;
