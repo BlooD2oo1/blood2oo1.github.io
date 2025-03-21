@@ -132,23 +132,24 @@ void main()
 	{
 		float fSinTime = (sin( fTimeSec * 0.001 )*0.5+0.5);
 		fSinTime = fSinTime*0.9+0.1;
-		float fRad = 0.02;
-		vec2 vDir = vTexCoord - vec2(0.85, 0.85);
+		float fRad = 0.3;
+		vec2 vDir = vTexCoord - vec2(0.95, 0.95);
 		float fDirLen = length(vDir);
 		float fW = max(0.0, (fRad - fDirLen) / fRad);
 		fW = 0.5 - 0.5 * cos(fW * PI2);
-		outColor0.z += fW * fSinTime * g_fEmitter_Source * g_fElapsedTimeInSec;
+		outColor0.z += fW * fSinTime * g_fEmitter_Source * g_fElapsedTimeInSec / (fRad*fRad);
+		outColor1.y += fW * g_fEmitter_Source * g_fElapsedTimeInSec / (fRad*fRad);
 	}
 
 	{
 		float fSinTime = (sin( fTimeSec * 0.001 + PI05 )*0.5+0.5);
 		fSinTime = fSinTime*0.9+0.1;
-		float fRad = 0.08;
-		vec2 vDir = vTexCoord - vec2(0.15, 0.15);
+		float fRad = 0.3;
+		vec2 vDir = vTexCoord - vec2(0.05, 0.05);
 		float fDirLen = length(vDir);
 		float fW = max(0.0, (fRad - fDirLen) / fRad);
 		fW = 0.5 - 0.5 * cos(fW * PI2);
-		outColor0.z -= fW * fSinTime * g_fEmitter_Drain * g_fElapsedTimeInSec;
+		outColor0.z -= fW * fSinTime * g_fEmitter_Drain * g_fElapsedTimeInSec / (fRad*fRad);
 	}
 
 }

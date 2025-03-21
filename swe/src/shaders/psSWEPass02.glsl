@@ -163,8 +163,8 @@ void main()
 	{
 		vec2 vVel = vec2(fVel_x_R + fVel_x_L, fVel_y_T + fVel_y_B) * 0.5;
 		float fVel = length(vVel);
-		float fSandToDilute = min(vTex2C.y, fVel*fVel * 0.000001 );
-		float fSandToSettle = vTex1C.w * 0.000001;
+		float fSandToDilute = min(vTex2C.y, fVel*fVel * 0.0001 );
+		float fSandToSettle = vTex1C.w * 0.0001;
 
 		float fTransfer = fSandToDilute - fSandToSettle;
 

@@ -129,12 +129,10 @@ float SampleDepth(vec2 xy)
         }
         fRet += 0.2;
 
-        fRet *= 0.001;
+        fRet *= 0.01;
 
-		fRet += xy.x*0.000005;
-		fRet += xy.y*0.000005;
-
-        fRet *= 5.0;
+		fRet += xy.x*0.00005;
+		fRet += xy.y*0.00005;
 
         //fRet = clamp(fRet, 0.0, 0.001);
         //fRet = ( 1.0-exp(-abs(fRet)/0.001))*0.001;// * sign(fRet);
@@ -186,7 +184,7 @@ float SampleDepth(vec2 xy)
 
         fRet += 0.0;
 
-        fRet *= 0.005 * 5.0;
+        fRet *= 0.025;
 
     }
     else if (g_iInitSetting == 2 )

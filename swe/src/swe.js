@@ -13,14 +13,14 @@ export class SWE {
 
 		this.params = {
 			fGridSizeInMeter: 5.0,
-			fElapsedTimeInSec: 1.0,
+			fElapsedTimeInSec: 0.5,
             fAdvectSpeed: 1.0,
-            fAdvectDissipation: 0.999,
+            fAdvectDissipation: 0.9998,
             fSandSlope: 0.00002,
             fSandFlow: 0.002,
 			fG: 9.8,
 			fHackBlurDepth: 1.0,
-			iInitSetting: 1,
+			iInitSetting: 0,
 		};
 	}
 

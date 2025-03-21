@@ -165,13 +165,13 @@ class WebGLApp {
 		});
 
 		// Create sliders with labels
-		this.createSlider('SubStepCount', 'SubStepCount', 0, 100, 20, 1);
-		this.createSlider('TimeScale', 'TimeScale', 0.01, 5.0, 0.2, 0.01);
-		this.createSlider('GridScale', 'GridScale', 0.01, 5.0, 1.0, 0.01);
-        this.createSlider('VelAdvect', 'VelAdvect', -1.0, 1.0, 1.0);
-        this.createSlider('VelAdvectDissipation', 'VelAdvectDissip.', 0.999, 1.0, 0.999, 0.000001);
-		this.createSlider('SandSlope', 'SandSlope', 0.0, 0.00005, 0.00001, 0.0000001);
-        this.createSlider('SandFlow', 'SandFlow', 0.0, 0.02, 0.002, 0.0002);
+		this.createSlider('SubStepCount', 'SubStepCount', 0, 100, 100, 1);
+        this.createSlider('TimeScale', 'TimeScale', 0.01, 5.0, this.Present.SWE.params.fElapsedTimeInSec, 0.01);
+        this.createSlider('GridScale', 'GridScale', 0.01, 10.0, this.Present.SWE.params.fGridSizeInMeter, 0.01);
+        this.createSlider('VelAdvect', 'VelAdvect', -1.0, this.Present.SWE.params.fAdvectSpeed, 1.0);
+        this.createSlider('VelAdvectDissipation', 'VelAdvectDissip.', 0.999, 1.0, this.Present.SWE.params.fAdvectDissipation, 0.000001);
+        this.createSlider('SandSlope', 'SandSlope', 0.0, 0.00005, this.Present.SWE.params.fSandSlope, 0.0000001);
+        this.createSlider('SandFlow', 'SandFlow', 0.0, 0.02, this.Present.SWE.params.fSandFlow, 0.0002);
 
 		// Create FPS display
 		this.fpsDisplay = document.createElement('div');
@@ -186,8 +186,8 @@ class WebGLApp {
 		this.createRadioButton('GizmoMaterial', 'water', 'Water', 3, 'iGizmoMaterial');
 		this.createSlider('GizmoRadius', 'GizmoRadius', 0.001, 0.5, 0.5, 0.0001);
 		this.createSlider('GizmoAmount', 'GizmoPower', -1.0, 1.0, -1.0, 0.001);
-		this.createSlider('EmitterSource', 'Emitter Source', 0.0, 1.0, 0.03, 0.001);
-		this.createSlider('EmitterDrain', 'Emitter drain', 0.0, 1.0, 0.03, 0.001);
+		this.createSlider('EmitterSource', 'Emitter Source', 0.0, 0.0001, 0.00001, 0.000001);
+		this.createSlider('EmitterDrain', 'Emitter drain', 0.0, 0.0001, 0.00001, 0.000001);
 	}
 
 	createSlider(id, label, min, max, value, step = '0.01') {
