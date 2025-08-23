@@ -1,0 +1,120 @@
+body {
+    margin: 0;
+    font-family: Arial, sans-serif;
+    background-color: #f5f5f5;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start;
+    min-height: 100vh;
+}
+
+header {
+    background-color: #333;
+    color: white;
+    padding: 1rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: calc(100% - 4rem); /* Adjust the width to fit within the viewport */
+    max-width: 1200px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    border-radius: 10px;
+}
+
+nav {
+    display: flex;
+    gap: 1rem;
+}
+
+nav a {
+    color: white;
+    text-decoration: none;
+    font-size: 1rem;
+}
+
+nav a:hover {
+    text-decoration: underline;
+}
+
+.content {
+    padding: 20px;
+    width: calc(100% - 4rem); /* Adjust the width to fit within the viewport */
+    max-width: 800px;
+    text-align: center;
+    background: white;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    border-radius: 5px;
+}
+
+canvas {
+    display: block;
+}
+
+button, input {
+    display: block;
+    margin-top: 2px;
+    padding: 2px 2px; /* Smaller padding for more compact buttons */
+    font-size: 0.6rem; /* Smaller font size */
+}
+
+input[type="range"] {
+    width: 100px; /* Set a fixed width for sliders */
+    margin-top: 4px;
+    -webkit-appearance: none; /* Remove default styling */
+    height: 4px; /* Set the height of the slider */
+    background: #ddd; /* Background color of the slider */
+    border-radius: 1px; /* Rounded corners */
+    outline: none; /* Remove outline */
+}
+
+input[type="range"]::-webkit-slider-thumb {
+    -webkit-appearance: none; /* Remove default styling */
+    appearance: none;
+    width: 10px; /* Width of the thumb */
+    height: 10px; /* Height of the thumb */
+    background: #333; /* Color of the thumb */
+    border-radius: 50%; /* Rounded thumb */
+    cursor: pointer; /* Cursor style */
+}
+
+input[type="range"]::-moz-range-thumb {
+    width: 10px; /* Width of the thumb */
+    height: 10px; /* Height of the thumb */
+    background: #333; /* Color of the thumb */
+    border-radius: 50%; /* Rounded thumb */
+    cursor: pointer; /* Cursor style */
+}
+
+/* Add this to your styles.css */
+.ui-element-container {
+    font-size: 0.6rem; /* Smaller font size for all UI elements */
+    margin-bottom: 5px; /* Add some space between elements */
+}
+
+.webapp {
+    padding: 2px;
+    display: flex;
+    gap: 1rem;
+    justify-content: center;
+    align-items: center;
+    margin-top: 1rem;
+    margin-bottom: 2rem; /* Add this line to create space at the bottom */
+    background: #303030;
+    border-radius: 2px;
+    flex-grow: 1;
+    height: calc(100% - 10rem); /* Adjust the height to fit within the viewport */
+    width: calc(100% - 10rem); /* Adjust the width to fit within the viewport */
+    position: relative; /* Add this line */
+}
+
+.gui-container {
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    background: rgba(0, 0, 0, 0.3);
+    padding: 10px;
+    border-radius: 5px;
+    color: white;
+    z-index: 10; /* Ensure the GUI is above the canvas */
+}

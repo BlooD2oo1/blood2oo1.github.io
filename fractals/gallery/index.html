@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Galleries</title>
+  <style>
+    body {
+      margin: 0;
+      padding: 40px;
+      background: #000;
+      color: #fff;
+      font-family: sans-serif;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+    h1 {
+      margin-bottom: 30px;
+      font-weight: normal;
+    }
+    .gallery-list {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: 30px;
+      width: 100%;
+      max-width: 1280px;
+    }
+    .gallery-card {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+      background: #111;
+      border-radius: 8px;
+      padding: 20px;
+      transition: background 0.2s ease;
+    }
+    .gallery-card:hover {
+      background: #222;
+    }
+    .gallery-card img {
+      width: 100%;
+      height: auto;
+      max-width: 512px;
+      border-radius: 6px;
+      margin-bottom: 15px;
+      cursor: pointer;
+    }
+    .gallery-card h2 {
+      font-size: 1.1em;
+      margin: 0;
+      cursor: pointer;
+    }
+      a.back {
+          display: inline-block;
+          margin-top: 30px;
+          color: #aaa;
+          text-decoration: none;
+          transition: color 0.2s;
+      }
+
+          a.back:hover {
+              color: #fff;
+          }
+  </style>
+</head>
+<body>
+    <h1>Kaleidoscopic Fractal Albums</h1>
+    <p>All images below were rendered with my fractal path tracer program, which will be publicly available soon.</p>
+    <div id="gallery-list" class="gallery-list">Loading...</div>
+
+    <script>
+        const galleryDirs = ["09", "08", "07", "06", "05", "04", "03", "02", "01"];
+
+        async function loadGalleries() {
+            const container = document.getElementById("gallery-list");
+            container.innerHTML = "";
+
+            for (const dir of galleryDirs) {
+                try {
+                    const response = await fetch(`${dir}/album.json`);
+                    const data = await response.json();
+
+                    const card = document.createElement("div");
+                    card.className = "gallery-card";
+
+                    const img = document.createElement("img");
+                    img.src = `${dir}/tn.jpg`;
+                    img.alt = data.title;
+                    img.onclick = () => { window.location.href = `${dir}/index.html`; };
+
+                    const title = document.createElement("h2");
+                    title.textContent = data.title;
+                    title.onclick = () => { window.location.href = `${dir}/index.html`; };
+
+                    // Count images
+                    let imageCount = 0;
+                    if (Array.isArray(data.images)) {
+                        imageCount = data.images.length;
+                    } else if (typeof data.count === "number") {
+                        imageCount = data.count;
+                    }
+
+                    // Add small text for image count
+                    const countElem = document.createElement("small");
+                    countElem.style.display = "block";
+                    countElem.style.marginTop = "6px";
+                    countElem.style.color = "#aaa";
+                    countElem.style.fontSize = "0.65em";
+                    countElem.textContent = `${imageCount} images`;
+
+                    card.appendChild(img);
+                    card.appendChild(title);
+                    card.appendChild(countElem);
+                    container.appendChild(card);
+
+                } catch (err) {
+                    console.error("Failed:", dir, err);
+                }
+            }
+        }
+
+        loadGalleries();
+    </script>
+    <a href="../../index.html" class="back">← Back to Home</a>
+</body>
+</html>

@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Gallery</title>
+  <style>
+    body {
+      margin: 0;
+      padding: 20px;
+      background: #000;
+      color: #fff;
+      font-family: sans-serif;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+    h1 {
+      margin-bottom: 5px;
+      font-weight: normal;
+    }
+    p {
+      margin-top: 0;
+      margin-bottom: 30px;
+      color: #aaa;
+    }
+    .gallery {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      width: 100%;
+      max-width: 1280px;
+      gap: 20px;
+    }
+    .thumb {
+      width: 100%;
+      height: auto;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: border 0.2s ease;
+      border: 2px solid transparent;
+    }
+    .thumb:hover {
+      border: 2px solid #404040;
+    }
+      a.back {
+          display: inline-block;
+          margin-top: 30px;
+          color: #aaa;
+          text-decoration: none;
+          transition: color 0.2s;
+      }
+
+          a.back:hover {
+              color: #fff;
+          }
+  </style>
+</head>
+<body>
+    <div id="content">Loading...</div>
+
+    <script>
+        async function loadGallery() {
+            const response = await fetch("album.json");
+            const gallery = await response.json();
+
+            const content = document.getElementById("content");
+            content.innerHTML = `
+            <h1>${gallery.title}</h1>
+            <p>${gallery.description}</p>
+          `;
+
+            const galleryDiv = document.createElement("div");
+            galleryDiv.className = "gallery";
+
+            gallery.images.forEach(f => {
+                const tnFile = f.replace(/\.jpg$/i, "_tn.jpg");
+                const img = document.createElement("img");
+                img.src = tnFile;
+                img.className = "thumb";
+                img.alt = f;
+
+                img.onclick = () => window.open(f, "_blank");
+
+                galleryDiv.appendChild(img);
+            });
+
+            content.appendChild(galleryDiv);
+        }
+
+        loadGallery();
+    </script>
+    <a href="../index.html" class="back">← Back to Home</a>
+</body>
+</html>
