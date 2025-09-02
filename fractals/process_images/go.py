@@ -79,12 +79,12 @@ def generate_gallery_thumbnail(dst_dir, jpg_files):
         top = (h - min_side) // 2
         right = left + min_side
         bottom = top + min_side
-        thumb = extra_img.crop((left, top, right, bottom)).resize((160, 160), Image.LANCZOS)
+        thumb = extra_img.crop((left, top, right, bottom)).resize((150, 150), Image.LANCZOS)
         thumb = add_border(thumb, border=4)
 
         # Pozíció (jobb oldal, sorban)
-        x_offset = 512 - 160 - 10
-        y_offset = i * 170 + 2
+        x_offset = 512 - 150 - 20
+        y_offset = i * (150+20) + 8
         crop.paste(thumb, (x_offset, y_offset))
 
     tn_path = dst_dir / "tn.jpg"
