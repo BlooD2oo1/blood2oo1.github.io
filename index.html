@@ -2,115 +2,49 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>Home - Tamás Mélykuti</title>
+  <title>Home - Tamas Melykuti</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <style>
-    :root {
-      --bg: #000;
-      --card: #0f0f0f;
-      --ink: #fff;
-      --ink-dim: #cfcfcf;
-      --hover: #1a1a1a;
-      --border: #202020;
-      --radius: 12px;
+    :root{
+      --bg:#000; --card:#0f0f0f; --ink:#fff; --ink-dim:#cfcfcf; --hover:#1a1a1a; --border:#202020;
+      --radius:12px;
     }
-    * { box-sizing: border-box; }
+    *{box-sizing:border-box}
+    body{
+      margin:0; padding:24px; background:var(--bg); color:var(--ink);
+      font-family:system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif;
+      display:grid; place-items:start center; min-height:100vh;
+    }
+    .wrap{ width:min(420px,100%); display:grid; gap:20px; }
+    h1{ margin:0 0 6px 0; font-weight:600; letter-spacing:.2px; }
+    .subtitle{ margin:0; color:var(--ink-dim); font-size:.98rem; }
+    .divider{ height:1px; background:#1b1b1b; border:none; margin:10px 0 0 0; }
 
-    /* Base font scaling: mobilon nagyobb, desktopon visszavesszük */
-    html { font-size: 18px; }          /* mobil first */
-    @media (min-width: 768px) {
-      html { font-size: 16px; }        /* tablet/desktop */
+    .btn{
+      display:block; width:100%; text-align:center; text-decoration:none;
+      color:var(--ink); background:#111; border:1px solid var(--border);
+      padding:16px 20px; border-radius:10px; font-size:1.05rem;
+      transition:background .15s ease, transform .04s ease;
     }
-    @media (min-width: 1400px) {
-      html { font-size: 17px; }        /* extra nagy desktop */
-    }
-
-    body {
-      margin: 0;
-      padding: 1.5rem;
-      background: var(--bg);
-      color: var(--ink);
-      font-family: system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif;
-      display: grid;
-      place-items: start center;
-      min-height: 100vh;
-      font-size: 1rem;  /* 1rem = html font-size */
-      line-height: 1.6;
-    }
-
-    .wrap {
-      width: min(30rem, 100%);  /* max 640px */
-      display: grid;
-      gap: 1.25rem;
-    }
-
-    h1 {
-      margin: 0 0 0.4rem 0;
-      font-weight: 600;
-      letter-spacing: .2px;
-      font-size: 2rem;
-    }
-    h2 {
-      margin: 0;
-      font-weight: 600;
-      font-size: 1.4rem;
-    }
-    .subtitle {
-      margin: 0;
-      color: var(--ink-dim);
-      font-size: 0.95rem;
-    }
-    .divider {
-      height: 1px;
-      background: #1b1b1b;
-      border: none;
-      margin: 0.6rem 0 0 0;
-    }
-
-    .btn {
-      display: block;
-      width: 100%;
-      text-align: center;
-      text-decoration: none;
-      color: var(--ink);
-      background: #111;
-      border: 1px solid var(--border);
-      padding: 1rem;
-      border-radius: 0.6rem;
-      font-size: 1.05rem;
-      min-height: 2.75rem; /* kb 44px */
-      letter-spacing: .2px;
-      transition: background .15s ease, transform .04s ease;
-    }
-    .btn:hover { background: var(--hover); }
-    .btn:active { transform: translateY(1px); }
+    .btn:hover{ background:var(--hover); }
+    .btn:active{ transform:translateY(1px); }
 
     .btn.disabled {
       background: #222;
-      color: #777;
+      color: #333;
       border: 1px solid #333;
       cursor: not-allowed;
       pointer-events: none;
+      position: relative;
     }
 
-    .card {
-      background: var(--card);
-      border: 1px solid var(--border);
-      border-radius: var(--radius);
-      padding: 1.2rem;
-      display: grid;
-      gap: 0.9rem;
+    .card{
+      background:var(--card); border:1px solid var(--border); border-radius:var(--radius);
+      padding:18px; display:grid; gap:14px;
     }
-    .card p {
-      margin: 0;
-      color: var(--ink-dim);
-      line-height: 1.55;
-      font-size: 1rem;
-    }
-    .actions {
-      display: grid;
-      gap: 0.75rem;
-    }
+    .card h2{ margin:0; font-weight:600; }
+    .card p{ margin:0; color:var(--ink-dim); line-height:1.55; }
+    .actions{ display:grid; gap:12px; }
   </style>
 </head>
 <body>
@@ -121,12 +55,10 @@
       <hr class="divider" />
     </header>
 
-    <!-- 1) ABOUT (full-width button) -->
     <a class="btn" href="blood2oo1/index.html" title="About Me">About Me</a>
 
-    <!-- 2) KALEO – stacked card with two full-width buttons underneath -->
     <section class="card">
-      <h2>Kaleo – Fractal Renderer toy</h2>
+      <h2>Kaleo - Fractal Renderer toy</h2>
       <p>Create, animate, and render kaleidoscopic fractals. Read the docs to get started, or jump straight into the gallery.</p>
       <div class="actions">
         <!-- TODO: replace # with your final Help/Docs URL -->
