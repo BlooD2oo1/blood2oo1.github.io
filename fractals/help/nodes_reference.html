@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>nodes_reference</title>
+    <link rel="stylesheet" type="text/css" href="template.css">
+</head>
+<body>
+<h1 id="node-reference">Node Reference</h1>
+<p><a href="index.html">Start</a> · <a href="ui_reference.html">UI Reference</a> · <a href="nodes_reference.html"><strong>Node Reference</strong></a></p>
+<h2 id="table-of-contents">Table of Contents</h2>
+<ul>
+<li><a href="nodes_reference.html#camera-setup-node">Light Setup</a></li>
+<li><a href="nodes_reference.html#light-setup-node">Camera Setup</a></li>
+<li><a href="nodes_reference.html#fractal-setup-node">Fractal Setup</a></li>
+<li><a href="nodes_reference.html#fractal-geometry-node">Fractal Geometry</a><ul>
+<li><a href="nodes_reference.html#transformation-nodes">Transform Nodes</a></li>
+</ul>
+</li>
+<li><a href="nodes_reference.html#fractal-material-node">Fractal Material</a></li>
+<li><a href="nodes_reference.html#time-remap-node">Time Remap</a></li>
+</ul>
+<h2 id="camera-setup-node">Camera Setup Node</h2>
+<p>The Camera Setup Node is responsible for the camera settings, such as camera positioning, zooming, focusing, tone mapping, and various lens effects.</p>
+<hr />
+<h2 id="light-setup-node">Light Setup Node</h2>
+<p>You can illuminate the fractal with two fixed types of light: a directional light (e.g. sunlight) and an ambient light (e.g. skylight). You will find their settings here.</p>
+<hr />
+<h2 id="fractal-setup-node">Fractal Setup Node</h2>
+<p>The Fractal Setup Node is responsible for the quality and speed of fractal rendering. Among other things, parameters such as fractal resolution and rendering algorithm can be adjusted. These settings allow for optimization of the rendering process.</p>
+<p><img alt="A-----------------" src="./images/node_fractal_setup.png" /></p>
+<h3 id="-sdf-sphere-size">- SDF Sphere Size</h3>
+<p>The entire fractal rendering starts with the drawing of a sphere with the radius specified here, and then, depending on the number of iterations, this sphere is folded, mirrored, and scaled down in space. For a detailed fractal rendered with many iterations, this parameter does not matter because after many iterations, the size of this sphere approaches the infinitely small, instead the fractal geometry itself will be the determining factor.</p>
+<h3 id="-de-iteration-count">- DE Iteration Count</h3>
+<p>The number of iterations executed recursively. The larger it is, the more detailed the fractal geometry, but the more calculations need to be performed.</p>
+<table>
+<thead>
+<tr>
+<th style="text-align: center;"><img alt="A" src="./images/depth01.png" /></th>
+<th style="text-align: center;"><img alt="B" src="./images/depth02.png" /></th>
+<th style="text-align: center;"><img alt="C" src="./images/depth03.png" /></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: center;">Iteration Count: 10</td>
+<td style="text-align: center;">Iteration Count: 16</td>
+<td style="text-align: center;">Iteration Count: 128</td>
+</tr>
+</tbody>
+</table>
+<h3 id="-epsilon">- Epsilon</h3>
+<p>Technical parameter that determines how close the ray can get to the fractal during ray tracing. Since the program works with finite precision numbers during calculations, it is necessary to bias to avoid numerical errors.
+It can also be used for optimization, if we don't allow the ray to get too close to the fractal, then the render will be faster due to fewer calculations.        </p>
+<h3 id="-render-model">- Render Model</h3>
+<p>You can choose from two algorithms to render your fractal:
+- Path Tracer: Photorealistic, but slow.
+- Simple: Faster, but does not calculate global illumination and ambient occlusion is only estimated.</p>
+<h3 id="-path-tracer-depth">- Path Tracer Depth</h3>
+<p>The number of reflections of light rays during path tracing. The larger it is, the better it reproduces global illumination, but the more calculations need to be performed.</p>
+<h3 id="-compute-shader-thread-count">- Compute Shader Thread Count</h3>
+<p>It does not change the rendered image, it only optimizes the rendering speed. The program runs the calculations on your GPU, and this parameter determines how many threads to use for the calculations. If there are too many, the calculation may slow down due to communication between the threads on the GPU, if there are too few, it may not use the full performance of the GPU.</p>
+<p>Its setting depends on the type of your GPU and the fractal, so it is recommended to try which is the best.</p>
+<hr />
+<h2 id="fractal-geometry-node">Fractal Geometry Node</h2>
+<p>Here you will find the settings responsible for the shape of the kaleidoscopic IFS fractal.</p>
+<hr />
+<h2 id="transformation-nodes">Transformation nodes</h2>
+<p>You can perform various spatial transformations (e.g. translations, rotations) with these nodes.</p>
+<hr />
+<h2 id="fractal-material-node">Fractal Material Node</h2>
+<p>Here you can set the diffuse and emissive color of the fractal.</p>
+<hr />
+<h2 id="time-remap-node">Time Remap Node</h2>
+<p>Here you can manipulate the speed of the animation set on the timeline.</p>
+<hr />
+<p><a href="index.html">Start</a> · <a href="ui_reference.html">UI Reference</a> · <a href="nodes_reference.html"><strong>Node Reference</strong></a></p>
+</body>
+</html>

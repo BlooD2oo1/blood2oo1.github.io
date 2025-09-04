@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>ui_reference</title>
+    <link rel="stylesheet" type="text/css" href="template.css">
+</head>
+<body>
+<h1 id="ui-reference">UI Reference</h1>
+<p><a href="index.html">Start</a> · <a href="ui_reference.html"><strong>UI Reference</strong></a> · <a href="nodes_reference.html">Node Reference</a></p>
+<h2 id="table-of-contents">Table of Contents</h2>
+<ul>
+<li><a href="#kaleidoscopic-ifs-fractals">Kaleidoscopic IFS Fractals</a></li>
+<li><a href="#user-interface">User Interface</a><ul>
+<li><a href="#viewport">Viewport</a></li>
+<li><a href="#scene-tree-window">Scene Tree Window</a></li>
+<li><a href="#properties-window">Properties Window</a></li>
+<li><a href="#timeline-and-curves-window">Timeline and Curves Window</a></li>
+<li><a href="#render-setup-window">Render Setup Window</a></li>
+<li><a href="#render-window">Render Window</a></li>
+</ul>
+</li>
+</ul>
+<hr />
+<h2 id="user-interface">User Interface</h2>
+<p>The main element of the user interface is the scene-tree. Here you can adjust the geometry and color of your fractal, as well as the properties of the camera and lighting. If you change any parameter, the viewport will update immediately. If you select a node in the scene-tree, you can view and modify its settings in the properties window, and many of these settings are also output to curves in the timeline window, where you can animate them.</p>
+<p>You can move, rotate, zoom, or keyframe the camera through the viewport.</p>
+<p>To start rendering, you just need to set the resolution and maybe the sample count in the render setup window, and then you can press the "Render Current Frame" button, which will render the image in the viewport.</p>
+<h1 id="_1"></h1>
+<p><img alt="UI" src="./images/screenshot01.png" /></p>
+<hr />
+<h2 id="viewport">Viewport</h2>
+<p><img alt="Scene Tree" src="./images/window_viewport.png" /></p>
+<p>Here you can see your fractal, move the camera, and here you can also key the current camera parameters to the timeline with the key icon.</p>
+<p>Camera Viewport Controls:</p>
+<table>
+<thead>
+<tr>
+<th style="text-align: right;">Hotkey</th>
+<th style="text-align: left;">Effect</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: right;">Left Click + Drag:</td>
+<td style="text-align: left;">Orbit Camera: rotates a camera about the target.</td>
+</tr>
+<tr>
+<td style="text-align: right;">Middle Click + Drag:</td>
+<td style="text-align: left;">Truck Camera: moves the camera parallel to the view plane.</td>
+</tr>
+<tr>
+<td style="text-align: right;">Right Click + Drag:</td>
+<td style="text-align: left;">Zoom.</td>
+</tr>
+<tr>
+<td style="text-align: right;">Scroll Wheel:</td>
+<td style="text-align: left;">Moving the camera along its axis.</td>
+</tr>
+<tr>
+<td style="text-align: right;">Left Double Click on the Fractal:</td>
+<td style="text-align: left;">Moves the view to the point you clicked on (also sets the DOF focus to this point).</td>
+</tr>
+<tr>
+<td style="text-align: right;">Right Double Click on the Fractal:</td>
+<td style="text-align: left;">Sets the DOF focus to the selected point.</td>
+</tr>
+</tbody>
+</table>
+<p>You can keyframe the camera to the current time on the timeline using the key icon in the top left corner of the viewport. You can also check and set whether you want to see the keyframed camera or the free camera.</p>
+<p>If you start a render with the "Render Frame Range" button, it will use the keyframed camera for rendering. However, if you start the render with the "Render Current Frame" button, it will render the image in the viewport.</p>
+<hr />
+<h2 id="scene-tree-window">Scene Tree Window</h2>
+<p><img alt="Scene Tree" src="./images/window_scene_tree.png" /></p>
+<p>The scene-tree is the main element of the user interface, where you can set the lights, camera properties, and the shape and color of your fractal.</p>
+<p>Nodes:</p>
+<ul>
+<li><a href="nodes_reference.html#camera-setup-node">Light Setup</a></li>
+<li><a href="nodes_reference.html#light-setup-node">Camera Setup</a></li>
+<li><a href="nodes_reference.html#fractal-setup-node">Fractal Setup</a></li>
+<li><a href="nodes_reference.html#fractal-geometry-node">Fractal Geometry</a><ul>
+<li><a href="nodes_reference.html#transformation-nodes">Transform Nodes</a></li>
+</ul>
+</li>
+<li><a href="nodes_reference.html#fractal-material-node">Fractal Material</a></li>
+<li><a href="nodes_reference.html#time-remap-node">Time Remap</a></li>
+</ul>
+<hr />
+<h2 id="properties-window">Properties Window</h2>
+<p>Here you can view and modify the settings of the selected node in the scene-tree.</p>
+<hr />
+<h2 id="timeline-and-curves-window">Timeline and Curves Window</h2>
+<p><img alt="Timeline and Curves" src="./images/window_timeline_and_curves.png" /></p>
+<p>Here you can find all the curves of the scene-tree collected in the Curve window.</p>
+<p>In the Timeline window, you can view and modify the selected curves, and set the current time.</p>
+<h3 id="timeline-window-navigation">Timeline window navigation:</h3>
+<table>
+<thead>
+<tr>
+<th style="text-align: right;">Hotkey</th>
+<th style="text-align: left;">Effect</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: right;">Middle Click + Drag:</td>
+<td style="text-align: left;">View panning.</td>
+</tr>
+<tr>
+<td style="text-align: right;">Scroll Wheel:</td>
+<td style="text-align: left;">Zoom along Y Axis.</td>
+</tr>
+<tr>
+<td style="text-align: right;">Ctrl + Scroll Wheel:</td>
+<td style="text-align: left;">Uniform zoom.</td>
+</tr>
+</tbody>
+</table>
+<h3 id="timeline-window-curve-editing">Timeline window curve editing:</h3>
+<table>
+<thead>
+<tr>
+<th style="text-align: right;">Hotkey</th>
+<th style="text-align: left;">Effect</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: right;">Left Click + Drag:</td>
+<td style="text-align: left;">Move key, or multi selection.</td>
+</tr>
+<tr>
+<td style="text-align: right;">Ctrl + Left Click + Drag:</td>
+<td style="text-align: left;">Move the tangent vectors of the selected keys.</td>
+</tr>
+<tr>
+<td style="text-align: right;">Delete:</td>
+<td style="text-align: left;">Delete selected keys.</td>
+</tr>
+<tr>
+<td style="text-align: right;">Left Double Click [ on the curve ]:</td>
+<td style="text-align: left;">Add a new key.</td>
+</tr>
+</tbody>
+</table>
+<p>You can snap to the grid while moving a key or time by holding down the Shift key.</p>
+<hr />
+<h2 id="render-setup-window">Render Setup Window</h2>
+<p><img alt="Render Setup" src="./images/window_render_setup.png" /></p>
+<p>If you have more than one GPU, you can select which one the program uses here. ( Multi-GPU is not supported yet )
+The further settings are divided into two tabs:
+- Viewport ( settings for the viewport )
+- Render ( settings for rendering )</p>
+<p>Resolution, and resolution presets: If the viewport is very laggy, it's worth lowering this.</p>
+<p>Sample Count: Specifies how many samples a pixel should be taken. The more, the less noisy the image, but the longer the render takes.</p>
+<p>UI Max FPS: How much to save on UI rendering during fractal rendering.</p>
+<p>Render Range: Specifies which range of the Framecount set in the Timeline window you want to render.</p>
+<hr />
+<h2 id="render-window">Render Window</h2>
+<p><img alt="Render Window" src="./images/window_render.png" /></p>
+<p>You can start rendering with the resolution and sample count set in the Render Setup window.
+Every rendered image will be automatically saved in the "render" folder, and a fractal project file will be saved next to the image.
+Images and image sequences will be saved in 4x16 bit PNG format. You can find the Depthmap in the alpha channel.
+- Render Frame Range: renders all frames of the frame range set in the render setup window into an image sequence.
+- Render Current Frame: renders the image in the viewport.
+- Save Screenshot: saves the image in the viewport. (Even during rendering)</p>
+<hr />
+<p><a href="index.html">Start</a> · <a href="ui_reference.html"><strong>UI Reference</strong></a> · <a href="nodes_reference.html">Node Reference</a></p>
+</body>
+</html>
