@@ -161,7 +161,7 @@
 </section>
 <section>
 <h2 id="animation">Animation</h2>
-<p>Almost every numeric setting is a curve that can be animated. Click the diamond next to a setting in the Properties window to insert a key at the current time, then change the time on the <a href="#timeline-window">Timeline</a> and set another value. The length of the animation, the range to render and the playback speed are set in the transport bar at the bottom of the Timeline. <strong>Render Frame Range</strong> renders the frames into an image sequence. The <a href="#time-remap-node">Time Remap</a> node changes the speed of the whole animation.</p>
+<p>Almost every numeric setting is a curve that can be animated. Click the diamond next to a setting in the Properties window to insert a key at the current time, then change the time on the <a href="#timeline-window">Timeline</a> and set another value. The length of the animation, the range to render and the playback speed are set in the playback bar at the bottom of the Timeline. <strong>Render Frame Range</strong> renders the frames into an image sequence. The <a href="#time-remap-node">Time Remap</a> node changes the speed of the whole animation.</p>
 
 </section>
 <section>
@@ -441,7 +441,7 @@
 <section>
 <h2 id="timeline-window">Timeline Window</h2>
 <p><img alt="Timeline" src="./images/ui_timeline.png" /></p>
-<p>The Timeline shows the selected curves (select them in the <a href="#curves-window">Curves window</a>, by clicking a setting label in the Properties window, or by selecting nodes in the Scene Tree). The horizontal axis is the time of the animation, the vertical yellow line is the current time.</p>
+<p>The Timeline shows the selected curves (select them in the <a href="#curves-window">Curves window</a>, by clicking a setting label in the Properties window, or by selecting nodes in the Scene Tree). The horizontal axis shows the frames of the animation (the "time" of the curves is measured in frames). The thick orange-yellow vertical line is the current frame: drag it with the left mouse button to move through the animation, and the viewport shows that frame. While dragging, the frame number is shown next to the line; it can be a fraction of a frame unless you hold Shift. If the <a href="#time-remap-node">Time Remap</a> node changes the timing, a thin red line shows the remapped frame that is actually rendered.</p>
 <p><strong>Navigation:</strong></p>
 <table>
 <thead>
@@ -484,7 +484,7 @@
 </tr>
 <tr>
 <td style="text-align: right;">Left drag on a key</td>
-<td style="text-align: left;">Moves the selected keys.</td>
+<td style="text-align: left;">Moves the selected keys. With Shift, the dragged key snaps to the grid.</td>
 </tr>
 <tr>
 <td style="text-align: right;">Left drag on an empty area</td>
@@ -492,19 +492,19 @@
 </tr>
 <tr>
 <td style="text-align: right;">Left drag on a tangent knob</td>
-<td style="text-align: left;">Rotates the tangents of the selected keys. The knobs are at the ends of the tangents of the selected keys.</td>
+<td style="text-align: left;">Rotates the tangents of the selected keys. The knobs are at the ends of the tangents of the selected keys. With Shift, the angle snaps to 15 degree steps.</td>
 </tr>
 <tr>
 <td style="text-align: right;">Left double-click on a curve</td>
 <td style="text-align: left;">Adds a new key.</td>
 </tr>
 <tr>
-<td style="text-align: right;">Left drag on the current time line</td>
-<td style="text-align: left;">Changes the current time.</td>
+<td style="text-align: right;">Left drag on the current frame line</td>
+<td style="text-align: left;">Changes the current frame. With Shift, it snaps to the grid.</td>
 </tr>
 <tr>
 <td style="text-align: right;">Left drag on a curve without keys</td>
-<td style="text-align: left;">Changes its static value.</td>
+<td style="text-align: left;">Changes its static value. With Shift, the value snaps to the grid.</td>
 </tr>
 <tr>
 <td style="text-align: right;">Delete</td>
@@ -516,8 +516,8 @@
 </tr>
 </tbody>
 </table>
-<p>Hold down Shift while moving a key, the time or a static value to snap to the grid. While dragging a tangent knob, Shift snaps its on-screen angle to 15 degree steps.</p>
-<p><strong>Transport bar</strong> (at the bottom):</p>
+<p>The grid spacing depends on the zoom: zoom in for finer snapping steps.</p>
+<p><strong>Playback bar</strong> (at the bottom):</p>
 <ul>
 <li><strong>Play/Pause (Space):</strong> plays the animation in the viewport.</li>
 <li><strong>Frames:</strong> the length of the animation in frames.</li>
@@ -563,7 +563,7 @@
 <li><strong>Resolution</strong> and the resolution presets (720p, 1080p, Quad HD, Ultra HD): the size of the rendered images.</li>
 <li><strong>Sample Count:</strong> the number of samples per pixel. More samples give a less noisy image, but the render takes longer.</li>
 </ul>
-<p>The length of the animation (<em>Frames</em>), the range to render (<em>Render Range</em>) and the playback speed (<em>FPS</em>) are also stored in this node, but you set them in the transport bar at the bottom of the <a href="#timeline-window">Timeline window</a>.</p>
+<p>The length of the animation (<em>Frames</em>), the range to render (<em>Render Range</em>) and the playback speed (<em>FPS</em>) are also stored in this node, but you set them in the playback bar at the bottom of the <a href="#timeline-window">Timeline window</a>.</p>
 
 </section>
 <section>
