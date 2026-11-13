@@ -2,26 +2,956 @@
 <html>
 <head>
     <meta charset="UTF-8">
-    <title>index</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Kaleo2 Help</title>
     <link rel="stylesheet" type="text/css" href="template.css">
 </head>
 <body>
-<h1 id="welcome-to-the-kaleo2-documentation">Welcome to the Kaleo2 documentation</h1>
-<p><a href="index.html"><strong>Start</strong></a> · <a href="ui_reference.html">UI Reference</a> · <a href="nodes_reference.html">Node Reference</a></p>
-<p><img alt="tn" src="./images/tn01.png" /></p>
+<nav class="sidebar">
+<a class="brand" href="#">Kaleo2 <span>Help</span></a>
+<div class="nav-page">
+<a class="page-link" href="#introduction">Introduction</a>
+<ul>
+<li><a href="#about-kaleo2">About Kaleo2</a>
+</li>
+<li><a href="#kaleidoscopic-ifs-fractals">Kaleidoscopic IFS Fractals</a>
+</li>
+<li><a href="#getting-started">Getting Started</a>
+</li>
+<li><a href="#how-a-kaleo-fractal-is-built">How a Kaleo Fractal Is Built</a>
+</li>
+<li><a href="#animation">Animation</a>
+</li>
+<li><a href="#files-and-folders">Files and Folders</a>
+</li>
+<li><a href="#keyboard-and-mouse-shortcuts">Keyboard and Mouse Shortcuts</a>
+</li>
+</ul>
+</div>
+<div class="nav-page">
+<a class="page-link" href="#ui-reference">UI Reference</a>
+<ul>
+<li><a href="#user-interface">User Interface</a>
+</li>
+<li><a href="#menu-bar">Menu Bar</a>
+<ul>
+<li><a href="#file-menu">File Menu</a></li>
+<li><a href="#edit-menu">Edit Menu</a></li>
+<li><a href="#view-menu">View Menu</a></li>
+<li><a href="#options-menu">Options Menu</a></li>
+<li><a href="#help-menu">Help Menu</a></li>
+</ul>
+</li>
+<li><a href="#viewport">Viewport</a>
+<ul>
+<li><a href="#camera-controls">Camera Controls</a></li>
+<li><a href="#visualize-fold-planes">Visualize Fold Planes</a></li>
+</ul>
+</li>
+<li><a href="#render-panel">Render Panel</a>
+</li>
+<li><a href="#scene-tree-window">Scene Tree Window</a>
+</li>
+<li><a href="#properties-window">Properties Window</a>
+</li>
+<li><a href="#timeline-window">Timeline Window</a>
+</li>
+<li><a href="#curves-window">Curves Window</a>
+</li>
+<li><a href="#history-window">History Window</a>
+</li>
+</ul>
+</div>
+<div class="nav-page">
+<a class="page-link" href="#node-reference">Node Reference</a>
+<ul>
+<li><a href="#render-setup-node">Render Setup Node</a>
+</li>
+<li><a href="#camera-setup-node">Camera Setup Node</a>
+<ul>
+<li><a href="#camera-transform">Camera Transform</a></li>
+<li><a href="#lens-and-film">Lens and Film</a></li>
+<li><a href="#exposure-and-tone-mapping">Exposure and Tone Mapping</a></li>
+<li><a href="#chromatic-aberration">Chromatic Aberration</a></li>
+</ul>
+</li>
+<li><a href="#light-setup-node">Light Setup Node</a>
+<ul>
+<li><a href="#direct-light">Direct Light</a></li>
+<li><a href="#ambient-light">Ambient Light</a></li>
+<li><a href="#emissive-light">Emissive Light</a></li>
+</ul>
+</li>
+<li><a href="#fractal-setup-node">Fractal Setup Node</a>
+<ul>
+<li><a href="#distance-estimator">Distance Estimator</a></li>
+<li><a href="#path-tracer">Path Tracer</a></li>
+</ul>
+</li>
+<li><a href="#fractal-geometry-node">Fractal Geometry Node</a>
+<ul>
+<li><a href="#pre-transform-post-transform-and-fold-plane-nodes">Pre Transform, Post Transform and Fold Plane Nodes</a></li>
+<li><a href="#transform-nodes">Transform Nodes</a></li>
+</ul>
+</li>
+<li><a href="#fractal-mixer-node">Fractal Mixer Node</a>
+</li>
+<li><a href="#fractal-material-node">Fractal Material Node</a>
+<ul>
+<li><a href="#fold-plane-color-nodes">Fold Plane Color Nodes</a></li>
+</ul>
+</li>
+<li><a href="#time-remap-node">Time Remap Node</a>
+</li>
+</ul>
+</div>
+</nav>
+<main>
+<div class="part">
+<h1 id="introduction">Introduction</h1>
+<p><img alt="Kaleo2" src="./images/tn01.png" /></p>
 <blockquote>
 <p><em>I believe that scientific knowledge has fractal properties; that no matter how much we learn, whatever is left, however small it may seem, is just as infinitely complex as the whole was to start with. That, I think, is the secret of the Universe.</em></p>
 </blockquote>
 <p>-- Isaac Asimov</p>
-<p>Kaleo2 is a fractal rendering toy with two main tasks:
-- It allows you to explore a small but diverse group of fractals, the kaleidoscopic iterated function system fractals.
-- You can render high-quality photorealistic images and videos of these fractals with the built-in path tracer.</p>
-<p>The motivation for creating this app was the fact that there are very few images of fractals on the internet that have been made with modern photorealistic renderers. Standard 3d rendering programs don't really support these exotic objects either.
-I hope it is relatively easy to use, I tried to simplify the settings as much as possible so that you can render unique 4K background images.</p>
-<h3 id="kaleidoscopic-ifs-fractals">Kaleidoscopic IFS Fractals</h3>
-<p>Fractals are geometric shapes characterized by their intricate patterns and self-similarity across different scales. They possess a fractional dimension, making them complex entities with fascinating properties. The concept of fractals is not limited to mathematics; it is also prevalent in nature. Examples include the romanesco broccoli or fern leaf, where the intricate structures exhibit self-repeating patterns resembling fractal geometry.</p>
-<p>One notable variation of fractals is the Kaleidoscopic IFS (Iterated Function System) Fractal. With this method, a wide range of classic shapes, such as the Menger Sponge, can be generated. The operation of this fractal variation can be envisioned as folding and mirroring the structure of space itself by series of affine transformations (translation, rotation, scaling), resulting in mesmerizing and intricate patterns reminiscent of kaleidoscope images in three dimensions. These transformations, including folding and mirroring, are recursively applied, further enriching the complexity and detail of the resulting fractal patterns.</p>
-<hr />
-<p><a href="index.html"><strong>Start</strong></a> · <a href="ui_reference.html">UI Reference</a> · <a href="nodes_reference.html">Node Reference</a></p>
+
+<section>
+<h2 id="about-kaleo2">About Kaleo2</h2>
+<p>Kaleo2 is a fractal rendering toy with two main goals:</p>
+<ul>
+<li>It lets you explore a small but diverse family of fractals: the kaleidoscopic iterated function system (KIFS) fractals.</li>
+<li>It renders high-quality, photorealistic images and animations of these fractals with its built-in path tracer.</li>
+</ul>
+<p>I made this program because there are very few fractal images on the internet that were rendered with a modern, photorealistic renderer, and standard 3D programs do not really support these exotic objects either. I have tried to keep it simple and to cut the settings down to the essentials, so that you can render a unique 4K wallpaper as quickly as possible.</p>
+<p>Keep in mind, though, that with this type of fractal (and with this program in general) you cannot expect to control precisely which shapes appear. Even after years of using it, I have no intuition about which settings produce which structures.</p>
+
+</section>
+<section>
+<h2 id="kaleidoscopic-ifs-fractals">Kaleidoscopic IFS Fractals</h2>
+<p>Fractals are geometric shapes with intricate patterns that repeat themselves at every scale (self-similarity). They have a fractional dimension, which makes them complex objects with fascinating properties. Fractals are not just a mathematical curiosity, they are also common in nature: the florets of a romanesco broccoli or the leaflets of a fern repeat the shape of the whole.</p>
+<p>The kaleidoscopic IFS (Iterated Function System) fractal is one notable family. It can produce a wide range of classic shapes, such as the Menger sponge or the Sierpiński tetrahedron. You can imagine it as folding and mirroring space itself, combined with affine transformations (translation, rotation, scaling). These steps are applied again and again, and the result is a three-dimensional pattern reminiscent of the images in a kaleidoscope. The fractal was introduced and named by Knighty on the Fractal Forums in 2010.</p>
+
+</section>
+<section>
+<h2 id="getting-started">Getting Started</h2>
+<ol>
+<li>When the program starts, the <strong>Examples</strong> window opens with a few example projects (for example the Menger sponge and the Sierpiński pyramid). Click one to load it, or close the window to keep the default project. You can open it again with <strong>Help &gt; View Examples</strong>.</li>
+<li>Move the camera in the <a href="#viewport">viewport</a>: drag with the left mouse button to orbit, use the mouse wheel to move closer, and double-click the fractal to aim at that point.</li>
+<li>Select a node in the <a href="#scene-tree-window">Scene Tree</a> and change its settings in the <a href="#properties-window">Properties window</a>. The viewport restarts its refinement after every change, so you see the result right away.</li>
+<li>Set the resolution and the sample count of the final image in the <a href="#render-setup-node">Render Setup</a> node.</li>
+<li>Click <strong>Render Current Frame</strong> in the <a href="#render-panel">Render panel</a>. The image is saved into the Renders folder.</li>
+<li>Save your project with <strong>File &gt; Save</strong> (Ctrl+S). Every rendered PNG contains its project as well, so you can reopen it from the image later.</li>
+</ol>
+<p>If you get lost, <strong>Edit &gt; Undo</strong> (Ctrl+Z) and the <a href="#history-window">History window</a> take you back to any earlier state.</p>
+
+</section>
+<section>
+<h2 id="how-a-kaleo-fractal-is-built">How a Kaleo Fractal Is Built</h2>
+<p>The shape is described by the <a href="#fractal-geometry-node">Fractal Geometry</a> node and its children. For every point of space, the renderer repeats the following steps (one iteration) many times:</p>
+<ol>
+<li><strong>Folding:</strong> each active <strong>fold plane</strong> mirrors the point to the side its normal points to. A point that is already on that side does not move. Fold Plane 1–7 start as the plane through the origin with its normal pointing along +Z, and the transformations under them rotate and move them. Only the first <em>Fold Plane Count</em> planes are used.</li>
+<li><strong>Post Transform:</strong> the transformations under Post Transform rotate and move the folded point.</li>
+<li><strong>Scaling:</strong> the point is scaled by the <em>Iterative Scale</em>.</li>
+</ol>
+<p>The <strong>Pre Transform</strong> places the whole fractal in space, but it is also built into the iteration, so it changes the shape as well.</p>
+<p>The number of iterations is the <em>DE Iteration Count</em> of the <a href="#fractal-setup-node">Fractal Setup</a> node. After the last iteration, the renderer measures the distance to a small sphere (<em>SDF Sphere Size</em>). Scaled back, this gives an estimate of the distance to the fractal surface (a distance estimator, DE), which the ray marcher uses to find the surface.</p>
+<p>The color comes from the folds as well: the <a href="#fractal-material-node">Fractal Material</a> node colors the surface by how often each fold plane mirrored the point.</p>
+<p>Every transformation belongs to a channel of the <a href="#fractal-mixer-node">Fractal Mixer</a>, and the weight of that channel scales its effect. With the channel weights you can blend between different sets of transformations.</p>
+
+</section>
+<section>
+<h2 id="animation">Animation</h2>
+<p>Almost every numeric setting is a curve that can be animated. Click the diamond next to a setting in the Properties window to insert a key at the current time, then change the time on the <a href="#timeline-window">Timeline</a> and set another value. The length of the animation, the range to render and the playback speed are set in the transport bar at the bottom of the Timeline. <strong>Render Frame Range</strong> renders the frames into an image sequence. The <a href="#time-remap-node">Time Remap</a> node changes the speed of the whole animation.</p>
+
+</section>
+<section>
+<h2 id="files-and-folders">Files and Folders</h2>
+<table>
+<thead>
+<tr>
+<th style="text-align: left;">Folder</th>
+<th style="text-align: left;">Content</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;">Renders</td>
+<td style="text-align: left;">Rendered images and screenshots (PNG), image sequences in their own <code>seq_...</code> subfolder.</td>
+</tr>
+<tr>
+<td style="text-align: left;">Projects</td>
+<td style="text-align: left;">Project files saved with the renders (see <em>Save Project File With Renders</em> in the <a href="#options-menu">Options menu</a>).</td>
+</tr>
+<tr>
+<td style="text-align: left;">AppData</td>
+<td style="text-align: left;">The application settings (<code>settings.dat</code>) and the window layout (<code>imgui.ini</code>).</td>
+</tr>
+</tbody>
+</table>
+<p>These folders are in <code>Documents\Blod2o1\Kaleo2\</code>. The example projects (Examples), the default project (<code>AppData\default.fproj</code>) and this help are next to the program.</p>
+<ul>
+<li><strong>Project files</strong> (<code>.fproj</code>) contain the whole scene, including the animation and the render settings. Open them with <strong>File &gt; Open</strong>, or drag them onto the window.</li>
+<li><strong>Rendered PNG files</strong> contain their project, so <strong>File &gt; Open from PNG</strong> (or dragging the PNG onto the window) restores the exact scene of an image.</li>
+<li><strong>File &gt; New</strong> starts again from the default project.</li>
+</ul>
+
+</section>
+<section>
+<h2 id="keyboard-and-mouse-shortcuts">Keyboard and Mouse Shortcuts</h2>
+<table>
+<thead>
+<tr>
+<th style="text-align: right;">Shortcut</th>
+<th style="text-align: left;">Effect</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: right;">F1</td>
+<td style="text-align: left;">Opens this help.</td>
+</tr>
+<tr>
+<td style="text-align: right;">Ctrl+Z / Ctrl+Y</td>
+<td style="text-align: left;">Undo / Redo.</td>
+</tr>
+<tr>
+<td style="text-align: right;">Ctrl+O</td>
+<td style="text-align: left;">Opens a project.</td>
+</tr>
+<tr>
+<td style="text-align: right;">Ctrl+S / Ctrl+Shift+S</td>
+<td style="text-align: left;">Saves the project / saves it under a new name.</td>
+</tr>
+<tr>
+<td style="text-align: right;">Space</td>
+<td style="text-align: left;">Plays or pauses the animation in the viewport.</td>
+</tr>
+<tr>
+<td style="text-align: right;">Mouse in the viewport</td>
+<td style="text-align: left;">Moves the camera, see <a href="#viewport">Viewport</a>.</td>
+</tr>
+<tr>
+<td style="text-align: right;">Mouse in the Timeline</td>
+<td style="text-align: left;">Edits the curves, see <a href="#timeline-window">Timeline Window</a>.</td>
+</tr>
+</tbody>
+</table>
+<p>The keyboard shortcuts work while no text field is being edited.</p>
+
+</section>
+</div>
+<div class="part">
+<h1 id="ui-reference">UI Reference</h1>
+
+<section>
+<h2 id="user-interface">User Interface</h2>
+<p><a href="./images/ui_overview.png"><img alt="The Kaleo2 window" src="./images/ui_overview.png" /></a></p>
+<p>The heart of the user interface is the <strong>Scene Tree</strong>. Its nodes hold the settings of the render, the camera, the lights, and the shape and color of the fractal. Select a node in the Scene Tree to see and change its settings in the <strong>Properties</strong> window. Every change shows up in the <strong>viewport</strong> right away. Most settings are also curves: the <strong>Curves</strong> window lists all of them, and the <strong>Timeline</strong> shows and animates the selected ones.</p>
+<p>You can move, rotate and zoom the camera in the viewport, and you can insert camera keys there as well.</p>
+<p>To render an image, set the resolution and the sample count in the <a href="#render-setup-node">Render Setup</a> node of the Scene Tree, then click <strong>Render Current Frame</strong> in the <a href="#render-panel">Render panel</a>.</p>
+<p>The windows can be docked anywhere: drag them by their tab. <strong>View &gt; Animation Layout</strong> and <strong>View &gt; Basic Layout</strong> restore the two built-in arrangements. The layout is saved when the program exits.</p>
+
+</section>
+<section>
+<h2 id="menu-bar">Menu Bar</h2>
+<h3 id="file-menu">File Menu</h3>
+<p><img alt="File menu" src="./images/ui_menu_file.png" /></p>
+<ul>
+<li><strong>New:</strong> starts a new project from the default project.</li>
+<li><strong>Open Recent:</strong> the recently opened project files.</li>
+<li><strong>Open... (Ctrl+O):</strong> opens a project file (<code>.fproj</code>).</li>
+<li><strong>Open from PNG...:</strong> opens the project embedded in an image rendered by Kaleo2.</li>
+<li><strong>Save (Ctrl+S):</strong> saves the project into its current file (asks for a file name the first time).</li>
+<li><strong>Save As... (Ctrl+Shift+S):</strong> saves the project under a new name.</li>
+<li><strong>Quit:</strong> closes the program.</li>
+</ul>
+<p>You can also open a project or a rendered PNG by dragging it onto the window. Opening a project is an undo step too, so <strong>Undo</strong> brings back the previous scene.</p>
+<h3 id="edit-menu">Edit Menu</h3>
+<ul>
+<li><strong>Undo (Ctrl+Z)</strong> and <strong>Redo (Ctrl+Y)</strong> step through the <a href="#history-window">History</a>.</li>
+</ul>
+<h3 id="view-menu">View Menu</h3>
+<p><img alt="View menu" src="./images/ui_menu_view.png" /></p>
+<ul>
+<li><strong>Basic Layout:</strong> Scene Tree, Properties and Timeline side by side on the left, History and Curves on the right.</li>
+<li><strong>Animation Layout:</strong> Scene Tree and Properties on the left, History on the right, a wide Timeline and the Curves window at the bottom.</li>
+<li><strong>UI Scale:</strong> the size of the user interface (100%, 125%, 160%, 200%).</li>
+</ul>
+<h3 id="options-menu">Options Menu</h3>
+<p><img alt="Options menu" src="./images/ui_menu_options.png" /></p>
+<p>The settings of the program. They are not stored in the project. The settings of the rendered images are in the <a href="#render-setup-node">Render Setup</a> node.</p>
+<p>Viewport:</p>
+<ul>
+<li><strong>Resolution</strong> and the resolution presets: the size of the viewport image. If the viewport is slow, lower it.</li>
+<li><strong>Sample Count:</strong> the viewport stops refining the image after this many samples per pixel.</li>
+<li><strong>UI Max FPS:</strong> frame rate limit of the user interface. Lower values leave more GPU time for the fractal. The field turns orange when a full render pass no longer fits into one UI frame.</li>
+</ul>
+<p>Rendering:</p>
+<ul>
+<li><strong>UI Max FPS:</strong> frame rate limit of the user interface while rendering. Lower values make rendering faster.</li>
+<li><strong>Exit After Render:</strong> closes the program when the render is complete.</li>
+<li><strong>Save Project File With Renders:</strong> also saves a project file (<code>.fproj</code>) into the Projects folder for every rendered image and screenshot (once per image sequence). The project is embedded in every saved PNG anyway.</li>
+</ul>
+<p>GPU:</p>
+<ul>
+<li><strong>Adapter:</strong> if you have more than one GPU, select the one the program uses. It takes effect after a restart. (Using several GPUs at once is not supported.)</li>
+</ul>
+<h3 id="help-menu">Help Menu</h3>
+<p><img alt="Help menu" src="./images/ui_menu_help.png" /></p>
+<ul>
+<li><strong>View Help (F1):</strong> opens this help in your web browser.</li>
+<li><strong>View Examples:</strong> opens the Examples window. Click an example to load it. <strong>Show at startup</strong> controls whether the window opens when the program starts.</li>
+<li><strong>About:</strong> version and credits.</li>
+</ul>
+
+</section>
+<section>
+<h2 id="viewport">Viewport</h2>
+<p><img alt="Viewport" src="./images/ui_viewport.png" /></p>
+<p>The viewport shows the fractal with the current settings. It renders progressively: the image starts noisy and gets cleaner with every pass until it reaches the <em>Sample Count</em> set in the <a href="#options-menu">Options menu</a>. Any change restarts the refinement.</p>
+<p><img alt="Viewport toolbar" src="./images/ui_toolbar.png" /></p>
+<p>The toolbar above the image:</p>
+<ul>
+<li><strong>Key button:</strong> inserts a camera key (Eye, LookAt, Roll, FOV, Focus Distance) at the current time of the Timeline, and switches the camera to Keyframed mode.</li>
+<li><strong>Camera mode:</strong> <em>Keyframed</em>: the camera follows its keys on the Timeline. <em>Free</em>: the camera ignores its keys, so you can move it freely. If the camera has keys and you move it in the viewport, the mode switches to Free automatically.</li>
+<li><strong>Visualize Fold Planes:</strong> see <a href="#visualize-fold-planes">below</a>.</li>
+</ul>
+<p>Renders use the current camera mode: <strong>Render Current Frame</strong> renders exactly what the viewport shows, and for a camera animation with <strong>Render Frame Range</strong>, switch the camera back to Keyframed first.</p>
+<h3 id="camera-controls">Camera Controls</h3>
+<table>
+<thead>
+<tr>
+<th style="text-align: right;">Mouse</th>
+<th style="text-align: left;">Effect</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: right;">Left drag</td>
+<td style="text-align: left;">Orbits the camera around the target (LookAt) point.</td>
+</tr>
+<tr>
+<td style="text-align: right;">Middle drag</td>
+<td style="text-align: left;">Moves the camera parallel to the image plane (pan).</td>
+</tr>
+<tr>
+<td style="text-align: right;">Right drag</td>
+<td style="text-align: left;">Zooms (changes the field of view).</td>
+</tr>
+<tr>
+<td style="text-align: right;">Mouse wheel</td>
+<td style="text-align: left;">Moves the camera toward or away from the target.</td>
+</tr>
+<tr>
+<td style="text-align: right;">Left button held + mouse wheel</td>
+<td style="text-align: left;">Moves the target along the view direction, the camera stays in place.</td>
+</tr>
+<tr>
+<td style="text-align: right;">Left double-click on the fractal</td>
+<td style="text-align: left;">Turns the camera to the clicked point, which becomes the new target and the focus distance.</td>
+</tr>
+<tr>
+<td style="text-align: right;">Right double-click on the fractal</td>
+<td style="text-align: left;">Sets the focus distance (DOF) to the clicked point; the target moves to this distance along the view direction.</td>
+</tr>
+</tbody>
+</table>
+<p>The camera cannot be moved while a final render is running.</p>
+<h3 id="visualize-fold-planes">Visualize Fold Planes</h3>
+<p><img alt="Fold planes in the viewport" src="./images/ui_viewport_fold_planes.png" /></p>
+<p>The layer button in the toolbar draws the fold (mirror) planes over the image. The colored lines show where a fold plane cuts the fractal. Hover over or select a Fold Plane (or its color node) in the Scene Tree to focus on that plane: the darkened side of the image is only its mirror image. With the overlay on, the Scene Tree shows the color of each plane next to its name. The overlay is only a display aid: it never appears in the rendered or saved images.</p>
+
+</section>
+<section>
+<h2 id="render-panel">Render Panel</h2>
+<p><img alt="Render panel" src="./images/ui_render.png" /></p>
+<p>The panel in the top right corner of the viewport starts the final renders. They use the resolution and the sample count of the <a href="#render-setup-node">Render Setup</a> node.</p>
+<ul>
+<li><strong>Render Frame Range:</strong> renders every frame of the <em>Render Range</em> (set at the bottom of the <a href="#timeline-window">Timeline</a>) into an image sequence.</li>
+<li><strong>Render Current Frame:</strong> renders the image of the viewport at the current time.</li>
+<li><strong>Cancel:</strong> stops the running render (it replaces the two buttons above while rendering).</li>
+<li><strong>Save Screenshot:</strong> saves the current viewport image as it is, even during a render.</li>
+</ul>
+<p>Below the buttons:</p>
+<ul>
+<li><strong>UI fps:</strong> the frame rate of the user interface.</li>
+<li><strong>Render fps:</strong> how many full passes (one sample for every pixel) the renderer completes per second. It turns orange when a pass needs more than one UI frame; lowering <em>UI Max FPS</em> in the Options menu leaves more GPU time for the fractal.</li>
+<li><strong>Samples:</strong> the progress of the current image.</li>
+<li><strong>Frames:</strong> the progress of an image sequence (only while rendering).</li>
+</ul>
+<p>While a final render runs, the other windows are hidden and the viewport shows the image being rendered.</p>
+<p>Every image is saved into the <strong>Renders</strong> folder as an 8-bit RGB PNG file, with a name made from the date and time. An image sequence gets its own subfolder (<code>seq_&lt;date&gt;</code>) with numbered frames. The project is embedded in every PNG, so <strong>File &gt; Open from PNG</strong>, or dragging the PNG onto the window, restores the scene of the image. If <em>Save Project File With Renders</em> is enabled in the Options menu, a project file with the same name is also saved into the Projects folder.</p>
+
+</section>
+<section>
+<h2 id="scene-tree-window">Scene Tree Window</h2>
+<p><img alt="Scene Tree" src="./images/ui_scene_tree.png" /></p>
+<p>The Scene Tree holds all the nodes of the project: the render settings, the light, the camera, and the shape and color of the fractal.</p>
+<ul>
+<li><a href="#render-setup-node">Render Setup</a></li>
+<li><a href="#camera-setup-node">Camera Setup</a></li>
+<li><a href="#light-setup-node">Light Setup</a></li>
+<li><a href="#fractal-setup-node">Fractal Setup</a></li>
+<li><a href="#fractal-geometry-node">Fractal Geometry</a><ul>
+<li><a href="#pre-transform-post-transform-and-fold-plane-nodes">Pre Transform, Post Transform, Fold Plane 1–7</a><ul>
+<li><a href="#transform-nodes">Transform nodes</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a href="#fractal-mixer-node">Fractal Mixer</a></li>
+<li><a href="#fractal-material-node">Fractal Material</a><ul>
+<li><a href="#fold-plane-color-nodes">Fold Plane 1–7 Color</a></li>
+</ul>
+</li>
+<li><a href="#time-remap-node">Time Remap</a></li>
+</ul>
+<p><strong>Selecting:</strong> click a node to select it and its children; their settings appear in the Properties window and their curves are selected in the Curves window. Ctrl+click adds a node to the selection or removes it, Shift+click selects a range. When you hover over a node, its curves are highlighted in the Curves window and on the Timeline.</p>
+<p>Fold planes above the <em>Fold Plane Count</em> of the Fractal Geometry node are not used; they are greyed out together with their color nodes. A transform that does not belong to Channel 1 of the <a href="#fractal-mixer-node">Fractal Mixer</a> shows its channel next to its name (Ch2, Ch3, Ch4).</p>
+<p><strong>Node menu:</strong> right-click a node, or click the <strong>...</strong> button at the end of its row.</p>
+<p><img alt="Node menu" src="./images/ui_scene_tree_node_menu.png" /></p>
+<ul>
+<li><strong>New...</strong> (on the Pre Transform, Post Transform and Fold Plane nodes, and on transforms): adds a transform. On a transform, the new one is inserted after it.</li>
+<li><strong>Copy / Paste:</strong> copies the settings of a node and pastes them into another node of the same type.</li>
+<li><strong>Move Up / Move Down</strong> (transforms): changes the order of the transforms.</li>
+<li><strong>Delete</strong> (transforms): deletes the transform.</li>
+<li><strong>Merge All Transforms</strong> (Fractal Geometry): replaces the transforms of every bone with one Rotate Gibbs and one Translate transform that give the same result at the current time. The animation of the merged transforms is lost.</li>
+</ul>
+<p><strong>Reordering transforms:</strong> the order of the transforms matters. Drag a transform to move it, also into another bone:</p>
+<ul>
+<li>drop it on the upper or lower half of a transform to put it before or after that one,</li>
+<li>drop it on a bone row (Pre Transform, Post Transform, Fold Plane) to make it the first transform of that bone.</li>
+</ul>
+<p>If only transforms are selected (Ctrl/Shift+click), they all move together.</p>
+
+</section>
+<section>
+<h2 id="properties-window">Properties Window</h2>
+<p><img alt="Properties of a Fold Plane Color node" src="./images/node_material.png" /></p>
+<p>The settings of the selected nodes, one panel per node. The panels and the sections inside them can be collapsed by clicking their headers. The settings are described in the <a href="#node-reference">Node Reference</a>.</p>
+<ul>
+<li><strong>Changing a value:</strong> drag the field left or right, or double-click (Ctrl+click) it and type a value.</li>
+<li><strong>Settings with a curve</strong> (animatable settings) have a diamond on the right. Click it to insert a key at the current time of the Timeline; a filled diamond means the setting is animated. An animated value cannot be edited in the Properties window: change its keys on the Timeline instead, or insert a new key and edit it there.</li>
+<li><strong>Clicking the label</strong> of an animatable setting selects its curve on the Timeline; Ctrl+click adds it to the selection.</li>
+<li>Some settings recompile the shaders when they change (for example <em>DE Iteration Count</em>). This takes a moment.</li>
+</ul>
+<p><strong>Color curves.</strong> The <em>Tone Curve</em> of the Camera Setup node and the <em>Ambient Color Multiplier</em> of the Light Setup node are edited with a small curve editor in the panel, with separate red, green and blue curves. The Tone Curve has a fourth curve as well: the saturation as a function of the brightness. It works like the Timeline: drag the keys and the tangent knobs, double-click on a curve to add a key, and press Delete to remove the selected keys.</p>
+
+</section>
+<section>
+<h2 id="timeline-window">Timeline Window</h2>
+<p><img alt="Timeline" src="./images/ui_timeline.png" /></p>
+<p>The Timeline shows the selected curves (select them in the <a href="#curves-window">Curves window</a>, by clicking a setting label in the Properties window, or by selecting nodes in the Scene Tree). The horizontal axis is the time of the animation, the vertical yellow line is the current time.</p>
+<p><strong>Navigation:</strong></p>
+<table>
+<thead>
+<tr>
+<th style="text-align: right;">Mouse</th>
+<th style="text-align: left;">Effect</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: right;">Middle drag</td>
+<td style="text-align: left;">Pans the view.</td>
+</tr>
+<tr>
+<td style="text-align: right;">Mouse wheel</td>
+<td style="text-align: left;">Zooms vertically.</td>
+</tr>
+<tr>
+<td style="text-align: right;">Ctrl + mouse wheel</td>
+<td style="text-align: left;">Zooms in both directions.</td>
+</tr>
+<tr>
+<td style="text-align: right;">Right-click</td>
+<td style="text-align: left;">Context menu: <em>Reset View</em> fits the view to the selected curves.</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Editing:</strong></p>
+<table>
+<thead>
+<tr>
+<th style="text-align: right;">Mouse / key</th>
+<th style="text-align: left;">Effect</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: right;">Left-click on a key</td>
+<td style="text-align: left;">Selects the key. Shift+click adds it to the selection.</td>
+</tr>
+<tr>
+<td style="text-align: right;">Left drag on a key</td>
+<td style="text-align: left;">Moves the selected keys.</td>
+</tr>
+<tr>
+<td style="text-align: right;">Left drag on an empty area</td>
+<td style="text-align: left;">Selects the keys inside a rectangle. With Shift, adds them to the selection.</td>
+</tr>
+<tr>
+<td style="text-align: right;">Left drag on a tangent knob</td>
+<td style="text-align: left;">Rotates the tangents of the selected keys. The knobs are at the ends of the tangents of the selected keys.</td>
+</tr>
+<tr>
+<td style="text-align: right;">Left double-click on a curve</td>
+<td style="text-align: left;">Adds a new key.</td>
+</tr>
+<tr>
+<td style="text-align: right;">Left drag on the current time line</td>
+<td style="text-align: left;">Changes the current time.</td>
+</tr>
+<tr>
+<td style="text-align: right;">Left drag on a curve without keys</td>
+<td style="text-align: left;">Changes its static value.</td>
+</tr>
+<tr>
+<td style="text-align: right;">Delete</td>
+<td style="text-align: left;">Deletes the selected keys.</td>
+</tr>
+<tr>
+<td style="text-align: right;">0 / 1</td>
+<td style="text-align: left;">Sets the value of the selected keys to 0 or 1. With Ctrl, sets their tangent instead.</td>
+</tr>
+</tbody>
+</table>
+<p>Hold down Shift while moving a key, the time or a static value to snap to the grid. While dragging a tangent knob, Shift snaps its on-screen angle to 15 degree steps.</p>
+<p><strong>Transport bar</strong> (at the bottom):</p>
+<ul>
+<li><strong>Play/Pause (Space):</strong> plays the animation in the viewport.</li>
+<li><strong>Frames:</strong> the length of the animation in frames.</li>
+<li><strong>Render Range Start / End:</strong> the frames rendered by <strong>Render Frame Range</strong> (both ends included).</li>
+<li><strong>FPS:</strong> the playback speed of the Timeline preview. It does not affect the rendered images.</li>
+</ul>
+<p>These values are stored in the <a href="#render-setup-node">Render Setup</a> node of the project.</p>
+
+</section>
+<section>
+<h2 id="curves-window">Curves Window</h2>
+<p><img alt="Curves" src="./images/ui_curves.png" /></p>
+<p>All the animatable settings of the project, listed by node. A filled diamond marks the animated curves.</p>
+<ul>
+<li>Click a curve to show it on the Timeline. Ctrl+click adds it to the selection or removes it, Shift+click selects a range.</li>
+<li>When you hover over a curve, it is highlighted on the Timeline and in the Properties window.</li>
+</ul>
+<p><img alt="Curves Tools menu" src="./images/ui_curves_tools.png" /></p>
+<p>The <strong>Tools</strong> menu works on the selected curves:</p>
+<ul>
+<li><strong>Clear Keys:</strong> removes all keys; the value at the current time becomes the static value.</li>
+<li><strong>Init Keys [0,1]:</strong> replaces the keys with two keys at the start and the end of the animation, both with the value at the current time.</li>
+<li><strong>Smooth Tangents:</strong> recomputes the tangents for a smooth motion.</li>
+<li><strong>Make seamless (0..1):</strong> matches the end of the animation to its start, for a seamless loop.</li>
+<li><strong>Set interpolation method:</strong> Linear, Hermite or Spline interpolation between the keys.</li>
+</ul>
+
+</section>
+<section>
+<h2 id="history-window">History Window</h2>
+<p>Every change is an undo step. The History window lists them; click a step to go back to that state, or use <strong>Undo (Ctrl+Z)</strong> and <strong>Redo (Ctrl+Y)</strong>. The greyed steps after the current one are the ones you can redo. A new change after an undo removes them. Camera moves, project opening and node selection are steps too.</p>
+
+</section>
+</div>
+<div class="part">
+<h1 id="node-reference">Node Reference</h1>
+
+<section>
+<h2 id="render-setup-node">Render Setup Node</h2>
+<p><img alt="Render Setup" src="./images/node_render_setup.png" /></p>
+<p>The settings of the final renders. They are saved with the project. The settings of the viewport and of the program are in the <a href="#options-menu">Options menu</a>.</p>
+<ul>
+<li><strong>Resolution</strong> and the resolution presets (720p, 1080p, Quad HD, Ultra HD): the size of the rendered images.</li>
+<li><strong>Sample Count:</strong> the number of samples per pixel. More samples give a less noisy image, but the render takes longer.</li>
+</ul>
+<p>The length of the animation (<em>Frames</em>), the range to render (<em>Render Range</em>) and the playback speed (<em>FPS</em>) are also stored in this node, but you set them in the transport bar at the bottom of the <a href="#timeline-window">Timeline window</a>.</p>
+
+</section>
+<section>
+<h2 id="camera-setup-node">Camera Setup Node</h2>
+<p><img alt="Camera Setup" src="./images/node_camera.png" /></p>
+<p>The position of the camera, the lens, the exposure and the tone mapping. You usually move the camera in the <a href="#camera-controls">viewport</a> rather than here.</p>
+<h3 id="camera-transform">Camera Transform</h3>
+<ul>
+<li><strong>Camera Mode:</strong> <em>Keyframed</em>: the camera follows its keys on the Timeline. <em>Free</em>: the camera ignores its keys and uses the values set here or in the viewport. Moving the camera in the viewport switches a keyed camera to Free automatically. Renders use the current mode.</li>
+<li><strong>Eye Position:</strong> the position of the camera (X, Y, Z).</li>
+<li><strong>LookAt Position:</strong> the point the camera looks at. Orbiting in the viewport rotates around this point.</li>
+<li><strong>Roll:</strong> rotation of the camera around its view direction, in degrees.</li>
+</ul>
+<h3 id="lens-and-film">Lens and Film</h3>
+<ul>
+<li><strong>FOV:</strong> the field of view in degrees. Smaller values zoom in.</li>
+<li><strong>DOF:</strong> the amount of depth of field blur. 0 means everything is sharp.</li>
+<li><strong>Focus Distance:</strong> the distance of the sharp plane from the camera. It matters only if DOF is above 0. Double-click the fractal with the right mouse button to focus on that point.</li>
+<li><strong>Lens Distortion:</strong> barrel (positive) or pincushion (negative) distortion. 0 means no distortion.</li>
+</ul>
+<table>
+<thead>
+<tr>
+<th style="text-align: center;"><img alt="DOF 0" src="./images/sample_dof_1.jpg" /></th>
+<th style="text-align: center;"><img alt="DOF 1" src="./images/sample_dof_2.jpg" /></th>
+<th style="text-align: center;"><img alt="DOF 3" src="./images/sample_dof_3.jpg" /></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: center;">DOF: 0</td>
+<td style="text-align: center;">DOF: 1</td>
+<td style="text-align: center;">DOF: 3</td>
+</tr>
+</tbody>
+</table>
+<table>
+<thead>
+<tr>
+<th style="text-align: center;"><img alt="Lens Distortion 0.15" src="./images/sample_lens_1.jpg" /></th>
+<th style="text-align: center;"><img alt="Lens Distortion 0" src="./images/sample_lens_2.jpg" /></th>
+<th style="text-align: center;"><img alt="Lens Distortion -0.5" src="./images/sample_lens_3.jpg" /></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: center;">Lens Distortion: 0.15</td>
+<td style="text-align: center;">Lens Distortion: 0</td>
+<td style="text-align: center;">Lens Distortion: -0.5</td>
+</tr>
+</tbody>
+</table>
+<h3 id="exposure-and-tone-mapping">Exposure and Tone Mapping</h3>
+<ul>
+<li><strong>Motion Blur:</strong> the shutter time as a fraction of a frame. 0: no motion blur, 1: the shutter is open for the whole frame. It is visible only in an animation, where things move during the frame.</li>
+<li><strong>Exposure:</strong> the brightness of the image before tone mapping. Changing it does not restart the refinement.</li>
+<li><strong>Expo Type:</strong> the tone mapping curve that compresses the bright (HDR) image into the displayable range. <em>None</em>: no compression, the highlights clip. <em>Exponential</em>, <em>Reinhard</em>: soft roll-off of the highlights. <em>Lottes</em>, <em>Uchimura</em>: filmic curves with more contrast. Changing it recompiles the shaders.</li>
+<li><strong>Tone Curve:</strong> final color adjustment after tone mapping. The red, green and blue curves set the brightness of each channel, the fourth curve sets the saturation as a function of the brightness. <strong>Reset Tone Curve</strong> restores the neutral curves.</li>
+</ul>
+<table>
+<thead>
+<tr>
+<th style="text-align: center;"><img alt="Expo Type None" src="./images/sample_expo_1.jpg" /></th>
+<th style="text-align: center;"><img alt="Expo Type Reinhard" src="./images/sample_expo_2.jpg" /></th>
+<th style="text-align: center;"><img alt="Expo Type Uchimura" src="./images/sample_expo_3.jpg" /></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: center;">Expo Type: None</td>
+<td style="text-align: center;">Expo Type: Reinhard</td>
+<td style="text-align: center;">Expo Type: Uchimura</td>
+</tr>
+</tbody>
+</table>
+<h3 id="chromatic-aberration">Chromatic Aberration</h3>
+<p>A real lens bends the different wavelengths (colors) of light slightly differently. Kaleo2 simulates this with a spectral camera.</p>
+<ul>
+<li><strong>Spectrum Spread:</strong> how much the rainbow colors blend into each other. 0: vivid rainbow colors but more noise. 1: no colors, only a soft blur, with less noise. It has a visible effect only if CA Depth or CA Radius is not 0.</li>
+<li><strong>CA Depth:</strong> how much the focal plane shifts with the wavelength. Higher values give more colorful blur in the out-of-focus areas (with DOF).</li>
+<li><strong>CA Radius:</strong> how much the field of view changes with the wavelength. Higher values give more color fringing toward the edges of the image.</li>
+</ul>
+<table>
+<thead>
+<tr>
+<th style="text-align: center;"><img alt="CA Radius 0" src="./images/sample_ca_1.jpg" /></th>
+<th style="text-align: center;"><img alt="CA Radius 5" src="./images/sample_ca_2.jpg" /></th>
+<th style="text-align: center;"><img alt="CA Radius 12" src="./images/sample_ca_3.jpg" /></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: center;">CA Radius: 0</td>
+<td style="text-align: center;">CA Radius: 5</td>
+<td style="text-align: center;">CA Radius: 12</td>
+</tr>
+</tbody>
+</table>
+
+</section>
+<section>
+<h2 id="light-setup-node">Light Setup Node</h2>
+<p><img alt="Light Setup" src="./images/node_light.png" /></p>
+<p>The fractal is lit by two kinds of light: a directional light (like sunlight) and an ambient light that comes from every direction (like skylight). The emissive (glowing) parts of the fractal are light sources too.</p>
+<h3 id="direct-light">Direct Light</h3>
+<ul>
+<li><strong>DirLight Intensity:</strong> the brightness of the directional light.</li>
+<li><strong>DirLight Color:</strong> the color of the directional light.</li>
+<li><strong>DirLight Direction:</strong> the direction of the light rays in degrees: the horizontal angle around the Z axis, and the elevation. The light comes from the opposite side.</li>
+<li><strong>DirLight Penumbra:</strong> the sharpness of the light. Low values: a large light source with soft shadows. High values: a small light source with crisp shadows.</li>
+<li><strong>DirLight Affect Background:</strong> how much the light source itself is visible in the background. 0: not visible.</li>
+</ul>
+<table>
+<thead>
+<tr>
+<th style="text-align: center;"><img alt="Penumbra 0.05" src="./images/sample_penumbra_1.jpg" /></th>
+<th style="text-align: center;"><img alt="Penumbra 0.23" src="./images/sample_penumbra_2.jpg" /></th>
+<th style="text-align: center;"><img alt="Penumbra 1.5" src="./images/sample_penumbra_3.jpg" /></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: center;">DirLight Penumbra: 0.05</td>
+<td style="text-align: center;">DirLight Penumbra: 0.23</td>
+<td style="text-align: center;">DirLight Penumbra: 1.5</td>
+</tr>
+</tbody>
+</table>
+<table>
+<thead>
+<tr>
+<th style="text-align: center;"><img alt="Direction 1" src="./images/sample_light_dir_1.jpg" /></th>
+<th style="text-align: center;"><img alt="Direction 2" src="./images/sample_light_dir_2.jpg" /></th>
+<th style="text-align: center;"><img alt="Direction 3" src="./images/sample_light_dir_3.jpg" /></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: center;">DirLight Direction: 2.7, -66.5</td>
+<td style="text-align: center;">DirLight Direction: 60, -25</td>
+<td style="text-align: center;">DirLight Direction: -120, -25</td>
+</tr>
+</tbody>
+</table>
+<h3 id="ambient-light">Ambient Light</h3>
+<ul>
+<li><strong>Ambient Intensity:</strong> the brightness of the ambient light.</li>
+<li><strong>Ambient Color:</strong> the color of the ambient light.</li>
+<li><strong>Ambient Affect Background:</strong> how much the ambient light is visible as the background color. 0: black background.</li>
+<li><strong>Ambient Color Multiplier:</strong> tints the ambient light by direction: the left side of the curves is the light coming from below, the right side the light from above. Use it for a sky gradient.</li>
+</ul>
+<table>
+<thead>
+<tr>
+<th style="text-align: center;"><img alt="Ambient 0" src="./images/sample_ambient_1.jpg" /></th>
+<th style="text-align: center;"><img alt="Ambient 0.083" src="./images/sample_ambient_2.jpg" /></th>
+<th style="text-align: center;"><img alt="Ambient 0.4" src="./images/sample_ambient_3.jpg" /></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: center;">Ambient Intensity: 0</td>
+<td style="text-align: center;">Ambient Intensity: 0.083</td>
+<td style="text-align: center;">Ambient Intensity: 0.4</td>
+</tr>
+</tbody>
+</table>
+<h3 id="emissive-light">Emissive Light</h3>
+<ul>
+<li><strong>Emissive Multiplier:</strong> multiplies the emissive colors set in the <a href="#fractal-material-node">Fractal Material</a>. 0 turns off every emission.</li>
+</ul>
+<table>
+<thead>
+<tr>
+<th style="text-align: center;"><img alt="Emissive 0" src="./images/sample_emissive_1.jpg" /></th>
+<th style="text-align: center;"><img alt="Emissive 10" src="./images/sample_emissive_2.jpg" /></th>
+<th style="text-align: center;"><img alt="Emissive 40" src="./images/sample_emissive_3.jpg" /></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: center;">Emissive Multiplier: 0</td>
+<td style="text-align: center;">Emissive Multiplier: 10</td>
+<td style="text-align: center;">Emissive Multiplier: 40</td>
+</tr>
+</tbody>
+</table>
+
+</section>
+<section>
+<h2 id="fractal-setup-node">Fractal Setup Node</h2>
+<p><img alt="Fractal Setup" src="./images/node_fractal_setup.png" /></p>
+<p>The quality and the speed of the fractal rendering: the precision of the distance estimator and the path tracer. These settings cannot be animated.</p>
+<h3 id="distance-estimator">Distance Estimator</h3>
+<p><strong>Bounding Sphere Radius:</strong> the radius of a sphere that contains the whole fractal. The rays are traced only inside it, which saves time. If it is too small, parts of the fractal are cut off; if it is too large, rendering is a bit slower.</p>
+<p><strong>SDF Sphere Size:</strong> the fractal starts as a sphere with this radius, which the iterations fold, mirror and scale down. With many iterations the sphere becomes very small and the fractal geometry itself determines the shape, so this setting hardly matters. With few iterations it changes the thickness of the shapes.</p>
+<p><strong>Escape Radius:</strong> the iteration stops early for a point that gets farther from the origin than this. Lower values can be faster but less stable; increase it if you see artifacts.</p>
+<p><strong>DE Iteration Count:</strong> the number of iterations. More iterations give more detailed geometry, but more calculations. Changing it recompiles the shaders.</p>
+<table>
+<thead>
+<tr>
+<th style="text-align: center;"><img alt="Iteration Count 10" src="./images/sample_iterations_1.jpg" /></th>
+<th style="text-align: center;"><img alt="Iteration Count 16" src="./images/sample_iterations_2.jpg" /></th>
+<th style="text-align: center;"><img alt="Iteration Count 128" src="./images/sample_iterations_3.jpg" /></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: center;">Iteration Count: 10</td>
+<td style="text-align: center;">Iteration Count: 16</td>
+<td style="text-align: center;">Iteration Count: 128</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Epsilon:</strong> how close a ray has to get to the fractal to count as a hit. Computers work with numbers of limited precision, so a small bias is needed to avoid numerical errors. Larger values render faster, because the rays stop earlier, but the fine details melt together.</p>
+<table>
+<thead>
+<tr>
+<th style="text-align: center;"><img alt="Epsilon 0.000002" src="./images/sample_epsilon_1.jpg" /></th>
+<th style="text-align: center;"><img alt="Epsilon 0.00002" src="./images/sample_epsilon_2.jpg" /></th>
+<th style="text-align: center;"><img alt="Epsilon 0.0001" src="./images/sample_epsilon_3.jpg" /></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: center;">Epsilon: 0.000002</td>
+<td style="text-align: center;">Epsilon: 0.00002</td>
+<td style="text-align: center;">Epsilon: 0.0001</td>
+</tr>
+</tbody>
+</table>
+<h3 id="path-tracer">Path Tracer</h3>
+<p><strong>Path Tracer Depth:</strong> the number of times a light ray can bounce (2–8). More bounces reproduce the indirect light (global illumination) better, but take more calculations. Changing it recompiles the shaders.</p>
+<table>
+<thead>
+<tr>
+<th style="text-align: center;"><img alt="Depth 2" src="./images/sample_path_depth_1.jpg" /></th>
+<th style="text-align: center;"><img alt="Depth 4" src="./images/sample_path_depth_2.jpg" /></th>
+<th style="text-align: center;"><img alt="Depth 8" src="./images/sample_path_depth_3.jpg" /></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: center;">Path Tracer Depth: 2</td>
+<td style="text-align: center;">Path Tracer Depth: 4</td>
+<td style="text-align: center;">Path Tracer Depth: 8</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Compute Shader Thread Count:</strong> it does not change the image, only the rendering speed. The GPU runs the threads in fixed-size batches of 32 or 64, and this setting sets the size of a thread group: 8 x 8 = 64 or 16 x 16 = 256 threads. 8 x 8 is usually the better choice, but it depends on your GPU and on the fractal, so it is worth trying both.</p>
+<p><strong>Fresnel Reflection:</strong> when enabled, the surfaces reflect more light at grazing angles, like most real materials do. Changing it recompiles the shaders.</p>
+
+</section>
+<section>
+<h2 id="fractal-geometry-node">Fractal Geometry Node</h2>
+<p><img alt="Fractal Geometry" src="./images/node_geometry.png" /></p>
+<p>The shape of the kaleidoscopic IFS fractal. The node itself has two settings, its children (the bones) hold the transformations. See <a href="#how-a-kaleo-fractal-is-built">How a Kaleo Fractal Is Built</a> for how they work together.</p>
+<p><strong>Iterative Scale:</strong> the scale factor applied in every iteration, after the folds. It must be greater than 1. Its effect is a bit like an erode/dilate filter in image editing: higher values eat the surface away into thinner, sparser structures with more holes, lower values fill it up into solid masses. The most interesting forms are usually in a narrow band between the two, so change it in small steps. It also changes the size of the whole fractal.</p>
+<p><strong>Fold Plane Count:</strong> how many fold (mirror) planes are applied in every iteration (2–7). Only the first N Fold Plane nodes are used; the others are greyed out in the Scene Tree. More planes give a more complex symmetry. Changing it recompiles the shaders.</p>
+<p>The node menu of Fractal Geometry has a <strong>Merge All Transforms</strong> command, see <a href="#scene-tree-window">Scene Tree Window</a>.</p>
+<h3 id="pre-transform-post-transform-and-fold-plane-nodes">Pre Transform, Post Transform and Fold Plane Nodes</h3>
+<p><img alt="Fold Plane" src="./images/node_bone.png" /></p>
+<p>These nodes (bones) hold the transformations of the fractal. Each bone has a list of transform nodes, applied from top to bottom:</p>
+<ul>
+<li><strong>Pre Transform:</strong> places the whole fractal, but it is also built into the iteration, so it changes the shape as well.</li>
+<li><strong>Post Transform:</strong> applied in every iteration, between the folds and the scaling.</li>
+<li><strong>Fold Plane 1–7:</strong> each one is a mirror plane. It starts as the plane through the origin with its normal pointing along +Z (the XY plane); its transformations rotate and move it. In every iteration, the plane mirrors the points that are behind it to its front side.</li>
+</ul>
+<p><strong>Inverse:</strong> applies the inverse of the combined transformations of the bone.</p>
+<p>Add transformations with <strong>New...</strong> in the node menu (right-click the bone, or click its <strong>...</strong> button).</p>
+<h3 id="transform-nodes">Transform Nodes</h3>
+<p><img alt="Transforms of the Pre Transform node" src="./images/node_transform.png" /></p>
+<p>Each transform node is one rotation or translation. The order of the transforms matters: they are applied from top to bottom. You can reorder them in the <a href="#scene-tree-window">Scene Tree</a> by dragging, or with Move Up and Move Down in the node menu.</p>
+<p>Every transform has a <strong>Channel</strong>: the <a href="#fractal-mixer-node">Fractal Mixer</a> channel that controls its strength. The values of the transform are multiplied by the weight of the channel: 0 means no effect, 1 means the full effect.</p>
+<table>
+<thead>
+<tr>
+<th style="text-align: left;">Transform</th>
+<th style="text-align: left;">Settings</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;"><strong>Rotate Euler (Yaw-Pitch-Roll)</strong></td>
+<td style="text-align: left;"><strong>Yaw</strong>, <strong>Pitch</strong>, <strong>Roll</strong>: rotations around the Y, X and Z axis, in degrees.</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>Rotate Quaternion (Axis-Angle)</strong></td>
+<td style="text-align: left;"><strong>Axis X, Y, Z</strong>: the axis of the rotation. <strong>Angle</strong>: the angle of the rotation around the axis, in degrees.</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>Rotate Gibbs (Axis)</strong></td>
+<td style="text-align: left;"><strong>Axis X, Y, Z</strong>: a single vector: its direction is the axis of the rotation, its length is the angle (1 = 180 degrees).</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>Translate</strong></td>
+<td style="text-align: left;"><strong>Translate X, Y, Z</strong>: moves along the axes.</td>
+</tr>
+</tbody>
+</table>
+<p>Older projects may also contain <em>PlaneDirXYZ</em> and <em>PlaneDirUV</em> transforms. They orient a fold plane directly: PlaneDirXYZ with a direction vector (only its direction matters), PlaneDirUV with two angles (U around the Z axis and the V elevation, in degrees). They cannot be added to new projects.</p>
+
+</section>
+<section>
+<h2 id="fractal-mixer-node">Fractal Mixer Node</h2>
+<p><img alt="Fractal Mixer" src="./images/node_mixer.png" /></p>
+<p>Blends between groups of transformations. Every transform belongs to one of four channels, and the channel weights set here scale how strongly those transforms are applied. Animate the weights to morph between shapes. By default Channel 1 has the weight 1 and the others 0, so the new transforms (Channel 1) have their full effect.</p>
+<ul>
+<li><strong>Exclusive Channel:</strong> shows only one channel: it gets the full weight and all the other channels are switched off, whatever their curves are. <em>-</em>: the channel curves are used.</li>
+<li><strong>Normalize Weights:</strong> when enabled, the weights are scaled so that their sum is 1.</li>
+<li><strong>Channel 1–4:</strong> the weight of the channel. Every transform assigned to it is scaled by this value: 0 = no effect, 1 = full effect.</li>
+</ul>
+
+</section>
+<section>
+<h2 id="fractal-material-node">Fractal Material Node</h2>
+<p>The color of the fractal. It has one child node for each fold plane; the colors of the unused planes are greyed out.</p>
+<h3 id="fold-plane-color-nodes">Fold Plane Color Nodes</h3>
+<p><img alt="Fold Plane Color" src="./images/node_material.png" /></p>
+<p>These nodes color the fractal by how often a point was mirrored by the given fold plane during the iterations. The diffuse colors of all the planes are multiplied together, the emissive colors are added. Because the diffuse colors are multiplied, coloring several planes darkens the image quickly; it often works better to tint one or two planes and leave the others white.</p>
+<p>Diffuse (the color of the surface):</p>
+<ul>
+<li><strong>Diffuse Start:</strong> sets when the second color starts to appear. At 0 it appears right away, at 1 much later (maybe never).</li>
+<li><strong>Diffuse Fade:</strong> how gradual the transition between the two colors is. At 0 the color changes abruptly.</li>
+<li><strong>Diffuse Color:</strong> the two colors the material blends between, based on Start and Fade.</li>
+</ul>
+<table>
+<thead>
+<tr>
+<th style="text-align: center;"><img alt="Diffuse Start 0" src="./images/sample_diffuse_start_1.jpg" /></th>
+<th style="text-align: center;"><img alt="Diffuse Start 0.33" src="./images/sample_diffuse_start_2.jpg" /></th>
+<th style="text-align: center;"><img alt="Diffuse Start 0.7" src="./images/sample_diffuse_start_3.jpg" /></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: center;">Fold Plane 1, Diffuse Start: 0</td>
+<td style="text-align: center;">Diffuse Start: 0.33</td>
+<td style="text-align: center;">Diffuse Start: 0.7</td>
+</tr>
+</tbody>
+</table>
+<p>Emissive (the light emitted by the surface):</p>
+<ul>
+<li><strong>Emissive Start</strong>, <strong>Emissive Fade</strong>, <strong>Emissive Color:</strong> the same as the diffuse settings, for the glow. Black means no emission. The overall strength is the <em>Emissive Multiplier</em> of the <a href="#light-setup-node">Light Setup</a> node.</li>
+</ul>
+
+</section>
+<section>
+<h2 id="time-remap-node">Time Remap Node</h2>
+<p><img alt="Time Remap" src="./images/node_time_remap.png" /></p>
+<p>Changes the speed of the animation set on the Timeline.</p>
+<p><strong>Remap:</strong> maps the time of the Timeline (horizontal axis) to the time of the animation (vertical axis). A diagonal line is the normal speed. Flatter parts slow the animation down, steeper parts speed it up. Select the Remap curve and edit it on the Timeline.</p>
+</section>
+</div>
+</main>
+<script>
+(function () {
+    var links = {};
+    document.querySelectorAll('nav.sidebar a[href^="#"]').forEach(function (a) {
+        links[a.getAttribute('href').substring(1)] = a;
+    });
+    var heads = Array.prototype.filter.call(document.querySelectorAll('main h1[id], main h2[id], main h3[id]'),
+        function (h) { return links[h.id]; });
+    var nav = document.querySelector('nav.sidebar');
+    var active = null;
+    function update() {
+        var cur = heads.length ? heads[0] : null;
+        for (var i = 0; i < heads.length; i++) {
+            if (heads[i].getBoundingClientRect().top < 120) cur = heads[i]; else break;
+        }
+        if ((window.innerHeight + window.scrollY) >= document.body.scrollHeight - 2 && heads.length)
+            cur = heads[heads.length - 1];
+        var a = cur ? links[cur.id] : null;
+        if (a === active) return;
+        if (active) active.classList.remove('active');
+        active = a;
+        if (!active) return;
+        active.classList.add('active');
+        // Keep the highlighted entry in the visible part of the sidebar
+        var r = active.getBoundingClientRect(), n = nav.getBoundingClientRect();
+        if (r.top < n.top + 60 || r.bottom > n.bottom - 60)
+            nav.scrollTo({ top: nav.scrollTop + r.top - n.top - nav.clientHeight / 3, behavior: 'smooth' });
+    }
+    window.addEventListener('scroll', update, { passive: true });
+    window.addEventListener('resize', update);
+    update();
+})();
+</script>
 </body>
 </html>

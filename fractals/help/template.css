@@ -1,49 +1,170 @@
-td, h1, h2, h3, h4, h5, p, ul, ol, li { page-break-inside: avoid; }
+/* Kaleo2 help style ("Graphite"). md2html.py builds the pages, the sidebar and the <section> boxes. */
+:root {
+    --sidebar-w: 270px;
+    --radius: 8px;
+    --shadow: none;
+    --font-body: "Segoe UI", Arial, sans-serif;
+    --font-ui: var(--font-body);
+    --font-head: var(--font-body);
+    --font-mono: Consolas, monospace;
+    --font-quote: var(--font-body);
+
+    --bg: #131315;
+    --panel: #1b1b1e;
+    --panel-head: #232327;
+    --border: #2e2e33;
+    --text: #d6d6d6;
+    --muted: #94949a;
+    --head: #ffffff;
+    --strong: #ffffff;
+    --accent: #ffa040;
+    --head-tint: rgba( 255, 150, 50, 0.09 );	/* orange glow at the left of the section headers */
+    --head-line: rgba( 255, 150, 50, 0.22 );	/* section header bottom line */
+    --link: #5ab0ff;
+    --link-hover: #8ac8ff;
+
+    --side-bg: #0e0e10;
+    --side-text: #d6d6d6;
+    --side-muted: #8e8e94;
+    --side-hover: #1e1e22;
+
+    --code-bg: #2a2a2f;
+    --code-text: #e6e6e6;
+    --pre-bg: #0e0e10;
+    --quote-bg: #18181b;
+    --th-bg: #26262b;
+    --td-bg: #1e1e21;
+}
+
+* { box-sizing: border-box; }
+html { scroll-padding-top: 20px; }
+
+/* Thin dark scrollbars (page and sidebar) instead of the classic system ones */
+html, nav.sidebar {
+    scrollbar-width: thin;
+    scrollbar-color: #3a3a40 transparent;
+}
+nav.sidebar { scrollbar-color: #2c2c31 transparent; }
+nav.sidebar:hover { scrollbar-color: #4a4a52 transparent; }
+::-webkit-scrollbar { width: 8px; height: 8px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: #3a3a40; border-radius: 4px; }
+::-webkit-scrollbar-thumb:hover { background: #55555d; }
 
 body {
-    background-color: #222;
-    color: #ddd;
-    font-family: Arial, sans-serif;
-    max-width: 800px;
-    margin: 0 auto;
-    padding: 0 20px;
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--font-body);
+    font-size: 15px;
+    line-height: 1.65;
+    margin: 0;
 }
 
-img { max-width: 100%; height: auto; }
+nav.sidebar {
+    position: fixed; top: 0; left: 0; bottom: 0;
+    width: var(--sidebar-w);
+    overflow-y: auto;
+    background: var(--side-bg);
+    border-right: 1px solid var(--border);
+    padding: 20px 0 40px;
+    font-size: 14px;
+    font-family: var(--font-ui);
+}
+nav.sidebar .brand {
+    display: block;
+    padding: 0 22px 16px; margin-bottom: 10px;
+    border-bottom: 1px solid var(--border);
+    color: var(--head);
+    font-family: var(--font-head);
+    font-size: 21px; font-weight: 600;
+    text-decoration: none;
+}
+nav.sidebar .brand span { color: var(--accent); font-weight: 400; }
+nav.sidebar ul { list-style: none; margin: 0; padding: 0; }
+nav.sidebar a {
+    display: block;
+    color: var(--side-muted);
+    text-decoration: none;
+    padding: 3px 20px 3px 30px;
+    border-left: 3px solid transparent;
+}
+nav.sidebar a:hover { color: var(--head); background: var(--side-hover); }
+nav.sidebar .page-link { padding: 8px 20px 4px 19px; color: var(--accent); font-weight: 600; }
+nav.sidebar .nav-page { margin-bottom: 10px; }
+nav.sidebar > .nav-page > ul > li > a { color: var(--side-text); }
+nav.sidebar ul ul a { padding-left: 46px; }
+nav.sidebar a.active { color: var(--head); background: var(--side-hover); border-left-color: var(--accent); }
 
-h1, h2, h3, h4, h5, h6 { color: #fff; }
+main { margin-left: var(--sidebar-w); max-width: 1000px; padding: 28px 52px 80px; }
+/* The three parts of the help (Introduction, UI Reference, Node Reference) */
+main .part { margin-bottom: 70px; }
+main .part > h1 {
+    font-size: 36px;
+    margin: 10px 0 24px;
+    padding-bottom: 12px;
+    border-bottom: 2px solid var(--accent);
+}
 
-a { color: #4af; }
-a:hover { color: #7af; }
+main section {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 4px 30px 20px;
+    margin: 0 0 30px;
+    box-shadow: var(--shadow);
+}
+
+h1, h2, h3, h4 { color: var(--head); line-height: 1.25; font-family: var(--font-head); }
+h1 { font-size: 34px; margin: 10px 0 20px; font-weight: 600; }
+main section > h2:first-child {
+    font-size: 24px; font-weight: 600;
+    margin: 0 -30px 18px;
+    padding: 18px 30px 13px;
+    border-bottom: 1px solid var(--head-line);
+    border-left: 4px solid var(--accent);
+    border-radius: var(--radius) var(--radius) 0 0;
+    background: linear-gradient( 90deg, var(--head-tint), transparent 70% ), var(--panel-head);
+}
+h3 { font-size: 19px; margin: 32px 0 10px; padding-bottom: 6px; border-bottom: 1px solid var(--border); }
+h4 { font-size: 15.5px; margin: 22px 0 6px; color: var(--accent); }
+
+p, li { max-width: 78ch; }
+img { max-width: 100%; height: auto; border-radius: 4px; }
+p > a > img, p > img { display: block; margin: 12px 0; }
+
+a { color: var(--link); }
+a:hover { color: var(--link-hover); }
 
 code {
-    background-color: #333;
-    color: #ccc;
-    padding: 2px 4px;
-    border-radius: 3px;
+    background: var(--code-bg); color: var(--code-text);
+    padding: 1px 5px; border-radius: 3px; font-size: 0.9em;
+    font-family: var(--font-mono);
 }
-
-pre {
-    background-color: #333;
-    color: #ccc;
-    padding: 10px;
-    border-radius: 5px;
-    overflow-x: auto;
-}
+pre { background: var(--pre-bg); padding: 10px 14px; border-radius: 5px; border: 1px solid var(--border); overflow-x: auto; }
+pre code { background: none; padding: 0; }
 
 blockquote {
-    border-left: 3px solid #4af;
-    padding-left: 10px;
-    margin-left: 10px;
+    border-left: 3px solid var(--accent);
+    margin: 18px 0; padding: 6px 18px;
+    color: var(--muted); background: var(--quote-bg);
+    font-family: var(--font-quote);
 }
+hr { border: none; border-top: 1px solid var(--border); margin: 24px 0; }
 
-table { border-collapse: collapse; width: 100%; }
+table { border-collapse: collapse; width: 100%; margin: 12px 0 20px; font-size: 14px; }
+th, td { border: 1px solid var(--border); padding: 7px 10px; text-align: left; vertical-align: top; }
+th { background: var(--th-bg); color: var(--head); font-weight: 600; font-family: var(--font-ui); }
+td { background: var(--td-bg); }
+td img { display: block; margin: 0 auto 4px; }
+strong { color: var(--strong); }
 
-th, td {
-    border: 1px solid #444;
-    padding: 8px;
-    text-align: left;
+@media (max-width: 900px) {
+    main { padding: 16px; }
+    main section { padding: 4px 16px 14px; }
+    main section > h2:first-child { margin: 0 -16px 14px; padding: 14px 16px 10px; }
 }
-
-th { background-color: #333; color: #fff; }
-td { background-color: #444; color: #ddd; }
+@media print {
+    nav.sidebar, script { display: none; }
+    main { margin: 0; max-width: none; padding: 0; }
+    main section { border: none; background: none; padding: 0; box-shadow: none; }
+}
